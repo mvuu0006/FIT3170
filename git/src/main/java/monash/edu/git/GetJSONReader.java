@@ -33,7 +33,6 @@ public class GetJSONReader {
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
-            //jsonText=jsonText.substring(1,jsonText.length()-1);
             jsonText="{ entry: "+jsonText +"}";
             JSONObject json = new JSONObject(jsonText);
             return json;
