@@ -36,3 +36,35 @@
     transform: rotate(360deg);
   }
 }
+
+.App-grid {
+  background-color: #282c34;
+  color: #FFFFFF;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-areas:  "student-selector repo-viewer"
+                        "repo-adder repo-viewer"
+                        "repo-list repo-viewer";
+}
+
+.Student-selector {
+  padding: 1em;
+  grid-area: student-selector;
+}
+
+.Repo-adder {
+  padding: 1em;
+  grid-area: repo-adder;
+}
+
+.Repo-list {
+  padding: 1em;
+  min-height: 40vh;
+  grid-area: repo-list;
+}
+
+.Repo-viewer {
+  padding: 1em;
+  grid-area: repo-viewer;
+}

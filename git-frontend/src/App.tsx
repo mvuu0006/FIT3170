@@ -1,26 +1,54 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import AuthcateDisplay from './AuthcateDisplay';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload XD.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  public authcateDisplayElement;
+
+  constructor(props) {
+    super(props);
+    this.authcateDisplayElement = React.createRef();
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <div className="App-grid">
+          <div className="Student-selector">
+            <Form onSubmit={this.changeStudent}>
+              <Form.Group controlId="studentAuthcate">
+                <Form.Label>Authcate</Form.Label>
+                <Form.Control placeholder="(eg. hbak0001)"/>
+              </Form.Group>
+              <Button variant="primary" type="submit">Submit</Button>
+            </Form>
+            <AuthcateDisplay ref={this.authcateDisplayElement} />
+          </div>
+          <Form className="Repo-adder">
+            <Form.Group controlId="repoLink">
+              <Form.Label>Link to git repository</Form.Label>
+              <Form.Control/>
+            </Form.Group>
+            <Button variant="primary">Submit</Button>
+          </Form>
+          <div className="Repo-list"></div>
+          <div className="Repo-viewer"></div>
+        </div>
+      </div>
+    );
+  }
+
+  componentDidMount() {
+    console.log("Swag");
+  }
+
+  changeStudent = (event) => {
+    event.preventDefault();
+    this.authcateDisplayElement.current.updateAuthcate(event.target.studentAuthcate.value);
+  }
 }
 
 export default App;
