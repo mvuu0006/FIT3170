@@ -1,6 +1,8 @@
 package monash.edu.git;
 
+import netscape.javascript.JSObject;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +18,9 @@ public class GitController {
 
     GitService gitService;
 
+    // Method responsible for getting all the contributors and their contribution percent
     @RequestMapping("/contributors")
-    public List<String> getContributions(String apiUrl) throws IOException, JSONException {
+    public JSONObject getContributions(String apiUrl) throws IOException, JSONException {
         return gitService.getContributions();
     }
 }
