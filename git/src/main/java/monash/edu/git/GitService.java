@@ -23,9 +23,6 @@ public class GitService {
         // Original URL : https://github.com/tensorflow/tensorflow.git
         String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors";
 
-        // THis is a test URL that has a jsonObject
-        //String reposUrl="http://echo.jsontest.com/key/value/one/two";
-
         // Class that reads from a URL
         GetJSONReader jsonReader= new GetJSONReader();
         JSONObject json = jsonReader.readJsonFromUrl(reposUrl);
