@@ -11,6 +11,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.authcateDisplayElement = React.createRef();
+    this.state = {data: null,}
   }
 
   render() {
@@ -27,13 +28,15 @@ class App extends React.Component {
             </Form>
             <AuthcateDisplay ref={this.authcateDisplayElement} />
           </div>
-          <Form className="Repo-adder">
-            <Form.Group controlId="repoLink">
-              <Form.Label>Link to git repository</Form.Label>
-              <Form.Control/>
-            </Form.Group>
-            <Button variant="primary">Submit</Button>
-          </Form>
+          <div className="Repo-adder">
+            <Form onSubmit={this.addRepo}>
+              <Form.Group controlId="repoLink">
+                <Form.Label>Link to git repository</Form.Label>
+                <Form.Control/>
+              </Form.Group>
+              <Button variant="light" type="submit">Submit</Button>
+            </Form>
+          </div>
           <div className="Repo-list"></div>
           <div className="Repo-viewer"></div>
         </div>
@@ -48,6 +51,18 @@ class App extends React.Component {
   changeStudent = (event) => {
     event.preventDefault();
     this.authcateDisplayElement.current.updateAuthcate(event.target.studentAuthcate.value);
+    // Fetch data from the API (replace url below with correct api call)
+    fetch('http://localhost:8080/api')
+      .then(response => response.json())
+      .then(data => this.setState({data}));
+  }
+
+  addRepo = (event) => {
+    event.preventDefault();
+    // Fetch data from the API (replace url below with correct api call)
+    fetch('http://localhost:8080/api')
+      .then(response => response.json())
+      .then(data => this.setState({data}));
   }
 }
 
