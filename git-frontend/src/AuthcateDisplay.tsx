@@ -15,7 +15,7 @@ class AuthcateDisplay extends React.Component<{authcate?: string}, {authcate?: s
     }
 
     render () {
-        return (<p>Current Student: {this.state.authcate}</p>);
+        return (<p>Current Project: {this.state.authcate}</p>);
     }
 
     updateAuthcate (newAuthcate) {

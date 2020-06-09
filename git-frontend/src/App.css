@@ -68,3 +68,8 @@
   padding: 1em;
   grid-area: repo-viewer;
 }
+
+.Slash {
+  padding: 1rem;
+  margin: 0;
+}
