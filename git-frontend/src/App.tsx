@@ -21,7 +21,7 @@ class App extends React.Component {
           <div className="Student-selector">
             <Form onSubmit={this.changeStudent}>
               <Form.Group controlId="studentAuthcate">
-                <Form.Label>Authcate</Form.Label>
+                <Form.Label>GitHub username</Form.Label>
                 <Form.Control placeholder="(eg. hbak0001)"/>
               </Form.Group>
               <Button variant="primary" type="submit">Submit</Button>
@@ -31,7 +31,7 @@ class App extends React.Component {
           <div className="Repo-adder">
             <Form onSubmit={this.addRepo}>
               <Form.Group controlId="repoLink">
-                <Form.Label>Link to git repository</Form.Label>
+                <Form.Label>GitHub repo name</Form.Label>
                 <Form.Control/>
               </Form.Group>
               <Button variant="light" type="submit">Submit</Button>
@@ -51,8 +51,15 @@ class App extends React.Component {
   changeStudent = (event) => {
     event.preventDefault();
     this.authcateDisplayElement.current.updateAuthcate(event.target.studentAuthcate.value);
+    // May possibly add in an initial GET that checks if the user has been registered in the backend
+    const requestOptions = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ user:  event.target.studentAuthcate.value }),
+    }
+    // This call to our backend api should provide us with a list of repos currently tracked by the backend
     // Fetch data from the API (replace url below with correct api call)
-    fetch('http://localhost:8080/api')
+    fetch('http://localhost:8080/api', requestOptions)
       .then(response => response.json())
       .then(data => this.setState({data}));
   }
@@ -60,7 +67,12 @@ class App extends React.Component {
   addRepo = (event) => {
     event.preventDefault();
     // Fetch data from the API (replace url below with correct api call)
-    fetch('http://localhost:8080/api')
+    const requestOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ repo:  event.target.repoLink.value }),
+    }
+    fetch('http://localhost:8080/api' ,requestOptions)
       .then(response => response.json())
       .then(data => this.setState({data}));
   }
