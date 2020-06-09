@@ -14,7 +14,7 @@ public class GitApplication {
 
 		GitService gitService = new GitService();
 		try {
-			gitService.getContributions();
+			gitService.getCommits();
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();
 		}
