@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,13 +53,14 @@ public class GitController {
      */
     @GetMapping(path = "/users", produces="application/json")
     @ResponseBody
-    public String getUser(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
+    public String getUser(@RequestParam(value = "name", defaultValue="") String name) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
         JSONObject status = new JSONObject();
         //
         if( name.equals("") ) {
             status.put("message", "User Not Found");
             status.put("status_code", 404);
+            throw new NoEntryException();
         }
         else {
             status.put("message", "OK");
@@ -78,5 +80,4 @@ public class GitController {
         }
         return "data for user: "+name;
     }
-
 }
