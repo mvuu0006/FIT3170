@@ -10,12 +10,14 @@ import java.io.IOException;
 public class GitService {
     String gitUrl="https://api.github.com/projects/1002604";
 
-    public JSONObject getContributions() throws IOException, JSONException {
+    public String getContributions() throws IOException, JSONException {
         //Creating a JSONObject that stores all the contributions
         JSONObject contribution = new JSONObject();
 
         // Original URL : https://github.com/tensorflow/tensorflow.git
         String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors?per_page=500";
+
+
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
@@ -42,6 +44,6 @@ public class GitService {
             contribution.put(name,contributionPercent);
         }
 
-        return contribution;
+        return contribution.toString();
     }
 }

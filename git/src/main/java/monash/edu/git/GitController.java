@@ -1,26 +1,41 @@
 package monash.edu.git;
 
 import netscape.javascript.JSObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/git")
 @CrossOrigin
 public class GitController {
 
-    GitService gitService;
+    GitService gitService = new GitService();
+
+    private RestTemplate restTemplate;
+
 
     // Method responsible for getting all the contributors and their contribution percent
     @RequestMapping("/contributors")
-    public JSONObject getContributions(String apiUrl) throws IOException, JSONException {
+    public String getContributions() throws IOException, JSONException {
         return gitService.getContributions();
     }
+
+    @RequestMapping("/hello")
+    public String hello() throws JSONException {
+
+
+        return "hello";
+    }
+
 }
