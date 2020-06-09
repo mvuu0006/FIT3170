@@ -4,11 +4,12 @@ package monash.edu.git;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.swing.*;
 import java.io.IOException;
 
 
 public class GitService {
-    String gitUrl="https://api.github.com/projects/1002604";
 
     public String getContributions() throws IOException, JSONException {
         //Creating a JSONObject that stores all the contributions
@@ -16,7 +17,7 @@ public class GitService {
 
         // Original URL : https://github.com/tensorflow/tensorflow.git
         String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors?per_page=500";
-
+        reposUrl="https://api.github.com/repos/octocat/Hello-World/contributors";
 
 
         // Class that reads from a URL and returns info in JSON format
@@ -45,5 +46,37 @@ public class GitService {
         }
 
         return contribution.toString();
+    }
+
+    public String getCommits() throws IOException, JSONException {
+        //JSONObject to store commit information
+        JSONObject commits = new JSONObject();
+
+        // Hardcoded commits URL
+        String commitsUrl="https://api.github.com/repos/octocat/Hello-World/commits";
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(commitsUrl);
+
+        // Extracting the array from the JSON Object
+        JSONArray jsonArray = json.getJSONArray("entry");
+
+        // Loop that goes through all the commits and extracts its authors
+        // Also increments commit number if author already exists in commit JSONObject
+        for (int i=0;i<jsonArray.length();i++)
+        {
+            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            if (commits.has(name))
+            {
+                int existingComments=commits.getInt(name)+1;
+                commits.put(name, existingComments);
+            }
+            else {
+                commits.put(name,1);
+            }
+        }
+
+        return commits.toString();
     }
 }

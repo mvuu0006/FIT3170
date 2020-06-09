@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class GitController {
 
 
     // Method responsible for getting all the contributors and their contribution percent
-    @RequestMapping("/contributors")
+    @GetMapping("/contributors")
     public String getContributions() throws IOException, JSONException {
         return gitService.getContributions();
     }
@@ -53,7 +54,7 @@ public class GitController {
     public String getUser(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
         JSONObject response = new JSONObject();
         JSONObject status = new JSONObject();
-        // 
+        //
         if( name.equals("") ) {
             status.put("message", "User Not Found");
             status.put("status_code", 404);
