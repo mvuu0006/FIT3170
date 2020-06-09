@@ -50,7 +50,8 @@ public class GitController {
      * @return  a JSON object containing user info
      * @throws JSONException
      */
-    @GetMapping("/users")
+    @GetMapping(path = "/users", produces="application/json")
+    @ResponseBody
     public String getUser(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
         JSONObject response = new JSONObject();
         JSONObject status = new JSONObject();

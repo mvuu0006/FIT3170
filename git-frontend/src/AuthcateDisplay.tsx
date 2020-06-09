@@ -3,7 +3,7 @@ import React from 'react';
 class AuthcateDisplay extends React.Component<{authcate?: string}, {authcate?: string}> {
     constructor(props) {
         super(props);
-        this.state = {authcate: "temp"};
+        this.state = {authcate: "None"};
     }
 
     componentDidMount() {
