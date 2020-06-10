@@ -45,10 +45,7 @@ public class GitService {
 
             contribution.put(name,contributionPercent);
         }
-
-
         gitRepository.setContributors(contribution);
-
         return contribution.toString();
     }
 
