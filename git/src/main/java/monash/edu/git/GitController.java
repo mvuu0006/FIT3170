@@ -44,16 +44,14 @@ public class GitController {
     }
 
     /**
-     * Returns the user data stored in the system. In this case
-     * user can be a specific GitHub user, but will likely be refactored
-     * into a project in the future.
+     * Returns the project data stored in the system. I
      * @param name the user to retrieve repo data or
      * @return  a JSON object containing user info
      * @throws JSONException
      */
-    @GetMapping(path = "/users", produces="application/json")
+    @GetMapping(path = "/projects/{projName}", produces="application/json")
     @ResponseBody
-    public String getUser(@RequestParam(value = "name", defaultValue="") String name) throws JSONException, NoEntryException {
+    public String getUser(@PathVariable("projName") String name) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
         JSONObject status = new JSONObject();
         //
@@ -73,8 +71,8 @@ public class GitController {
         return response.toString();
     }
 
-    @PutMapping("/users")
-    public String putUser(@RequestParam(value = "name", defaultValue = "") String name) {
+    @PutMapping(path = "/projects/{projName}")
+    public String putUser(@PathVariable("projName") String name) {
         if( name.equals("") ) {
             return "all users";
         }
