@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,7 @@ public class GitController {
     GitService gitService = new GitService();
 
     private RestTemplate restTemplate;
+    private ArrayList<Project> projects = new ArrayList<Project>();
 
 
     // Method responsible for getting all the contributors and their contribution percent
@@ -49,7 +51,7 @@ public class GitController {
      * @return  a JSON object containing user info
      * @throws JSONException
      */
-    @GetMapping(path = "/projects/{projName}", produces="application/json")
+    @GetMapping(path = "/project/{projName}", produces="application/json")
     @ResponseBody
     public String getUser(@PathVariable("projName") String name) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
@@ -64,7 +66,16 @@ public class GitController {
             status.put("message", "OK");
             status.put("status_code", 200);
             JSONObject body = new JSONObject();
-            body.put("user", name);
+            boolean found = false;
+            for (Project project: projects) {
+                if (project.getProjectName().equals(name)) {
+                    body.put("project", project.toString());
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new NoEntryException();
+            }
             response.put("body", body);
         }
         response.put("status", status);
@@ -72,10 +83,79 @@ public class GitController {
     }
 
     @PutMapping(path = "/projects/{projName}")
-    public String putUser(@PathVariable("projName") String name) {
+    public void putUser(@PathVariable("projName") String name) throws NoEntryException {
+        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
         if( name.equals("") ) {
-            return "all users";
+            return;
         }
-        return "data for user: "+name;
+        for (Project project : projects) {
+            if (project.getProjectName().equals(name)) {
+                throw new NoEntryException();
+            }
+        }
+        projects.add(new Project(name));
+        return;
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos")
+    @ResponseBody
+    public String getProjectRepos(@PathVariable("projName") String projectName) throws NoEntryException, JSONException {
+        if( projectName.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.getProjectName().equals(projectName)) {
+                return project.getRepositories().toString();
+            }
+        }
+        throw new NoEntryException();
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    @ResponseBody
+    public String getRepo(@PathVariable("projName") String projectName,
+                        @PathVariable("githubUsername") String githubUsername,
+                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException {
+        if( projectName.equals("")  || githubUsername.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.hasRepository(githubUsername, repoName)) {
+                // Call project.getRepo() func and return the JSON for it
+            }
+        }
+        throw new NoEntryException();
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    @ResponseBody
+    public String getRepoContributors(@PathVariable("projName") String projectName,
+                        @PathVariable("githubUsername") String githubUsername,
+                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException { 
+        if( projectName.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.hasRepository(githubUsername, repoName)) {
+                // Call project.getRepo().getContributors func and return the JSON for it
+            }
+        }
+        throw new NoEntryException();
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    @ResponseBody
+    public String getRepoCommits(@PathVariable("projName") String projectName,
+                        @PathVariable("githubUsername") String githubUsername,
+                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException { 
+        if( projectName.equals("") || githubUsername.equals("") || repoName.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.hasRepository(githubUsername, repoName)) {
+                // Call project.getRepo().getCommits func and return the JSON for it
+            }
+        }
+        throw new NoEntryException();
     }
 }
