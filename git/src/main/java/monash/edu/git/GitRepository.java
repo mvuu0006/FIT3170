@@ -98,4 +98,13 @@ public class GitRepository {
     public JSONObject getInfo() {
         return repoInfo;
     }
+
+    public  JSONObject getContributors(){
+        return contributors;
+    }
+
+    public  JSONObject getCommits(){
+        return commits;
+    }
+
 }

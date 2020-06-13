@@ -85,7 +85,6 @@ public class GitController {
         }
         for (Project project: projects) {
             if (project.getProjectName().equals(projectName)) {
-                // TODO: The below function may not contain exactly what we want it to
                 return project.getRepositories().toString();
             }
         }
@@ -139,8 +138,10 @@ public class GitController {
             throw new NoEntryException();
         }
         for (Project project: projects) {
-            if (project.getRepository(githubUsername, repoName) != null) {
-                // Call project.getRepo().getContributors func and return the JSON for it
+            if (project.getProjectName().equals(projectName)) {
+                if (project.getRepository(githubUsername, repoName) != null) {
+                    return project.getRepository(githubUsername,repoName).getContributors().toString();
+                }
             }
         }
         throw new NoEntryException();
@@ -150,16 +151,17 @@ public class GitController {
     @ResponseBody
     public String getRepoCommits(@PathVariable("projName") String projectName,
                         @PathVariable("githubUsername") String githubUsername,
-                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException { 
-        // if( projectName.equals("") || githubUsername.equals("") || repoName.equals("") ) {
-        //     throw new NoEntryException();
-        // }
-        // for (Project project: projects) {
-        //     if (project.hasRepository(githubUsername, repoName)) {
-        //         // Call project.getRepo().getCommits func and return the JSON for it
-        //     }
-        // }
-        // throw new NoEntryException();
-        return "";
+                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException {
+        if( projectName.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.getProjectName().equals(projectName)) {
+                if (project.getRepository(githubUsername, repoName) != null) {
+                    return project.getRepository(githubUsername,repoName).getCommits().toString();
+                }
+            }
+        }
+        throw new NoEntryException();
     }
 }

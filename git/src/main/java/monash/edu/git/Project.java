@@ -25,14 +25,14 @@ public class Project {
         return email;
     }
 
-    public JSONObject getRepositories() throws JSONException {
-        JSONObject reposObject = new JSONObject();
+    public JSONArray getRepositories() throws JSONException {
+        //JSONObject reposObject = new JSONObject();
         JSONArray repos = new JSONArray();
         for (GitRepository repo : repositories) {
             repos.put(repo.getInfo());
         }
-        reposObject.append("repos", repos);
-        return reposObject;
+        //reposObject.append("repos", repos);
+        return repos;
     }
 
     public GitRepository getRepository(String gitUserName, String gitURL) {
