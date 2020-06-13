@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -19,11 +17,7 @@ import java.util.ArrayList;
 @RequestMapping("/git")
 @CrossOrigin
 public class GitController {
-
-    GitService gitService = new GitService();
     private ArrayList<Project> projects = new ArrayList<Project>();
-
-
 
     @RequestMapping("/hello")
     public String hello(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {

@@ -21,17 +21,12 @@ public class GitRepository {
     }
 
     private void constructRepoInfo(String gitUsername, String repoName) throws IOException, JSONException {
-        String urlString = "https://api.github.com/repos/" + gitUsername + "/" + repoName;
-        JSONObject response = new JSONObject();
-        try {
-            response = jsonReader.readJsonFromUrl(urlString);
-        }
-        catch(IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        repoInfo = response;
         constructRepoContributors(gitUsername, repoName);
         constructRepoCommits(gitUsername, repoName);
+        repoInfo.put("UserName", gitUsername);
+        repoInfo.put("RepositoryName", repoName);
+        repoInfo.put("commits", commits);
+        repoInfo.put("contributions", contributors);
     }
 
     private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
