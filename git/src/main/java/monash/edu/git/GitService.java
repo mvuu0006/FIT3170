@@ -10,7 +10,7 @@ import java.io.IOException;
 
 
 public class GitService {
-    GitRepository gitRepository=new GitRepository();
+    //GitRepository gitRepository=new GitRepository();
 
     public String getContributions() throws IOException, JSONException {
         //Creating a JSONObject that stores all the contributions
@@ -45,7 +45,7 @@ public class GitService {
 
             contribution.put(name,contributionPercent);
         }
-        gitRepository.setContributors(contribution);
+        //gitRepository.setContributors(contribution);
         return contribution.toString();
     }
 
@@ -78,7 +78,7 @@ public class GitService {
             }
         }
 
-        gitRepository.setCommits(commits);
+        //gitRepository.setCommits(commits);
 
         return commits.toString();
     }

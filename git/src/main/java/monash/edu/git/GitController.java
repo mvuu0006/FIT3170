@@ -120,14 +120,15 @@ public class GitController {
             throw new NoEntryException();
         }
         for (Project project: projects) {
-            if (project.hasRepository(githubUsername, repoName)) {
-                // Call project.getRepo() func and return the JSON for it
+            GitRepository repo = project.getRepository(githubUsername, repoName);
+            if (repo != null && project.getProjectName().equals(projectName)) {
+                return repo.getInfo().toString();
             }
         }
         throw new NoEntryException();
     }
 
-    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}/contributors")
     @ResponseBody
     public String getRepoContributors(@PathVariable("projName") String projectName,
                         @PathVariable("githubUsername") String githubUsername,
@@ -136,26 +137,40 @@ public class GitController {
             throw new NoEntryException();
         }
         for (Project project: projects) {
-            if (project.hasRepository(githubUsername, repoName)) {
+            if (project.getRepository(githubUsername, repoName) != null) {
                 // Call project.getRepo().getContributors func and return the JSON for it
             }
         }
         throw new NoEntryException();
     }
 
-    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}/commits")
     @ResponseBody
     public String getRepoCommits(@PathVariable("projName") String projectName,
                         @PathVariable("githubUsername") String githubUsername,
                         @PathVariable("repoName") String repoName) throws NoEntryException, JSONException { 
-        if( projectName.equals("") || githubUsername.equals("") || repoName.equals("") ) {
-            throw new NoEntryException();
-        }
-        for (Project project: projects) {
-            if (project.hasRepository(githubUsername, repoName)) {
-                // Call project.getRepo().getCommits func and return the JSON for it
-            }
-        }
-        throw new NoEntryException();
+        // if( projectName.equals("") || githubUsername.equals("") || repoName.equals("") ) {
+        //     throw new NoEntryException();
+        // }
+        // for (Project project: projects) {
+        //     if (project.hasRepository(githubUsername, repoName)) {
+        //         // Call project.getRepo().getCommits func and return the JSON for it
+        //     }
+        // }
+        // throw new NoEntryException();
+        /* Debugging code */
+        Project project = new Project("test");
+        GitRepository repo = new GitRepository("hbak0001", "fit3157-asgn2");
+        return repo.toString();
+    }
+
+    /* Remove this when testing is complete */
+    @GetMapping(path = "/testcreate")
+    @ResponseBody
+    public String doTest() {
+        Project project = new Project("test");
+        projects.add(project);
+        project.addRepository("hbak0001", "fit3157-asgn2");
+        return "";
     }
 }

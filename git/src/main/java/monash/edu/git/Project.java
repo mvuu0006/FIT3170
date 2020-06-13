@@ -12,6 +12,7 @@ public class Project {
 
     public Project(String name) {
         this.projectName = name;
+        repositories = new ArrayList<GitRepository>();
     }
 
     public String getProjectName() {
@@ -26,24 +27,23 @@ public class Project {
         JSONObject reposObject = new JSONObject();
         JSONArray repos = new JSONArray();
         for (GitRepository repo : repositories) {
-            repos.put(repo.getInfo());
+            //repos.put(repo.getInfo());
         }
         reposObject.append("repos", repos);
         return reposObject;
     }
 
-    public boolean hasRepository(String gitUserName, String gitURL) {
+    public GitRepository getRepository(String gitUserName, String gitURL) {
         for (GitRepository repo : repositories) {
-            JSONObject info = repo.getInfo();
-            if (info["name"].equals(gitUserName) && info["URL"].equals(gitURL)) {
-                return true;
+            if (gitUserName.equals(repo.githubUsername) && gitURL.equals(repo.repoName)) {
+                return repo;
             }
         }
-        return false;
+        return null;
     }
 
     public void addRepository(String gitUsername, String gitURL) {
-        if (!hasRepository(gitUsername, gitURL)) {
+        if (getRepository(gitUsername, gitURL) == null) {
             repositories.add(new GitRepository(gitUsername, gitURL));
         }
     }
