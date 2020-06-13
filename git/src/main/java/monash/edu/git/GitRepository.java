@@ -1,9 +1,6 @@
 package monash.edu.git;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,59 +11,35 @@ public class GitRepository {
     private GetJSONReader jsonReader;
     public String githubUsername;
     public String repoName;
+    GitService gitService=new GitService();
 
-    public GitRepository(String gitUsername, String repoName) {
+    public GitRepository(String gitUsername, String repoName) throws IOException, JSONException {
         jsonReader = new GetJSONReader();
         this.githubUsername = gitUsername;
         this.repoName = repoName;
         constructRepoInfo(gitUsername, repoName);
     }
 
-    private void constructRepoInfo(String gitUsername, String repoName) {
+    private void constructRepoInfo(String gitUsername, String repoName) throws IOException, JSONException {
         String urlString = "https://api.github.com/repos/" + gitUsername + "/" + repoName;
         JSONObject response = new JSONObject();
         try {
             response = jsonReader.readJsonFromUrl(urlString);
         }
-        catch(IOException e) {
-
-        }
-        catch(JSONException e) {
-
+        catch(IOException | JSONException e) {
+            e.printStackTrace();
         }
         repoInfo = response;
         constructRepoContributors(gitUsername, repoName);
         constructRepoCommits(gitUsername, repoName);
     }
 
-    private void constructRepoContributors(String gitUsername, String repoName) {
-        String urlString = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/contributors";
-        JSONObject response = new JSONObject();
-        try {
-            response = jsonReader.readJsonFromUrl(urlString);
-        }
-        catch(IOException e) {
-
-        }
-        catch(JSONException e) {
-
-        }
-        contributors = response;
+    private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
+        contributors=gitService.getContributions(gitUsername,repoName);
     }
 
-    private void constructRepoCommits(String gitUsername, String repoName) {
-        String urlString = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
-        JSONObject response = new JSONObject();
-        try {
-            response = jsonReader.readJsonFromUrl(urlString);
-        }
-        catch(IOException e) {
-
-        }
-        catch(JSONException e) {
-
-        }
-        commits = response;
+    private void constructRepoCommits(String gitUsername, String repoName) throws IOException, JSONException {
+        commits=gitService.getCommits(gitUsername,repoName);
     }
 
     public JSONObject getInfo() {

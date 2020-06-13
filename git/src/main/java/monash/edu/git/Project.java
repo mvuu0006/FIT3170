@@ -3,6 +3,8 @@ package monash.edu.git;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Project {
@@ -44,7 +46,11 @@ public class Project {
 
     public void addRepository(String gitUsername, String gitURL) {
         if (getRepository(gitUsername, gitURL) == null) {
-            repositories.add(new GitRepository(gitUsername, gitURL));
+            try {
+                repositories.add(new GitRepository(gitUsername, gitURL));
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -12,13 +12,15 @@ import java.io.IOException;
 public class GitService {
     //GitRepository gitRepository=new GitRepository();
 
-    public String getContributions() throws IOException, JSONException {
+    public JSONObject getContributions(String gitUsername, String repoName) throws IOException, JSONException {
         //Creating a JSONObject that stores all the contributions
         JSONObject contribution = new JSONObject();
 
+        String reposUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/contributors";
+
         // Original URL : https://github.com/tensorflow/tensorflow.git
-        String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors?per_page=500";
-        reposUrl="https://api.github.com/repos/octocat/Hello-World/contributors";
+        //String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors?per_page=500";
+        //reposUrl="https://api.github.com/repos/octocat/Hello-World/contributors";
 
 
         // Class that reads from a URL and returns info in JSON format
@@ -46,15 +48,17 @@ public class GitService {
             contribution.put(name,contributionPercent);
         }
         //gitRepository.setContributors(contribution);
-        return contribution.toString();
+        return contribution;
     }
 
-    public String getCommits() throws IOException, JSONException {
+    public JSONObject getCommits(String gitUsername, String repoName) throws IOException, JSONException {
         //JSONObject to store commit information
         JSONObject commits = new JSONObject();
 
+        String commitsUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
+
         // Hardcoded commits URL
-        String commitsUrl="https://api.github.com/repos/octocat/Hello-World/commits";
+        //String commitsUrl="https://api.github.com/repos/octocat/Hello-World/commits";
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
@@ -77,9 +81,7 @@ public class GitService {
                 commits.put(name,1);
             }
         }
-
-        //gitRepository.setCommits(commits);
-
-        return commits.toString();
+        return commits;
     }
+
 }

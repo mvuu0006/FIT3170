@@ -12,9 +12,16 @@ public class GitApplication {
 
 	public static void main(String[] args) {
 
-		GitService gitService = new GitService();
+//		GitService gitService = new GitService();
+//		try {
+//			gitService.getCommits();
+//		} catch (IOException | JSONException e) {
+//			e.printStackTrace();
+//		}
+
 		try {
-			gitService.getCommits();
+			GitRepository gitRepository=new GitRepository("octocat","Hello-World");
+			int a=0;
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();
 		}
