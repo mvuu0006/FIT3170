@@ -105,6 +105,7 @@ public class GitController {
         }
         for (Project project: projects) {
             if (project.getProjectName().equals(projectName)) {
+                // TODO: The below function may not contain exactly what we want it to
                 return project.getRepositories().toString();
             }
         }
@@ -126,6 +127,13 @@ public class GitController {
             }
         }
         throw new NoEntryException();
+    }
+
+    @PutMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}")
+    public void putRepo(@PathVariable("projName") String projectName,
+    @PathVariable("githubUsername") String githubUsername,
+    @PathVariable("repoName") String repoName) throws NoEntryException, JSONException {
+        // Look at PUT mapping for project for an idea on what to code here
     }
 
     @GetMapping(path = "/projects/{projName}/repos/{githubUsername}/{repoName}/contributors")
@@ -158,19 +166,6 @@ public class GitController {
         //     }
         // }
         // throw new NoEntryException();
-        /* Debugging code */
-        Project project = new Project("test");
-        GitRepository repo = new GitRepository("hbak0001", "fit3157-asgn2");
-        return repo.toString();
-    }
-
-    /* Remove this when testing is complete */
-    @GetMapping(path = "/testcreate")
-    @ResponseBody
-    public String doTest() {
-        Project project = new Project("test");
-        projects.add(project);
-        project.addRepository("hbak0001", "fit3157-asgn2");
         return "";
     }
 }
