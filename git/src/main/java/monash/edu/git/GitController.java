@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class GitController {
             throw new NoEntryException();
         }
         for (Project project: projects) {
-            GitRepository repo = project.getRepository(githubUsername, repoName);
+            GitRepository repo = project.getRepositoryByUserName(githubUsername, repoName);
             if (repo != null && project.getProjectName().equals(projectName)) {
                 return repo.getInfo().toString();
             }
@@ -121,7 +120,7 @@ public class GitController {
         }
         for (Project project : projects) {
             if (project.getProjectName().equals(projectName)) {
-                project.addRepository(githubUsername,repoName);
+                project.addRepositoryByUsername(githubUsername,repoName);
                 return;
             }
         }
@@ -139,8 +138,8 @@ public class GitController {
         }
         for (Project project: projects) {
             if (project.getProjectName().equals(projectName)) {
-                if (project.getRepository(githubUsername, repoName) != null) {
-                    return project.getRepository(githubUsername,repoName).getContributors().toString();
+                if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
+                    return project.getRepositoryByUserName(githubUsername,repoName).getContributors().toString();
                 }
             }
         }
@@ -157,11 +156,84 @@ public class GitController {
         }
         for (Project project: projects) {
             if (project.getProjectName().equals(projectName)) {
-                if (project.getRepository(githubUsername, repoName) != null) {
-                    return project.getRepository(githubUsername,repoName).getCommits().toString();
+                if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
+                    return project.getRepositoryByUserName(githubUsername,repoName).getCommits().toString();
                 }
             }
         }
         throw new NoEntryException();
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @GetMapping(path = "/projects/{projName}/repos/{gitID}")
+    @ResponseBody
+    public String getRepoByID(@PathVariable("projName") String projectName,
+                          @PathVariable("gitID") String gitID) throws NoEntryException, JSONException {
+        if( projectName.equals("")  || gitID.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            GitRepository repo = project.getRepositoryByID(gitID);
+            if (repo != null && project.getProjectName().equals(projectName)) {
+                return repo.getInfo().toString();
+            }
+        }
+        throw new NoEntryException();
+    }
+
+    @PutMapping(path = "/projects/{projName}/repos/{gitID}")
+    public void putRepoByID(@PathVariable("projName") String projectName,
+                        @PathVariable("gitID") String gitId) throws NoEntryException, JSONException {
+        // Look at PUT mapping for project for an idea on what to code here
+        //GitRepository repo = new GitRepository(githubUsername, repoName);
+
+        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
+        if( projectName.equals("") || gitId.equals("")) {
+            return;
+        }
+        for (Project project : projects) {
+            if (project.getProjectName().equals(projectName)) {
+                project.addRepositoryByID(gitId);
+                return;
+            }
+        }
+        throw new NoEntryException();
+
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos/{gitId}/contributors")
+    @ResponseBody
+    public String getRepoContributorsByID(@PathVariable("projName") String projectName,
+                                      @PathVariable("gitId") String gitID) throws NoEntryException, JSONException {
+        if( projectName.equals("")  || gitID.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.getProjectName().equals(projectName)) {
+                if (project.getRepositoryByID(gitID) != null) {
+                    return project.getRepositoryByID(gitID).getContributors().toString();
+                }
+            }
+        }
+        throw new NoEntryException();
+    }
+
+    @GetMapping(path = "/projects/{projName}/repos/{gitId}/commits")
+    @ResponseBody
+    public String getRepoCommitsByID(@PathVariable("projName") String projectName,
+                                 @PathVariable("gitId") String gitId) throws NoEntryException, JSONException {
+        if( projectName.equals("")  || gitId.equals("") ) {
+            throw new NoEntryException();
+        }
+        for (Project project: projects) {
+            if (project.getProjectName().equals(projectName)) {
+                if (project.getRepositoryByID(gitId) != null) {
+                    return project.getRepositoryByID(gitId).getCommits().toString();
+                }
+            }
+        }
+        throw new NoEntryException();
+    }
+
 }

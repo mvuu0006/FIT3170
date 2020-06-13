@@ -35,7 +35,7 @@ public class Project {
         return repos;
     }
 
-    public GitRepository getRepository(String gitUserName, String gitURL) {
+    public GitRepository getRepositoryByUserName(String gitUserName, String gitURL) {
         for (GitRepository repo : repositories) {
             if (gitUserName.equals(repo.githubUsername) && gitURL.equals(repo.repoName)) {
                 return repo;
@@ -44,8 +44,17 @@ public class Project {
         return null;
     }
 
-    public void addRepository(String gitUsername, String gitURL) {
-        if (getRepository(gitUsername, gitURL) == null) {
+    public GitRepository getRepositoryByID(String id) {
+        for (GitRepository repo : repositories) {
+            if (id.equals(repo.getGitId())) {
+                return repo;
+            }
+        }
+        return null;
+    }
+
+    public void addRepositoryByUsername(String gitUsername, String gitURL) {
+        if (getRepositoryByUserName(gitUsername, gitURL) == null) {
             try {
                 repositories.add(new GitRepository(gitUsername, gitURL));
             } catch (IOException | JSONException e) {
@@ -53,6 +62,18 @@ public class Project {
             }
         }
     }
+
+    public void addRepositoryByID(String id) {
+        if (getRepositoryByID(id) == null) {
+            try {
+                repositories.add(new GitRepository(id));
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
     public JSONObject getProjectInfo()
     {

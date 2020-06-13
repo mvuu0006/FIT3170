@@ -12,11 +12,28 @@ public class GitRepository {
     private JSONObject repoInfo;
     public String githubUsername;
     public String repoName;
+    private String gitId;
 
     public GitRepository(String gitUsername, String repoName) throws IOException, JSONException {
         this.githubUsername = gitUsername;
         this.repoName = repoName;
         constructRepoInfo(gitUsername, repoName);
+    }
+
+    public GitRepository(String id) throws IOException, JSONException {
+        this.gitId=id;
+        String gitUrl = "https://api.github.com/repositories/" + id;
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(gitUrl);
+
+        // Extracting the array from the JSON Object
+        JSONObject jsonObject = json.getJSONObject("entry");
+        this.repoName=jsonObject.getString("name");
+        this.githubUsername=jsonObject.getJSONObject("owner").getString("login");
+        constructRepoInfo(this.githubUsername,this.repoName);
+
     }
 
     private void constructRepoInfo(String gitUsername, String repoName) throws IOException, JSONException {
@@ -107,4 +124,7 @@ public class GitRepository {
         return commits;
     }
 
+    public String getGitId() {
+        return gitId;
+    }
 }

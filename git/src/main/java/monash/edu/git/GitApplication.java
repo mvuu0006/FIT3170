@@ -14,7 +14,7 @@ public class GitApplication {
 
 
 		try {
-			GitRepository gitRepository=new GitRepository("octocat","Hello-World");
+			GitRepository gitRepository=new GitRepository("1296269");
 			int a=0;
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();
