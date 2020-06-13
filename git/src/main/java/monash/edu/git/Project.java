@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Project {
     private String projectName;
     private ArrayList<GitRepository> repositories;
-    private String email;
+    private String email="";
 
     public Project(String name) {
         this.projectName = name;
@@ -29,7 +29,7 @@ public class Project {
         JSONObject reposObject = new JSONObject();
         JSONArray repos = new JSONArray();
         for (GitRepository repo : repositories) {
-            //repos.put(repo.getInfo());
+            repos.put(repo.getInfo());
         }
         reposObject.append("repos", repos);
         return reposObject;
@@ -52,6 +52,20 @@ public class Project {
                 e.printStackTrace();
             }
         }
+    }
+
+    public JSONObject getProjectInfo()
+    {
+        JSONObject projectInfo= new JSONObject();
+        try {
+            projectInfo.put("projectName", projectName);
+            projectInfo.put("email", email);
+            projectInfo.put("repositories",repositories);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return projectInfo;
     }
 
 }

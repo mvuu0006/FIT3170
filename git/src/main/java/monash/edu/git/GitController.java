@@ -19,12 +19,12 @@ import java.util.ArrayList;
 public class GitController {
     private ArrayList<Project> projects = new ArrayList<Project>();
 
-    @RequestMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
-        System.out.println(name);
-
-        return "hello, "+name;
-    }
+//    @RequestMapping("/hello")
+//    public String hello(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
+//        System.out.println(name);
+//
+//        return "hello, "+name;
+//    }
 
     /**
      * Returns the project data stored in the system. I
@@ -50,7 +50,7 @@ public class GitController {
             boolean found = false;
             for (Project project: projects) {
                 if (project.getProjectName().equals(name)) {
-                    body.put("project", project.toString());
+                    body.put("project", project.getProjectInfo());
                     found = true;
                 }
             }
@@ -115,6 +115,18 @@ public class GitController {
     @PathVariable("repoName") String repoName) throws NoEntryException, JSONException {
         // Look at PUT mapping for project for an idea on what to code here
         //GitRepository repo = new GitRepository(githubUsername, repoName);
+
+        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
+        if( projectName.equals("") || githubUsername.equals("") || repoName.equals("") ) {
+            return;
+        }
+        for (Project project : projects) {
+            if (project.getProjectName().equals(projectName)) {
+                project.addRepository(githubUsername,repoName);
+                return;
+            }
+        }
+        throw new NoEntryException();
 
     }
 
