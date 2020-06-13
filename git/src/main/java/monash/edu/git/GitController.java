@@ -82,7 +82,7 @@ public class GitController {
         return response.toString();
     }
 
-    @PutMapping(path = "/projects/{projName}")
+    @PutMapping(path = "/project/{projName}")
     public void putUser(@PathVariable("projName") String name) throws NoEntryException {
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
         if( name.equals("") ) {
