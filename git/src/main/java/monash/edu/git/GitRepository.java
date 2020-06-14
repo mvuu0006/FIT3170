@@ -14,12 +14,14 @@ public class GitRepository {
     public String repoName;
     private String gitId;
 
+    // Constructor that creates the Repository object based on username and reponame
     public GitRepository(String gitUsername, String repoName) throws IOException, JSONException {
         this.githubUsername = gitUsername;
         this.repoName = repoName;
         constructRepoInfo(gitUsername, repoName);
     }
 
+    // Constructor that creates the Repository object based on ID
     public GitRepository(String id) throws IOException, JSONException {
         this.gitId=id;
         String gitUrl = "https://api.github.com/repositories/" + id;
@@ -30,12 +32,15 @@ public class GitRepository {
 
         // Extracting the array from the JSON Object
         JSONObject jsonObject = json.getJSONObject("entry");
+
+        // Getting the username and reponame
         this.repoName=jsonObject.getString("name");
         this.githubUsername=jsonObject.getJSONObject("owner").getString("login");
         constructRepoInfo(this.githubUsername,this.repoName);
 
     }
 
+    // Function that creates the RepoInfo JSOn object that will be used to display information on the front end
     private void constructRepoInfo(String gitUsername, String repoName) throws IOException, JSONException {
         constructRepoContributors(gitUsername, repoName);
         constructRepoCommits(gitUsername, repoName);
@@ -48,12 +53,9 @@ public class GitRepository {
 
     private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
         contributors=new JSONObject();
+
+        // Creating a URL
         String reposUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/contributors";
-
-        // Original URL : https://github.com/tensorflow/tensorflow.git
-        //String reposUrl="https://api.github.com/repos/tensorflow/tensorflow/contributors?per_page=500";
-        //reposUrl="https://api.github.com/repos/octocat/Hello-World/contributors";
-
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
@@ -84,10 +86,9 @@ public class GitRepository {
 
     private void constructRepoCommits(String gitUsername, String repoName) throws IOException, JSONException {
         commits=new JSONObject();
-        String commitsUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
 
-        // Hardcoded commits URL
-        //String commitsUrl="https://api.github.com/repos/octocat/Hello-World/commits";
+        // Creating the URL
+        String commitsUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
