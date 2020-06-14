@@ -10,9 +10,11 @@ public class Project {
     private String projectName;
     private ArrayList<GitRepository> repositories;
     private String email="";
+    private int id;
 
-    public Project(String name) {
+    public Project(String name, int id) {
         this.projectName = name;
+        this.id = id;
         repositories = new ArrayList<GitRepository>();
     }
 
@@ -22,6 +24,10 @@ public class Project {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getId() {
+        return String.valueOf(id);
     }
 
     public JSONArray getRepositories() throws JSONException {

@@ -23,15 +23,17 @@ class App extends React.Component {
       <div className="App">
         <div className="App-grid">
           <div className="Student-selector">
-            <Form onSubmit={this.changeStudent}>
+            {/*<Form onSubmit={this.changeStudent}>
               <Form.Label>Select Project</Form.Label>
               <Form.Group controlId="projName">
                 <Badge variant="secondary">Project Name</Badge>
                 <Form.Control placeholder="(eg. My Project)"/>
               </Form.Group>
               <Button variant="primary" type="submit">Submit</Button>
-            </Form>
+            </Form>*/}
+            <Form.Label>Current Task</ Form.Label>
             <AuthcateDisplay ref={this.authcateDisplayElement} />
+            <Button variant="primary" onClick={this.doExample}>Click Me!</Button>
           </div>
           <div></div>
           <div className="Repo-adder">
@@ -89,6 +91,37 @@ class App extends React.Component {
         this.authcateDisplayElement.current.updateAuthcate();
       })
       .then(data => this.setState({data}));
+  }
+
+  doExample = (event) =>{
+    event.preventDefault();
+    // Fetch data from the API (replace url below with correct api call)
+    /*const requestOptions = {
+      method: 'GET',
+      mode: 'no-cors' as "no-cors",
+      headers: {'Content-Type': 'application/json'},
+    }
+    fetch('http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-project?email=test123&projectId=2' ,requestOptions)
+    .then(response => {
+      console.log("SED")
+      response.json()
+    })
+    .then(data => {
+      console.log(JSON.stringify(data));
+    });*/
+    // This var should be removed and the following code should be put into the second .then once the CORS issue is worked out
+    var testData = {"projectId":"2","projectName":"TestProject2","projectGitIds":["1","1234","tesre22","tesre223","testGoogle","testGoogle2"],"projectGoogleDriveIds":["0AMHqlwMzue81Uk9PVA","1","tesre222223","tesre223","test","test1","testGoogle","testGoogle2"],"projectGoogleFolderIds":["test1","testGoogle","testGoogle2"],"projectTrelloIds":["1","2","50","501","tesre22","tesre222","testGoogle","testGoogle2"]};
+    // See if project is already registered
+    const projectGETOptions = {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+      "Access-Control-Request-Method": 'GET',
+    }
+    fetch('http://localhost:5001/api/project/'+testData["projectId"], projectGETOptions)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    });
   }
 }
 
