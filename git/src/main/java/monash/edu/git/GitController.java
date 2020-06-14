@@ -18,12 +18,6 @@ import java.util.ArrayList;
 public class GitController {
     private ArrayList<Project> projects = new ArrayList<Project>();
 
-//    @RequestMapping("/hello")
-//    public String hello(@RequestParam(value = "name", defaultValue="") String name) throws JSONException {
-//        System.out.println(name);
-//
-//        return "hello, "+name;
-//    }
 
     /**
      * Returns the project data stored in the system. I
@@ -36,7 +30,7 @@ public class GitController {
     public String getUser(@PathVariable("projName") String name) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
         JSONObject status = new JSONObject();
-        //
+
         if( name.equals("") ) {
             status.put("message", "User Not Found");
             status.put("status_code", 404);
@@ -164,7 +158,6 @@ public class GitController {
         throw new NoEntryException();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping(path = "/projects/{projName}/repos/{gitID}")
     @ResponseBody

@@ -3,7 +3,6 @@ package monash.edu.git;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,15 +25,15 @@ public class Project {
     }
 
     public JSONArray getRepositories() throws JSONException {
-        //JSONObject reposObject = new JSONObject();
+        // Loop that returns a JSONArray of all the repos
         JSONArray repos = new JSONArray();
         for (GitRepository repo : repositories) {
             repos.put(repo.getInfo());
         }
-        //reposObject.append("repos", repos);
         return repos;
     }
 
+    // Method that gets a repo from the project by username
     public GitRepository getRepositoryByUserName(String gitUserName, String gitURL) {
         for (GitRepository repo : repositories) {
             if (gitUserName.equals(repo.githubUsername) && gitURL.equals(repo.repoName)) {
@@ -44,6 +43,7 @@ public class Project {
         return null;
     }
 
+    // Method that gets a repo from the project by ID
     public GitRepository getRepositoryByID(String id) {
         for (GitRepository repo : repositories) {
             if (id.equals(repo.getGitId())) {
@@ -53,6 +53,7 @@ public class Project {
         return null;
     }
 
+    // Method that adds repository by username
     public void addRepositoryByUsername(String gitUsername, String gitURL) {
         if (getRepositoryByUserName(gitUsername, gitURL) == null) {
             try {
@@ -63,6 +64,7 @@ public class Project {
         }
     }
 
+    // Method that adds repository by ID
     public void addRepositoryByID(String id) {
         if (getRepositoryByID(id) == null) {
             try {
@@ -73,8 +75,7 @@ public class Project {
         }
     }
 
-
-
+    // Method that returns a JSONObject containing project info
     public JSONObject getProjectInfo()
     {
         JSONObject projectInfo= new JSONObject();
