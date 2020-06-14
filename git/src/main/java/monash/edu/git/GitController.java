@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/git")
-@CrossOrigin
+@CrossOrigin("http://localhost:5001")
 public class GitController {
     private ArrayList<Project> projects = new ArrayList<Project>();
 
