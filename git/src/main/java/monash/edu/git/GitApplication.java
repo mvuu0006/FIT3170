@@ -11,18 +11,7 @@ import java.io.IOException;
 public class GitApplication {
 
 	public static void main(String[] args) {
-
-
-		try {
-			GitRepository gitRepository=new GitRepository("1296269");
-			int a=0;
-		} catch (IOException | JSONException e) {
-			e.printStackTrace();
-		}
-
 		SpringApplication.run(GitApplication.class, args);
-		System.out.println("test");
-
 	}
 
 }
