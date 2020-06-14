@@ -32,17 +32,17 @@ public class GetJSONReader {
          */
         String accessToken="300957cf2e509361ce59c68f5dab0b03a0a09501";
 
+        // Creating the URL to set properties to it
         URL newUrl=new URL(url);
         HttpURLConnection conn = (HttpURLConnection) newUrl.openConnection();
 
-        //conn.setRequestProperty("Accept","application/vnd.github.inertia-preview+json");
+        // Setting properties to the URL
         conn.setRequestProperty("Content-Type","application/json");
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", accessToken);
 
-        //InputStream is = new URL(url).openStream();
+        // Reading from the URl and creating a JSON object
         try {
-            //BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String jsonText = readAll(rd);
             jsonText="{ entry: "+jsonText +"}";
@@ -50,7 +50,6 @@ public class GetJSONReader {
             return json;
         } finally {
             conn.disconnect();
-            //is.close();
         }
 
     }
