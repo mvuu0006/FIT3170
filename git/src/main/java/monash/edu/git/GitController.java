@@ -1,6 +1,7 @@
 package monash.edu.git;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -237,6 +238,28 @@ public class GitController {
             }
         }
         throw new NoEntryException();
+    }
+
+    @PostMapping(path = "/user-project-service/save-git")
+    public String saveGit() throws JSONException {
+        JSONObject response = new JSONObject();
+        JSONObject body = new JSONObject();
+        boolean found = false;
+        for (Project project: projects) {
+            JSONArray repo = project.getRepositories();
+                body.put("GitID", repo.getString(Integer.parseInt("GitId")));
+                body.put("projectId", project.getId());
+
+            found = true;
+
+        }
+        if (!found) {
+            throw new NoEntryException();
+        }
+        response.put("body", body);
+        response.put("status", 200);
+
+        return response.toString();
     }
 
 }

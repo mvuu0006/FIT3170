@@ -49,6 +49,7 @@ public class GitRepository {
         // Getting the username and reponame
         this.repoName=jsonObject.getString("name");
         this.githubUsername=jsonObject.getJSONObject("owner").getString("login");
+        this.gitId = jsonObject.getString("id");
         constructRepoInfo(this.githubUsername,this.repoName);
 
     }
@@ -62,6 +63,7 @@ public class GitRepository {
         repoInfo.put("RepositoryName", repoName);
         repoInfo.put("commits", commits);
         repoInfo.put("contributions", contributors);
+        repoInfo.put("GitId",gitId);
     }
 
     private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
