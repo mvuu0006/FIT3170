@@ -18,6 +18,19 @@ public class GitRepository {
     public GitRepository(String gitUsername, String repoName) throws IOException, JSONException {
         this.githubUsername = gitUsername;
         this.repoName = repoName;
+
+        // Creating the URL
+        String repoUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName;
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(repoUrl);
+
+        // Extracting the array from the JSON Object
+        JSONObject jsonObject = json.getJSONObject("entry");
+        // Getting the gitId
+        this.gitId = jsonObject.getString("id");
+
         constructRepoInfo(gitUsername, repoName);
     }
 
