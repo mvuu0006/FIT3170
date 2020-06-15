@@ -47,7 +47,7 @@ class App extends React.Component {
                 <Badge variant="secondary">GitHub repository name</Badge>
                 <Form.Control placeholder="(eg. fit3170-asgn1)"/>
               </Form.Group>
-              <Button variant="light" type="submit">Submit</Button>
+              <Button variant="light" type="submit" disabled>Submit</Button>
             </Form>
           </div>
           <div className="Repo-list">
@@ -115,12 +115,73 @@ class App extends React.Component {
     const projectGETOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
-      "Access-Control-Request-Method": 'GET',
     }
-    fetch('http://localhost:5001/api/project/'+testData["projectId"], projectGETOptions)
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to GET project");
+    fetch('http://localhost:5001/git/project/'+testData["projectId"], projectGETOptions)
     .then(response => response.json())
     .then(data => {
-      console.log(data);
+      if (data["status"] == 404) {
+        this.createNewProject(testData);
+      }
+      else {
+        this.authcateDisplayElement.current.updateAuthcate("None");
+        this.presentProjectRepos(testData["projectId"]);
+      }
+    });
+  }
+
+  createNewProject(projectData) {
+    var body = {'projectId': projectData["projectId"], 'projectName': projectData["projectName"]};
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT project");
+    const projectPUTOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+    }
+    fetch('http://localhost:5001/git/project', projectPUTOptions)
+    .then(response => {
+      console.log(response["status"]);
+      if (response["status"] == 201) {
+        for (var i = 0; i < projectData["projectGitIds"].length; i++) {
+          this.addGitToProject(projectData["projectGitIds"][i], projectData["projectId"]);
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error:',error)
+    });
+  }
+
+  addGitToProject(gitId, projectId) {
+    const projectPUTOptions = {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+    }
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
+    fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/'+(gitId as string), projectPUTOptions)
+    .then(response => {
+      if (response["status"] == 201) {
+        console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
+        this.authcateDisplayElement.current.updateAuthcate("None");
+      }
+    })
+    .catch(error => {
+      console.error('Error:',error)
+    });
+  }
+
+  presentProjectRepos(projectId) {
+    const requestOptions = {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+    }
+    fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos', requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      this.lastGetResponse.current.updateData(JSON.stringify(data));
+    })
+    .catch(error => {
+
     });
   }
 }
