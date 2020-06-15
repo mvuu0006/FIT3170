@@ -85,7 +85,6 @@ public class Project {
                 }
             }
         }
-        System.out.println(repositories.size());
     }
 
     // Method that returns a JSONObject containing project info

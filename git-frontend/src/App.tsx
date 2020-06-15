@@ -140,7 +140,6 @@ class App extends React.Component {
     }
     fetch('http://localhost:5001/git/project', projectPUTOptions)
     .then(response => {
-      console.log(response["status"]);
       if (response["status"] == 201) {
         for (var i = 0; i < projectData["projectGitIds"].length; i++) {
           this.addGitToProject(projectData["projectGitIds"][i], projectData["projectId"]);
@@ -163,6 +162,11 @@ class App extends React.Component {
       if (response["status"] == 201) {
         console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
         this.authcateDisplayElement.current.updateAuthcate("None");
+      }
+      else if (response["status"] == 400) {
+        var message = "Repo with ID: "+gitId+" failed to be added to Project with ID: "+projectId;
+        message = message + "\nPerhaps the repo ID does not exist?";
+        console.log(message);
       }
     })
     .catch(error => {
