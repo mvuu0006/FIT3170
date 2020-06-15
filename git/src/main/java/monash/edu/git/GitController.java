@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
 @RestController
 @RequestMapping("/git")
-@CrossOrigin("http://localhost:5001")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003"}, maxAge = 0)
 public class GitController {
     private ArrayList<Project> projects = new ArrayList<Project>();
 
@@ -29,16 +32,11 @@ public class GitController {
     @ResponseBody
     public String getProject(@PathVariable("projID") String id) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
-        JSONObject status = new JSONObject();
 
         if( id.equals("") ) {
-            status.put("message", "User Not Found");
-            status.put("status_code", 404);
             throw new NoEntryException();
         }
         else {
-            status.put("message", "OK");
-            status.put("status_code", 200);
             JSONObject body = new JSONObject();
             boolean found = false;
             for (Project project: projects) {
@@ -51,12 +49,14 @@ public class GitController {
                 throw new NoEntryException();
             }
             response.put("body", body);
+            response.put("status", 200);
         }
-        response.put("status", status);
         return response.toString();
     }
 
     @PutMapping(path = "/project")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    @ResponseBody
     public void putUser(@RequestBody String req) throws NoEntryException, JSONException {
         System.out.println(req);
         JSONObject requestJSON = new JSONObject(req);
@@ -65,7 +65,7 @@ public class GitController {
             throw new NoEntryException();
         }
         String name = requestJSON.getString("projectName");
-        int id = Integer.parseInt(requestJSON.getString("projectId"));
+        String id = requestJSON.getString("projectId");
         for (Project project : projects) {
             if (project.getProjectName().equals(name)) {
                 throw new NoEntryException();
@@ -183,9 +183,11 @@ public class GitController {
         throw new NoEntryException();
     }
 
+    @CrossOrigin
     @PutMapping(path = "/project/{projId}/repos/{gitID}")
+    @ResponseStatus(code = HttpStatus.CREATED)
     public void putRepoByID(@PathVariable("projId") String projectId,
-                        @PathVariable("gitID") String gitId) throws NoEntryException, JSONException {
+                        @PathVariable("gitID") String gitId) throws NoEntryException, JSONException, NoRepoException {
         // Look at PUT mapping for project for an idea on what to code here
         //GitRepository repo = new GitRepository(githubUsername, repoName);
 

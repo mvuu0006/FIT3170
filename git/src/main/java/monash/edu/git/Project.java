@@ -3,6 +3,8 @@ package monash.edu.git;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -10,9 +12,9 @@ public class Project {
     private String projectName;
     private ArrayList<GitRepository> repositories;
     private String email="";
-    private int id;
+    private String id;
 
-    public Project(String name, int id) {
+    public Project(String name, String id) {
         this.projectName = name;
         this.id = id;
         repositories = new ArrayList<GitRepository>();
@@ -27,7 +29,7 @@ public class Project {
     }
 
     public String getId() {
-        return String.valueOf(id);
+        return id;
     }
 
     public JSONArray getRepositories() throws JSONException {
@@ -63,7 +65,8 @@ public class Project {
     public void addRepositoryByUsername(String gitUsername, String gitURL) {
         if (getRepositoryByUserName(gitUsername, gitURL) == null) {
             try {
-                repositories.add(new GitRepository(gitUsername, gitURL));
+                GitRepository newRepo = new GitRepository(gitUsername, gitURL);
+                repositories.add(newRepo);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
@@ -71,14 +74,18 @@ public class Project {
     }
 
     // Method that adds repository by ID
-    public void addRepositoryByID(String id) {
+    public void addRepositoryByID(String id) throws NoRepoException {
         if (getRepositoryByID(id) == null) {
             try {
                 repositories.add(new GitRepository(id));
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    throw new NoRepoException();
+                }
             }
         }
+        System.out.println(repositories.size());
     }
 
     // Method that returns a JSONObject containing project info
