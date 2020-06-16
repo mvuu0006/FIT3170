@@ -209,7 +209,7 @@ public class GitController {
             if (project.getId().equals(projectId)) {
                 project.addRepositoryByID(gitId);
                 try {
-                    URL url = new URL("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-git");
+                    URL url = new URL("http://localhost:3000/user-project-service/save-git");
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     con.setRequestMethod("POST");
                     con.setRequestProperty("Content-Type", "application/json; utf-8");
