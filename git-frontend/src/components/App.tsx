@@ -12,12 +12,13 @@ import PageHandler from './PageHandler';
 class App extends React.Component {
   public authcateDisplayElement;
   public lastGetResponse;
+  public projectId;
 
   constructor(props) {
     super(props);
     this.authcateDisplayElement = React.createRef();
     this.lastGetResponse = React.createRef();
-    this.state = {data: null,};
+    this.state = {data: null};
   }
 
   render() {
@@ -49,7 +50,7 @@ class App extends React.Component {
                 <Badge variant="secondary">GitHub repository name</Badge>
                 <Form.Control placeholder="(eg. fit3170-asgn1)"/>
               </Form.Group>
-              <Button variant="light" type="submit" disabled>Submit</Button>
+              <Button variant="light" type="submit">Submit</Button>
             </Form>
           </div>
           <div className="Repo-list">
@@ -67,6 +68,7 @@ class App extends React.Component {
     var projectId = params.get('project');
     var gitId = params.get('gitId');
 
+    this.projectId = projectId;
     this.doGitStuff(projectId, gitId);
     
   }
@@ -90,16 +92,26 @@ class App extends React.Component {
   addRepo = (event) => {
     event.preventDefault();
     // Fetch data from the API (replace url below with correct api call)
-    const requestOptions = {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ repo:  event.target.repoLink.value }),
+    var repoOwner = event.target.repoUser.value;
+    var repoName = event.target.repoLink.value;
+    if (!(repoOwner == '') && !(repoName == '')) {
+      if (this.projectId != null){
+        const requestOptions = {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ repo:  event.target.repoLink.value }),
+        }
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+repoOwner+'/'+repoName ,requestOptions)
+          .then(response => {
+            this.authcateDisplayElement.current.updateAuthcate();
+          })
+          .then(data => {
+            this.setState({data});
+            this.updateTable();
+          })
+          .catch(e => { console.error('Error:', e) });
+      }
     }
-    fetch('http://localhost:8080/api' ,requestOptions)
-      .then(response => {
-        this.authcateDisplayElement.current.updateAuthcate();
-      })
-      .then(data => this.setState({data}));
   }
 
   async doGitStuff(projectId, gitId) {
@@ -116,18 +128,22 @@ class App extends React.Component {
       await this.createNewProject(receivedInfo);
     }
     // Add repos to the project
-    console.log("Adding repo to project");
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
     // Display Project Information
-    console.log("Displaying Info");
-    var repo_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"]+"/repos", projectGETOptions);
+    this.updateTable();
+  }
+
+  async updateTable() {
+    const projectGETOptions = {
+      method: 'GET',
+    };
+    var repo_response = await fetch('http://localhost:5001/git/project/'+this.projectId+"/repos", projectGETOptions);
     var repo_data = await repo_response.json();
     if (repo_data["status"] == 404) {
       console.log("Repo GET didnt work. SAD!");
     }
     else {
-      var allInfo = {projectId: receivedInfo["projectId"], repoInfo: repo_data};
-      console.log(allInfo);
+      var allInfo = {projectId: this.projectId, repoInfo: repo_data};
       // Display Info
       this.lastGetResponse.current.updateData(allInfo);
     }
@@ -145,8 +161,8 @@ class App extends React.Component {
     .catch(error => {
       console.error('Error:',error)
     });
-    if (response["status"] == 201) {
-      console.log("Project Created");
+    if (!(response["status"] == 201)) {
+      console.log("Something went wrong in creating a new project");
     };
   }
 
