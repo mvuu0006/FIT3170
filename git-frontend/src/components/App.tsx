@@ -1,11 +1,13 @@
 import React from 'react';
-//import logo from './logo.svg';
+import logo from './logo.svg';
 import './App.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import AuthcateDisplay from './AuthcateDisplay';
 import HTTPResponseDisplay from './HTTPResponseDisplay';
+import { parse } from 'querystring';
+import PageHandler from './PageHandler';
 
 class App extends React.Component {
   public authcateDisplayElement;
@@ -15,7 +17,7 @@ class App extends React.Component {
     super(props);
     this.authcateDisplayElement = React.createRef();
     this.lastGetResponse = React.createRef();
-    this.state = {data: null,}
+    this.state = {data: null,};
   }
 
   render() {
@@ -33,7 +35,7 @@ class App extends React.Component {
             </Form>*/}
             <Form.Label>Current Task</ Form.Label>
             <AuthcateDisplay ref={this.authcateDisplayElement} />
-            <Button variant="primary" onClick={this.doExample}>Click Me!</Button>
+            <Button variant="primary" disabled>Click Me!</Button>
           </div>
           <div></div>
           <div className="Repo-adder">
@@ -51,15 +53,22 @@ class App extends React.Component {
             </Form>
           </div>
           <div className="Repo-list">
-            <HTTPResponseDisplay ref={this.lastGetResponse} />
           </div>
-          <div className="Repo-viewer"></div>
+          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
         </div>
       </div>
     );
   }
 
   componentDidMount() {
+    var search = window.location.search;
+    var params = new URLSearchParams(search);
+
+    var projectId = params.get('project');
+    var gitId = params.get('gitId');
+
+    this.doGitStuff(projectId, gitId);
+    
   }
 
   changeStudent = (event) => {
@@ -74,7 +83,7 @@ class App extends React.Component {
     fetch('http://localhost:8080/git/users?name='+event.target.projName.value, requestOptions)
       .then(response => response.json())
       .then(data => {
-        this.lastGetResponse.current.updateData(JSON.stringify(data));
+        //this.lastGetResponse.current.updateData(JSON.stringify(data));
       });
   }
 
@@ -93,44 +102,40 @@ class App extends React.Component {
       .then(data => this.setState({data}));
   }
 
-  doExample = (event) =>{
-    event.preventDefault();
-    // Fetch data from the API (replace url below with correct api call)
-    /*const requestOptions = {
-      method: 'GET',
-      mode: 'no-cors' as "no-cors",
-      headers: {'Content-Type': 'application/json'},
-    }
-    fetch('http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-project?email=test123&projectId=2' ,requestOptions)
-    .then(response => {
-      console.log("SED")
-      response.json()
-    })
-    .then(data => {
-      console.log(JSON.stringify(data));
-    });*/
-    // This var should be removed and the following code should be put into the second .then once the CORS issue is worked out
-    var testData = {"projectId":"2","projectName":"TestProject2","projectGitIds":["1","1234","tesre22","tesre223","testGoogle","testGoogle2"],"projectGoogleDriveIds":["0AMHqlwMzue81Uk9PVA","1","tesre222223","tesre223","test","test1","testGoogle","testGoogle2"],"projectGoogleFolderIds":["test1","testGoogle","testGoogle2"],"projectTrelloIds":["1","2","50","501","tesre22","tesre222","testGoogle","testGoogle2"]};
+  async doGitStuff(projectId, gitId) {
+    var receivedInfo = {"projectId":projectId,"projectGitIds":[gitId]};
     // See if project is already registered
     const projectGETOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
     }
     this.authcateDisplayElement.current.updateAuthcate("Attempting to GET project");
-    fetch('http://localhost:5001/git/project/'+testData["projectId"], projectGETOptions)
-    .then(response => response.json())
-    .then(data => {
-      if (data["status"] == 404) {
-        this.createNewProject(testData);
-      }
-      else {
-        this.authcateDisplayElement.current.updateAuthcate("None");
-        this.presentProjectRepos(testData["projectId"]);
-      }
-    });
+    var init_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"], projectGETOptions)
+    var init_data = await init_response.json();
+    if (init_data["status"] == 404) {
+      await this.createNewProject(receivedInfo);
+    }
+    // Add repos to the project
+    console.log("Adding repos to project");
+    for (var i = 0; i < receivedInfo["projectGitIds"].length; i++) {
+      await this.addGitToProject(receivedInfo["projectGitIds"][i], receivedInfo["projectId"]);
+    }
+    // Display Project Information
+    console.log("Displaying Info");
+    var repo_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"]+"/repos", projectGETOptions)
+    var repo_data = await repo_response.json();
+    if (init_data["status"] == 404) {
+      console.log("Repo GET didnt work. SAD!");
+    }
+    else {
+      var allInfo = {projectId: receivedInfo["projectId"], repoInfo: repo_data};
+      console.log(allInfo);
+      // Display Info
+      this.lastGetResponse.current.updateData(allInfo);
+    }
   }
 
-  createNewProject(projectData) {
+  async createNewProject(projectData) {
     var body = {'projectId': projectData["projectId"], 'projectName': projectData["projectName"]};
     this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT project");
     const projectPUTOptions = {
@@ -138,40 +143,34 @@ class App extends React.Component {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body),
     }
-    fetch('http://localhost:5001/git/project', projectPUTOptions)
-    .then(response => {
-      if (response["status"] == 201) {
-        for (var i = 0; i < projectData["projectGitIds"].length; i++) {
-          this.addGitToProject(projectData["projectGitIds"][i], projectData["projectId"]);
-        }
-      }
-    })
+    let response = await fetch('http://localhost:5001/git/project', projectPUTOptions)
     .catch(error => {
       console.error('Error:',error)
     });
+    if (response["status"] == 201) {
+      console.log("Project Created");
+    };
   }
 
-  addGitToProject(gitId, projectId) {
+  async addGitToProject(gitId, projectId) {
     const projectPUTOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
     }
     this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
-    fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/'+(gitId as string), projectPUTOptions)
-    .then(response => {
-      if (response["status"] == 201) {
-        console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
-        this.authcateDisplayElement.current.updateAuthcate("None");
-      }
-      else if (response["status"] == 400) {
-        var message = "Repo with ID: "+gitId+" failed to be added to Project with ID: "+projectId;
-        message = message + "\nPerhaps the repo ID does not exist?";
-        console.log(message);
-      }
-    })
+    var response = await fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/'+(gitId as string), projectPUTOptions)
     .catch(error => {
       console.error('Error:',error)
     });
+    if (response["status"] == 201) {
+      console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
+      this.authcateDisplayElement.current.updateAuthcate("None");
+    }
+    else if (response["status"] == 400) {
+      var message = "Repo with ID: "+gitId+" failed to be added to Project with ID: "+projectId;
+      message = message + "\nPerhaps the repo ID does not exist?";
+      console.log(message);
+    }
   }
 
   presentProjectRepos(projectId) {
@@ -182,7 +181,7 @@ class App extends React.Component {
     fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos', requestOptions)
     .then(response => response.json())
     .then(data => {
-      this.lastGetResponse.current.updateData(JSON.stringify(data));
+      //this.lastGetResponse.current.updateData(JSON.stringify(data));
     })
     .catch(error => {
 

@@ -43,9 +43,9 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 50% 50%;
-  grid-template-areas:  "student-selector repo-viewer"
-                        "repo-adder repo-viewer"
-                        "repo-list repo-viewer";
+  grid-template-areas:  "student-selector repo-adder"
+                        "repo-viewer repo-viewer"
+                        "repo-viewer repo-viewer";
 }
 
 .Student-selector {
@@ -67,9 +67,18 @@
 .Repo-viewer {
   padding: 1em;
   grid-area: repo-viewer;
+  max-width: 100%;
 }
 
 .Slash {
   padding: 1rem;
   margin: 0;
+}
+
+.table {
+  table-layout: fixed;
+}
+
+.table td {
+  word-wrap: break-word;
 }
