@@ -103,7 +103,7 @@ class App extends React.Component {
   }
 
   async doGitStuff(projectId, gitId) {
-    var receivedInfo = {"projectId":projectId,"projectGitIds":[gitId]};
+    var receivedInfo = {"projectId":projectId,"projectGitId":gitId};
     // See if project is already registered
     const projectGETOptions = {
       method: 'GET',
@@ -116,15 +116,13 @@ class App extends React.Component {
       await this.createNewProject(receivedInfo);
     }
     // Add repos to the project
-    console.log("Adding repos to project");
-    for (var i = 0; i < receivedInfo["projectGitIds"].length; i++) {
-      await this.addGitToProject(receivedInfo["projectGitIds"][i], receivedInfo["projectId"]);
-    }
+    console.log("Adding repo to project");
+    await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
     // Display Project Information
     console.log("Displaying Info");
-    var repo_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"]+"/repos", projectGETOptions)
+    var repo_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"]+"/repos", projectGETOptions);
     var repo_data = await repo_response.json();
-    if (init_data["status"] == 404) {
+    if (repo_data["status"] == 404) {
       console.log("Repo GET didnt work. SAD!");
     }
     else {
