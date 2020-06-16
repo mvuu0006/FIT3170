@@ -138,7 +138,13 @@ public class GitController {
         }
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
-                project.addRepositoryByUsername(githubUsername,repoName);
+                project.addRepositoryByUsername(githubUsername, repoName);
+                String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
+                // TODO: Remove this before demo
+                boolean doPOST = false;
+                if (doPOST) {
+                    postToUserService(projectId, gitId);
+                }
                 return;
             }
         }
@@ -205,7 +211,6 @@ public class GitController {
                         @PathVariable("gitID") String gitId) throws NoEntryException, JSONException, NoRepoException {
         // Look at PUT mapping for project for an idea on what to code here
         //GitRepository repo = new GitRepository(githubUsername, repoName);
-
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
         if( projectId.equals("") || gitId.equals("")) {
             return;
@@ -216,32 +221,7 @@ public class GitController {
                 // TODO: Remove this before demo
                 boolean sendPOST = false;
                 if (sendPOST){
-                    try {
-                        URL url = new URL("http://localhost:3000/user-project-service/save-git");
-                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                        con.setRequestMethod("POST");
-                        con.setRequestProperty("Content-Type", "application/json; utf-8");
-                        con.setRequestProperty("Accept", "application/json");
-                        con.setDoOutput(true);
-                        String jsonInputString = "{'projectId': '"+projectId+"', 'gitId': '"+gitId+"'}";
-                        try (OutputStream os = con.getOutputStream()) {
-                            byte[] input = jsonInputString.getBytes("utf-8");
-                            os.write(input, 0, input.length);
-                        }
-                        try (BufferedReader br = new BufferedReader(
-                            new InputStreamReader(con.getInputStream(), "utf-8"))) {
-                                StringBuilder response = new StringBuilder();
-                                String responseLine = null;
-                                while ((responseLine = br.readLine()) != null) {
-                                    response.append(responseLine.trim());
-                                }
-                                System.out.println(response.toString());
-                            }
-                    }
-                    catch (IOException e) {
-                        // e.printStackTrace();
-                        System.out.println("post to user-service failed");
-                    }
+                    postToUserService(projectId, gitId);
                 }
 
                 return;
@@ -305,6 +285,35 @@ public class GitController {
         response.put("status", 200);
 
         return response.toString();
+    }
+
+    private void postToUserService(String projectId, String gitId) {
+        try {
+            URL url = new URL("http://localhost:3000/user-project-service/save-git");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+            String jsonInputString = "{'projectId': '"+projectId+"', 'gitId': '"+gitId+"'}";
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println(response.toString());
+                }
+        }
+        catch (IOException e) {
+            // e.printStackTrace();
+            System.out.println("post to user-service failed");
+        }
     }
 
 }
