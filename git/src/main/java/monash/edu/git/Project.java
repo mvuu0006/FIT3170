@@ -69,6 +69,10 @@ public class Project {
                 repositories.add(newRepo);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    throw new NoRepoException();
+                }
+
             }
         }
     }

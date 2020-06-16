@@ -33,7 +33,7 @@ public class GitController {
 
     /**
      * Returns the project data stored in the system. I
-     * @param name the user to retrieve repo data or
+     * @param id the user to retrieve repo data or
      * @return  a JSON object containing user info
      * @throws JSONException
      */
@@ -116,13 +116,18 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             GitRepository repo = project.getRepositoryByUserName(githubUsername, repoName);
             if (repo != null && project.getId().equals(projectId)) {
+                success=true;
                 return repo.getInfo().toString();
             }
         }
-        throw new NoEntryException();
+        if(!success) {
+            throw new NoEntryException();
+        }
+        return "";
     }
 
     @PutMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}")
@@ -159,14 +164,18 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
+                    success=true;
                     return project.getRepositoryByUserName(githubUsername,repoName).getContributors().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+        throw new NoEntryException();}
+        return "";
     }
 
     @GetMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}/commits")
@@ -177,6 +186,7 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
             throw new NoEntryException();
         }
+
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
@@ -184,6 +194,7 @@ public class GitController {
                 }
             }
         }
+
         throw new NoEntryException();
     }
 
@@ -238,14 +249,18 @@ public class GitController {
         if( projectId.equals("")  || gitID.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitID) != null) {
+                    success=true;
                     return project.getRepositoryByID(gitID).getContributors().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+            throw new NoEntryException();}
+        return "";
     }
 
     @GetMapping(path = "/project/{projId}/repos/{gitId}/commits")
@@ -255,14 +270,18 @@ public class GitController {
         if( projectId.equals("")  || gitId.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitId) != null) {
+                    success=true;
                     return project.getRepositoryByID(gitId).getCommits().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+        throw new NoEntryException();}
+        return "";
     }
 
     @PostMapping(path = "/user-project-service/save-git")
