@@ -14,13 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -33,7 +30,7 @@ public class GitController {
 
     /**
      * Returns the project data stored in the system. I
-     * @param name the user to retrieve repo data or
+     * @param id the user to retrieve repo data or
      * @return  a JSON object containing user info
      * @throws JSONException
      */
@@ -68,17 +65,22 @@ public class GitController {
     @ResponseStatus(code = HttpStatus.CREATED)
     @ResponseBody
     public void putUser(@RequestBody String req) throws NoEntryException, JSONException {
-        System.out.println(req);
         JSONObject requestJSON = new JSONObject(req);
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
-        if( !requestJSON.has("projectName") || !requestJSON.has("projectId")) {
+        if( !requestJSON.has("projectId")) {
             throw new NoEntryException();
         }
-        String name = requestJSON.getString("projectName");
+        String name;
+        if (!requestJSON.has("projectName")) {
+            name = "Untitled";
+        }
+        else {
+            name = requestJSON.getString("projectName");
+        }
         String id = requestJSON.getString("projectId");
         for (Project project : projects) {
-            if (project.getProjectName().equals(name)) {
-                throw new NoEntryException();
+            if (project.getId().equals(name)) {
+                return;
             }
         }
         projects.add(new Project(name, id));
@@ -111,13 +113,18 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             GitRepository repo = project.getRepositoryByUserName(githubUsername, repoName);
             if (repo != null && project.getId().equals(projectId)) {
+                success=true;
                 return repo.getInfo().toString();
             }
         }
-        throw new NoEntryException();
+        if(!success) {
+            throw new NoEntryException();
+        }
+        return "";
     }
 
     @PutMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}")
@@ -133,7 +140,9 @@ public class GitController {
         }
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
-                project.addRepositoryByUsername(githubUsername,repoName);
+                project.addRepositoryByUsername(githubUsername, repoName);
+                String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
+                postToUserService(projectId, gitId);
                 return;
             }
         }
@@ -148,14 +157,18 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
+                    success=true;
                     return project.getRepositoryByUserName(githubUsername,repoName).getContributors().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+        throw new NoEntryException();}
+        return "";
     }
 
     @GetMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}/commits")
@@ -166,6 +179,7 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
             throw new NoEntryException();
         }
+
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
@@ -173,6 +187,7 @@ public class GitController {
                 }
             }
         }
+
         throw new NoEntryException();
     }
 
@@ -200,7 +215,6 @@ public class GitController {
                         @PathVariable("gitID") String gitId) throws NoEntryException, JSONException, NoRepoException {
         // Look at PUT mapping for project for an idea on what to code here
         //GitRepository repo = new GitRepository(githubUsername, repoName);
-
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
         if( projectId.equals("") || gitId.equals("")) {
             return;
@@ -208,32 +222,7 @@ public class GitController {
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
                 project.addRepositoryByID(gitId);
-                try {
-                    URL url = new URL("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-git");
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("POST");
-                    con.setRequestProperty("Content-Type", "application/json; utf-8");
-                    con.setRequestProperty("Accept", "application/json");
-                    con.setDoOutput(true);
-                    String jsonInputString = "{'projectId': '"+projectId+"', 'gitId': '"+gitId+"'}";
-                    try (OutputStream os = con.getOutputStream()) {
-                        byte[] input = jsonInputString.getBytes("utf-8");
-                        os.write(input, 0, input.length);
-                    }
-                    try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
-                            StringBuilder response = new StringBuilder();
-                            String responseLine = null;
-                            while ((responseLine = br.readLine()) != null) {
-                                response.append(responseLine.trim());
-                            }
-                            System.out.println(response.toString());
-                        }
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                postToUserService(projectId, gitId);
                 return;
             }
         }
@@ -248,14 +237,18 @@ public class GitController {
         if( projectId.equals("")  || gitID.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitID) != null) {
+                    success=true;
                     return project.getRepositoryByID(gitID).getContributors().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+            throw new NoEntryException();}
+        return "";
     }
 
     @GetMapping(path = "/project/{projId}/repos/{gitId}/commits")
@@ -265,36 +258,47 @@ public class GitController {
         if( projectId.equals("")  || gitId.equals("") ) {
             throw new NoEntryException();
         }
+        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitId) != null) {
+                    success=true;
                     return project.getRepositoryByID(gitId).getCommits().toString();
                 }
             }
         }
-        throw new NoEntryException();
+        if(!success){
+        throw new NoEntryException();}
+        return "";
     }
 
-    @PostMapping(path = "/user-project-service/save-git")
-    public String saveGit() throws JSONException {
-        JSONObject response = new JSONObject();
-        JSONObject body = new JSONObject();
-        boolean found = false;
-        for (Project project: projects) {
-            JSONArray repo = project.getRepositories();
-                body.put("GitID", repo.getString(Integer.parseInt("GitId")));
-                body.put("projectId", project.getId());
-
-            found = true;
-
+    private void postToUserService(String projectId, String gitId) {
+        try {
+            URL url = new URL("http://localhost:3000/user-project-service/save-git");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+            String jsonInputString = "{'projectId': '"+projectId+"', 'gitId': '"+gitId+"'}";
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println(response.toString());
+                }
         }
-        if (!found) {
-            throw new NoEntryException();
+        catch (IOException e) {
+            // e.printStackTrace();
+            System.out.println("post to user-service failed");
         }
-        response.put("body", body);
-        response.put("status", 200);
-
-        return response.toString();
     }
 
 }

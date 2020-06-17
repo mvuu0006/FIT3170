@@ -69,6 +69,10 @@ public class Project {
                 repositories.add(newRepo);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    throw new NoRepoException();
+                }
+
             }
         }
     }
@@ -77,7 +81,8 @@ public class Project {
     public void addRepositoryByID(String id) throws NoRepoException {
         if (getRepositoryByID(id) == null) {
             try {
-                repositories.add(new GitRepository(id));
+                GitRepository newRepo = new GitRepository(id);
+                repositories.add(newRepo);
             } catch (IOException | JSONException e) {
                 //e.printStackTrace();
                 if (e instanceof FileNotFoundException) {
