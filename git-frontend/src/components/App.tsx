@@ -38,7 +38,7 @@ class App extends React.Component {
               </Form.Group>
               <Form.Group controlId="repoLink">
                 <Badge variant="secondary">GitHub repository name</Badge>
-                <Form.Control placeholder="(eg. fit3170-asgn1)"/>
+                <Form.Control placeholder="(eg. fit3157-asgn2)"/>
               </Form.Group>
               <Button variant="light" type="submit">Submit</Button>
             </Form>
