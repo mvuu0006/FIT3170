@@ -26,7 +26,17 @@ class App extends React.Component {
       <div className="App">
         <div className="App-grid">
           <div className="Student-selector">
-            <h1>Git Repo Tracker</h1>
+            {/*<Form onSubmit={this.changeStudent}>
+              <Form.Label>Select Project</Form.Label>
+              <Form.Group controlId="projName">
+                <Badge variant="secondary">Project Name</Badge>
+                <Form.Control placeholder="(eg. My Project)"/>
+              </Form.Group>
+              <Button variant="primary" type="submit">Submit</Button>
+            </Form>*/}
+            <Form.Label>Current Task</ Form.Label>
+            <AuthcateDisplay ref={this.authcateDisplayElement} />
+            <Button variant="primary" disabled>Click Me!</Button>
           </div>
           <div></div>
           <div className="Repo-adder">
@@ -38,7 +48,7 @@ class App extends React.Component {
               </Form.Group>
               <Form.Group controlId="repoLink">
                 <Badge variant="secondary">GitHub repository name</Badge>
-                <Form.Control placeholder="(eg. fit3157-asgn2)"/>
+                <Form.Control placeholder="(eg. fit3170-asgn1)"/>
               </Form.Group>
               <Button variant="light" type="submit">Submit</Button>
             </Form>
@@ -111,7 +121,7 @@ class App extends React.Component {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
     }
-    //this.authcateDisplayElement.current.updateAuthcate("Attempting to GET project");
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to GET project");
     var init_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"], projectGETOptions)
     var init_data = await init_response.json();
     if (init_data["status"] == 404) {
@@ -141,7 +151,7 @@ class App extends React.Component {
 
   async createNewProject(projectData) {
     var body = {'projectId': projectData["projectId"], 'projectName': projectData["projectName"]};
-    // this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT project");
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT project");
     const projectPUTOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
@@ -161,14 +171,14 @@ class App extends React.Component {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
     }
-    // this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
+    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
     var response = await fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/'+(gitId as string), projectPUTOptions)
     .catch(error => {
       console.error('Error:',error)
     });
     if (response["status"] == 201) {
       console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
-      // this.authcateDisplayElement.current.updateAuthcate("None");
+      this.authcateDisplayElement.current.updateAuthcate("None");
     }
     else if (response["status"] == 400) {
       var message = "Repo with ID: "+gitId+" failed to be added to Project with ID: "+projectId;
