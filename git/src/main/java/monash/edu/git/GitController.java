@@ -14,13 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -145,11 +142,7 @@ public class GitController {
             if (project.getId().equals(projectId)) {
                 project.addRepositoryByUsername(githubUsername, repoName);
                 String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
-                // TODO: Remove this before demo
-                boolean doPOST = false;
-                if (doPOST) {
-                    postToUserService(projectId, gitId);
-                }
+                postToUserService(projectId, gitId);
                 return;
             }
         }
@@ -229,12 +222,7 @@ public class GitController {
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
                 project.addRepositoryByID(gitId);
-                // TODO: Remove this before demo
-                boolean sendPOST = false;
-                if (sendPOST){
-                    postToUserService(projectId, gitId);
-                }
-
+                postToUserService(projectId, gitId);
                 return;
             }
         }
@@ -282,28 +270,6 @@ public class GitController {
         if(!success){
         throw new NoEntryException();}
         return "";
-    }
-
-    @PostMapping(path = "/user-project-service/save-git")
-    public String saveGit() throws JSONException {
-        JSONObject response = new JSONObject();
-        JSONObject body = new JSONObject();
-        boolean found = false;
-        for (Project project: projects) {
-            JSONArray repo = project.getRepositories();
-                body.put("GitID", repo.getString(Integer.parseInt("GitId")));
-                body.put("projectId", project.getId());
-
-            found = true;
-
-        }
-        if (!found) {
-            throw new NoEntryException();
-        }
-        response.put("body", body);
-        response.put("status", 200);
-
-        return response.toString();
     }
 
     private void postToUserService(String projectId, String gitId) {
