@@ -127,14 +127,20 @@ public class GitController {
         return "";
     }
 
-    @PutMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}")
-    public void putRepo(@PathVariable("projId") String projectId,
-    @PathVariable("githubUsername") String githubUsername,
-    @PathVariable("repoName") String repoName) throws NoEntryException, JSONException {
-        // Look at PUT mapping for project for an idea on what to code here
-        //GitRepository repo = new GitRepository(githubUsername, repoName);
 
+    // This method creates a new gitHub repo from Username and RepoName
+    @CrossOrigin
+    @PutMapping(path = "/project/{projId}/repos/addRepofromName")
+    public void putRepo(@RequestBody String req) throws NoEntryException, JSONException {
+        JSONObject requestJSON = new JSONObject(req);
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
+        if( !requestJSON.has("projectId") || !requestJSON.has("githubUsername") || !requestJSON.has("repoName")) {
+            throw new NoEntryException();
+        }
+        String githubUsername = requestJSON.getString("githubUsername");
+        String repoName = requestJSON.getString("repoName");
+        String projectId = requestJSON.getString("projectId");
+
         if( projectId.equals("") || githubUsername.equals("") || repoName.equals("") ) {
             return;
         }
@@ -209,13 +215,16 @@ public class GitController {
     }
 
     @CrossOrigin
-    @PutMapping(path = "/project/{projId}/repos/{gitID}")
+    @PutMapping(path = "/project/{projId}/repos/addRepofromID")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void putRepoByID(@PathVariable("projId") String projectId,
-                        @PathVariable("gitID") String gitId) throws NoEntryException, JSONException, NoRepoException {
-        // Look at PUT mapping for project for an idea on what to code here
-        //GitRepository repo = new GitRepository(githubUsername, repoName);
+    public void putRepoByID(@RequestBody String req) throws NoEntryException, JSONException {
+        JSONObject requestJSON = new JSONObject(req);
         // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
+        if( !requestJSON.has("projectId") || !requestJSON.has("gitId")) {
+            throw new NoEntryException();
+        }
+        String gitId = requestJSON.getString("gitId");
+        String projectId = requestJSON.getString("projectId");
         if( projectId.equals("") || gitId.equals("")) {
             return;
         }
