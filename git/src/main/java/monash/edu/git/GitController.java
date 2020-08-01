@@ -39,7 +39,6 @@ public class GitController {
     @ResponseBody
     public String getProject(@PathVariable("projID") String id) throws JSONException, NoEntryException {
         JSONObject response = new JSONObject();
-
         if( id.equals("") ) {
             throw new NoEntryException();
         }
@@ -64,11 +63,10 @@ public class GitController {
     @PutMapping(path = "/project")
     @ResponseStatus(code = HttpStatus.CREATED)
     @ResponseBody
-    public void putUser(@RequestBody String req) throws NoEntryException, JSONException {
+    public void putUser(@RequestBody String req) throws ForbiddenException, JSONException {
         JSONObject requestJSON = new JSONObject(req);
-        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
         if( !requestJSON.has("projectId")) {
-            throw new NoEntryException();
+            throw new ForbiddenException();
         }
         String name;
         if (!requestJSON.has("projectName")) {
@@ -92,20 +90,16 @@ public class GitController {
         if( projectId.equals("") ) {
             throw new NoEntryException();
         }
-        boolean success = false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
-                success = true;
                 return project.getRepositories().toString();
             }
         }
-        if (!success) {
-            throw new NoEntryException();
-        }
-        return "";
+        throw new NoEntryException();
     }
 
-    @GetMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}")
+    // This method returns repo info based on github username and repo name
+    @GetMapping(path = "/github/project/{projId}/repos/{githubUsername}/{repoName}")
     @ResponseBody
     public String getRepo(@PathVariable("projId") String projectId,
                         @PathVariable("githubUsername") String githubUsername,
@@ -113,71 +107,67 @@ public class GitController {
         if( projectId.equals("")  || githubUsername.equals("") ) {
             throw new NoEntryException();
         }
-        boolean success=false;
         for (Project project: projects) {
             GitRepository repo = project.getRepositoryByUserName(githubUsername, repoName);
             if (repo != null && project.getId().equals(projectId)) {
-                success=true;
                 return repo.getInfo().toString();
-            }
-        }
-        if(!success) {
-            throw new NoEntryException();
-        }
-        return "";
-    }
-
-
-    // This method creates a new gitHub repo from Username and RepoName
-    @CrossOrigin
-    @PutMapping(path = "/project/{projId}/repos/addRepofromName")
-    public void putRepo(@RequestBody String req) throws NoEntryException, JSONException {
-        JSONObject requestJSON = new JSONObject(req);
-        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
-        if( !requestJSON.has("projectId") || !requestJSON.has("githubUsername") || !requestJSON.has("repoName")) {
-            throw new NoEntryException();
-        }
-        String githubUsername = requestJSON.getString("githubUsername");
-        String repoName = requestJSON.getString("repoName");
-        String projectId = requestJSON.getString("projectId");
-
-        if( projectId.equals("") || githubUsername.equals("") || repoName.equals("") ) {
-            return;
-        }
-        for (Project project : projects) {
-            if (project.getId().equals(projectId)) {
-                project.addRepositoryByUsername(githubUsername, repoName);
-                String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
-                postToUserService(projectId, gitId);
-                return;
             }
         }
         throw new NoEntryException();
     }
 
-    @GetMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}/contributors")
+
+    // This method creates a new gitHub repo from username and repo name
+    @CrossOrigin
+    @PutMapping(path = "/project/{projId}/repos/addRepofromName")
+    public void putRepo(@RequestBody String req) throws NoEntryException, ForbiddenException, JSONException {
+        JSONObject requestJSON = new JSONObject(req);
+        if( !requestJSON.has("projectId") || !requestJSON.has("githubUsername") || !requestJSON.has("repoName") || !requestJSON.has("gitSite")) {
+            throw new ForbiddenException();
+        }
+        String githubUsername = requestJSON.getString("githubUsername");
+        String repoName = requestJSON.getString("repoName");
+        String projectId = requestJSON.getString("projectId");
+        String gitSite = requestJSON.getString("gitSite");
+
+        if( projectId.equals("") || githubUsername.equals("") || repoName.equals("") ) {
+            return;
+        }
+        projects.add(new Project("Moo","Moo")); // Delete this line once done refactoring
+        for (Project project : projects) {
+            if (project.getId().equals(projectId)) {
+                if (gitSite.equals("github")) {
+                        project.addRepositoryByUsername(githubUsername, repoName);
+                        String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
+                        postToUserService(projectId, gitId);
+                        return;
+                }
+            }
+        }
+        throw new ForbiddenException();
+    }
+
+    // This method returns contributors for a repo based on github username and repo name
+    @GetMapping(path = "/github/project/{projId}/repos/{githubUsername}/{repoName}/contributors")
     @ResponseBody
     public String getRepoContributors(@PathVariable("projId") String projectId,
                         @PathVariable("githubUsername") String githubUsername,
-                        @PathVariable("repoName") String repoName) throws NoEntryException, JSONException { 
+                        @PathVariable("repoName") String repoName) throws NoEntryException {
         if( projectId.equals("")  || githubUsername.equals("") || repoName.equals("") ) {
             throw new NoEntryException();
         }
-        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByUserName(githubUsername, repoName) != null) {
-                    success=true;
                     return project.getRepositoryByUserName(githubUsername,repoName).getContributors().toString();
                 }
             }
         }
-        if(!success){
-        throw new NoEntryException();}
-        return "";
+        throw new NoEntryException();
     }
 
-    @GetMapping(path = "/project/{projId}/repos/{githubUsername}/{repoName}/commits")
+    // This method returns repo commuts based on github username and repo name
+    @GetMapping(path = "/github/project/{projId}/repos/{githubUsername}/{repoName}/commits")
     @ResponseBody
     public String getRepoCommits(@PathVariable("projId") String projectId,
                         @PathVariable("githubUsername") String githubUsername,
@@ -193,12 +183,12 @@ public class GitController {
                 }
             }
         }
-
         throw new NoEntryException();
     }
 
 
-    @GetMapping(path = "/project/{projId}/repos/{gitID}")
+    // This method returns repo info based on github id
+    @GetMapping(path = "/github/project/{projId}/repos/{gitID}")
     @ResponseBody
     public String getRepoByID(@PathVariable("projId") String projectId,
                           @PathVariable("gitID") String gitID) throws NoEntryException, JSONException {
@@ -214,73 +204,71 @@ public class GitController {
         throw new NoEntryException();
     }
 
+    // This method adds a repo to the project based on github id
     @CrossOrigin
     @PutMapping(path = "/project/{projId}/repos/addRepofromID")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void putRepoByID(@RequestBody String req) throws NoEntryException, JSONException {
+    public void putRepoByID(@RequestBody String req) throws ForbiddenException, JSONException {
         JSONObject requestJSON = new JSONObject(req);
-        // TODO: Change NoEntryException to an exception that creates a 403 Forbidden
-        if( !requestJSON.has("projectId") || !requestJSON.has("gitId")) {
-            throw new NoEntryException();
+        if( !requestJSON.has("projectId") || !requestJSON.has("gitId") || !requestJSON.has("gitSite")) {
+            throw new ForbiddenException();
         }
         String gitId = requestJSON.getString("gitId");
         String projectId = requestJSON.getString("projectId");
-        if( projectId.equals("") || gitId.equals("")) {
+        String gitSite = requestJSON.getString("gitSite");
+        if( projectId.equals("") || gitId.equals("") || gitSite.equals("")) {
             return;
         }
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
-                project.addRepositoryByID(gitId);
-                postToUserService(projectId, gitId);
-                return;
+                if (gitSite.equals("github")) {
+                    project.addRepositoryByID(gitId);
+                    postToUserService(projectId, gitId);
+                    return;
+                }
             }
         }
-        throw new NoEntryException();
+        throw new ForbiddenException();
 
     }
 
-    @GetMapping(path = "/project/{projId}/repos/{gitId}/contributors")
+    // This method returns the contributors of a repo based on github id
+    @GetMapping(path = "/github/project/{projId}/repos/{gitId}/contributors")
     @ResponseBody
     public String getRepoContributorsByID(@PathVariable("projId") String projectId,
-                                      @PathVariable("gitId") String gitID) throws NoEntryException, JSONException {
+                                      @PathVariable("gitId") String gitID) throws NoEntryException {
         if( projectId.equals("")  || gitID.equals("") ) {
             throw new NoEntryException();
         }
-        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitID) != null) {
-                    success=true;
                     return project.getRepositoryByID(gitID).getContributors().toString();
                 }
             }
         }
-        if(!success){
-            throw new NoEntryException();}
-        return "";
+        throw new NoEntryException();
     }
 
-    @GetMapping(path = "/project/{projId}/repos/{gitId}/commits")
+    // This method retuns repo commit info based on github id
+    @GetMapping(path = "/github/project/{projId}/repos/{gitId}/commits")
     @ResponseBody
     public String getRepoCommitsByID(@PathVariable("projId") String projectId,
                                  @PathVariable("gitId") String gitId) throws NoEntryException, JSONException {
         if( projectId.equals("")  || gitId.equals("") ) {
             throw new NoEntryException();
         }
-        boolean success=false;
         for (Project project: projects) {
             if (project.getId().equals(projectId)) {
                 if (project.getRepositoryByID(gitId) != null) {
-                    success=true;
                     return project.getRepositoryByID(gitId).getCommits().toString();
                 }
             }
         }
-        if(!success){
-        throw new NoEntryException();}
-        return "";
+        throw new NoEntryException();
     }
 
+    // This method posts project id and git id back to the central site
     private void postToUserService(String projectId, String gitId) {
         try {
             URL url = new URL("http://localhost:3000/user-project-service/save-git");

@@ -99,7 +99,7 @@ class App extends React.Component {
         const requestOptions = {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner }),
+          body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
         }
         fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/addRepofromName' ,requestOptions)
           .then(response => {
@@ -167,7 +167,7 @@ class App extends React.Component {
   }
 
   async addGitToProject(gitId, projectId) {
-    var body = {'repoId': gitId, 'projectId': projectId};
+    var body = {'repoId': gitId, 'projectId': projectId, 'gitSite': 'github'};
     const projectPUTOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
