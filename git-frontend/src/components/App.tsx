@@ -13,6 +13,7 @@ class App extends React.Component {
   public authcateDisplayElement;
   public lastGetResponse;
   public projectId;
+  public gitLabToken;
 
   constructor(props) {
     super(props);
@@ -61,16 +62,46 @@ class App extends React.Component {
     );
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
     var projectId = params.get('project');
     var gitId = params.get('gitId');
 
+    var gitLabCode = params.get('code');
+    /* 
+      Step 1: If no code is given the the url, redirect to authorise with GitLab
+    */
+    if (gitLabCode === null) {
+      window.location.href = "https://git.infotech.monash.edu/oauth/authorize" + 
+        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" + 
+        "&response_type=code" + 
+        "&redirect_uri=http://localhost:3001";
+    }
+    /*
+      Step 2: Once authorisation code is received, call backend api to get access token
+    */
+    var response = await this.getAuthorisationCode(gitLabCode);
+    // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
+    var accessToken = response["access_token"];
+
     this.projectId = projectId;
     this.doGitStuff(projectId, gitId);
+    /*
+      Step 6: Store access token in component to submit to future backend calls 
+     */
+    this.gitLabToken = accessToken;
     
+  }
+
+  async getAuthorisationCode(code) {
+    const requestOptions = {
+      method: 'GET'
+    }
+    var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code ,requestOptions)
+    var response = await promise.json();
+    return response;
   }
 
   changeStudent = (event) => {
@@ -82,7 +113,7 @@ class App extends React.Component {
     }
     // This call to our backend api should provide us with a list of repos currently tracked by the backend
     // Fetch data from the API (replace url below with correct api call)
-    fetch('http://localhost:8080/git/users?name='+event.target.projName.value, requestOptions)
+    fetch('http://localhost:5001/git/users?name='+event.target.projName.value, requestOptions)
       .then(response => response.json())
       .then(data => {
         //this.lastGetResponse.current.updateData(JSON.stringify(data));

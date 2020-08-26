@@ -10,8 +10,8 @@ import java.io.IOException;
 public class GitApplication {
 
 	public static void main(String[] args) throws IOException, JSONException {
-		GitLabRepository gitLabRepository = new GitLabRepository("3398900");
-		//SpringApplication.run(GitApplication.class, args);
+		//GitLabRepository gitLabRepository = new GitLabRepository("3398900");
+		SpringApplication.run(GitApplication.class, args);
 	}
 
 }

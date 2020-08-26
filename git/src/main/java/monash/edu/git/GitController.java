@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -85,6 +86,7 @@ public class GitController {
         }
         projects.add(new Project(name, id));
     }
+
 
     @GetMapping(path = "/project/{projId}/repos")
     @ResponseBody
@@ -299,6 +301,49 @@ public class GitController {
             // e.printStackTrace();
             System.out.println("post to user-service failed");
         }
+    }
+
+    @GetMapping(path = "/gitlab-access-code")
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.OK)
+    public String getAccessToken(@RequestParam String code) throws NoEntryException, JSONException {
+        /*
+            STEP 3: Get access token from gitlab using authorisation code (see frontend for previous steps)
+        */
+        String getAccessCodeURL = "https://git.infotech.monash.edu/oauth/token" + 
+            "?code=" + code +
+            "&client_id=" + "25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
+            "&client_secret=" + "264287a16f1a7228d0444f94f68ba268c9d77a17adfbaf0bab1892d22192276c" +
+            "&grant_type=authorization_code" +
+            "&redirect_uri=http://localhost:3001";
+        
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+            URL url = new URL(getAccessCodeURL);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            int tokenStatus = con.getResponseCode();
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream())   
+            );
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            /*
+                Step 4: Send access token back to front-end
+             */
+            return content.toString();
+        }
+        catch (IOException e) {
+        }
+
+        throw new NoEntryException();
+        
     }
 
 }
