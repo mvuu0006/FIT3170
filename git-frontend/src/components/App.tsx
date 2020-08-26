@@ -54,6 +54,16 @@ class App extends React.Component {
               <Button variant="light" type="submit">Submit</Button>
             </Form>
           </div>
+                    <div className="Repo-adder-lab">
+                      <Form.Label>Add a LabRepo to Project:</Form.Label>
+                      <Form onSubmit={this.addlabRepo}>
+                        <Form.Group controlId="repoLabLink">
+                          <Badge variant="secondary">GitLab Project ID</Badge>
+                          <Form.Control placeholder="(eg. 10273)"/>
+                        </Form.Group>
+                        <Button variant="light" type="submit">Submit</Button>
+                      </Form>
+                    </div>
           <div className="Repo-list">
           </div>
           <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
@@ -133,6 +143,32 @@ class App extends React.Component {
           body: JSON.stringify({ repo:  event.target.repoLink.value }),
         }
         fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+repoOwner+'/'+repoName ,requestOptions)
+          .then(response => {
+            this.authcateDisplayElement.current.updateAuthcate();
+          })
+          .then(data => {
+            this.setState({data});
+            this.updateTable();
+          })
+          .catch(e => { console.error('Error:', e) });
+      }
+    }
+  }
+  addlabRepo = (event) => {
+    event.preventDefault();
+    // Fetch data from the API (replace url below with correct api call)
+    var repoID = event.target.repoLabLink.value;
+    if (!(repoID == '')) {
+      if (this.projectId != null){
+        const requestOptions = {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ repo:  event.target.repoLabLink.value }),
+        }
+        if (this.gitLabToken != null) {
+        var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID;}
+        else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+repoID;}
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID ,requestOptions)
           .then(response => {
             this.authcateDisplayElement.current.updateAuthcate();
           })

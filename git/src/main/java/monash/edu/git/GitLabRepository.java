@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public class GitLabRepository {
     private String id;
+    private String accesstoken;
     private JSONObject commits;
     private JSONObject issues;
 
@@ -15,6 +16,15 @@ public class GitLabRepository {
         this.id=id;
 
         String repoUrl="https://gitlab.com/api/v4/projects/"+id;
+        //String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
+        constructRepoCommits(repoUrl);
+        constructRepoIssues(repoUrl);
+
+    }
+    public GitLabRepository(String id, String accesstoken) throws IOException, JSONException {
+        this.id=id;
+        this.accesstoken = accesstoken;
+        String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
         constructRepoCommits(repoUrl);
         constructRepoIssues(repoUrl);
 
@@ -22,6 +32,9 @@ public class GitLabRepository {
 
     public void constructRepoIssues(String reposUrl) throws IOException, JSONException {
         String issuesUrl=reposUrl+"/issues";
+        if (accesstoken != null){
+            issuesUrl+= "?access_token=" + this.accesstoken;
+        }
         issues=new JSONObject();
 
         GetJSONReader jsonReader= new GetJSONReader();
@@ -53,6 +66,8 @@ public class GitLabRepository {
 
     public void constructRepoCommits(String repoUrl) throws IOException, JSONException {
         String commitsUrl=repoUrl+"/repository/commits";
+        if (this.accesstoken != null) {
+                commitsUrl +="?access_token="+this.accesstoken;}
         commits = new JSONObject();
 
         GetJSONReader jsonReader= new GetJSONReader();
@@ -74,6 +89,13 @@ public class GitLabRepository {
                 commits.put(name,1);
             }
         }
+    }
+    public JSONObject getInfo() throws IOException, JSONException{
+        JSONObject repoInfo = new JSONObject();
+        repoInfo.put("commits",commits);
+        repoInfo.put("issues",issues);
+        repoInfo.put("gitID", id);
+        return repoInfo;
     }
 
 }
