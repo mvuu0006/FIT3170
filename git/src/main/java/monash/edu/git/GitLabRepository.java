@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GitLabRepository {
     private String id;
@@ -80,6 +81,7 @@ public class GitLabRepository {
         JSONObject json = jsonReader.readJsonFromUrl(commitsUrl);
 
         JSONArray jsonArray = json.getJSONArray("entry");
+        ArrayList<String> commitdates = new ArrayList<>();
 
         for (int i=0; i<jsonArray.length();i++)
         {
@@ -94,7 +96,9 @@ public class GitLabRepository {
             {
                 branchcommits.put(name,1);
             }
+            commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
         }
+        branchcommits.put("Timestamps", commitdates);
         return branchcommits;
     }
     public JSONObject getInfo() throws IOException, JSONException{
