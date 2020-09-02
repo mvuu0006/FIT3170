@@ -8,14 +8,15 @@ import AuthcateDisplay from './AuthcateDisplay';
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
 import Table from 'react-bootstrap/Table';
+import ContactComponents from './ContactComponents';
 
-class Contacts extends React.Component {
+class Contacts extends React.Component<{}, { users: string }> {
   public projectId;
   public emailaddress;
 
   constructor(props) {
     super(props);
-    this.state = {data: null};
+    this.state = {users: ""};
 
   }
 
@@ -29,6 +30,7 @@ class Contacts extends React.Component {
             <Form.Label><h3>Go team. Yeah!</h3></ Form.Label>
           </div>
           <div><h6>Current Project ID: {this.projectId}</h6></div>
+          <div><h5>{this.state.users}</h5></div>
           <div></div>
         </div>
       </div>
@@ -36,6 +38,10 @@ class Contacts extends React.Component {
   }
 
   async componentDidMount() {
+  if (this.state.users == "") { this.getUsers();
+  }}
+
+  async getUsers() {
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
@@ -53,6 +59,7 @@ class Contacts extends React.Component {
             var init_data = await init_response.json();
             if (init_data["status"] != 404) {
               var data = JSON.stringify(init_data);
+              this.setState({users: data});
               console.log(data);
             }
             else {console.log("Boo. Something went wrong :(");}
