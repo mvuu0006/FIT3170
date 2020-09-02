@@ -57,9 +57,9 @@ class Contacts extends React.Component <{}, {users: any}>{
             var init_response = await fetch(projectmemberslink, projectGETOptions)
             var init_data = await init_response.json();
             if (init_data["status"] != 404) {
-
-                this.projectName = init_data.projects.projectName;
-                this.setState({users: init_data});
+                if (init_data.users != null) {
+                    this.projectName = init_data.projects.projectName;
+                    this.setState({users: init_data});}
             }
             else {console.log("Boo. Something went wrong :(");}
          }
