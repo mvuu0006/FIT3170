@@ -1,46 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge';
-import AuthcateDisplay from './AuthcateDisplay';
-import HTTPResponseDisplay from './HTTPResponseDisplay';
-import { parse } from 'querystring';
-import PageHandler from './PageHandler';
 
-import {Pie, Doughnut} from 'react-chartjs-2';
-import exp from "constants";
-const state = {
-    labels: ['January', 'February', 'March',
-        'April'],
-    datasets: [
-        {
-            label: 'Rainfall',
-            backgroundColor: [
-                '#2FDE00',
-                '#00A6B4',
-                '#B21F00',
-                '#C9DE00',
-                '#6800B4'
-            ],
+import {Pie} from 'react-chartjs-2';
 
-            data: [75, 10, 5, 2]
-        }
-    ]
-}
-
-class PieChart extends  React.Component<{ }, {users: any }>{
+class PieChart extends  React.Component<{data?: any}, {data?: any}> {
+    public state;
+    public test
     constructor(props) {
         super(props);
-        this.state = {users: null};
+        this.state=null;
+        this.test={data: "{}"};
+        console.log(this.test);
     }
+
+    async componentWillMount() {
+        await this.getContributions();}
 
     render() {
         return (
             <div>
                 <Pie
-                     data={state}
+                     data={this.state}
                      options={{
                          title:{
                              display:true,
@@ -57,6 +37,29 @@ class PieChart extends  React.Component<{ }, {users: any }>{
         );
     }
 
+
+
+    async getContributions()
+    {
+        this.state={
+            labels: ['January', 'February', 'March',
+                'April'],
+            datasets: [
+                {
+                    label: 'Rainfall',
+                    backgroundColor: [
+                        '#2FDE00',
+                        '#00A6B4',
+                        '#B21F00',
+                        '#C9DE00',
+                        '#6800B4'
+                    ],
+
+                    data: [75, 10, 5, 2]
+                }
+            ]
+        }
+    }
 }
 
 export default PieChart;

@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -10,7 +9,6 @@ import PieChart from "./PieChart";
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
 
-import {Pie, Doughnut} from 'react-chartjs-2';
 
 class App extends React.Component {
 
@@ -45,7 +43,7 @@ class App extends React.Component {
             <AuthcateDisplay ref={this.authcateDisplayElement} />
             <Button variant="primary" disabled>Click Me!</Button>
           </div>
-          <div className="Repo-Viewer"><PieChart /></div>
+          <div className="Repo-Viewer"><PieChart ref={this.lastGetResponse}/></div>
           <div></div>
           <div className="Repo-adder">
             <Form.Label>Add a Repo to Project:</Form.Label>

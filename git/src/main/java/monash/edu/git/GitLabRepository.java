@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class GitLabRepository {
     private String id;
@@ -15,11 +16,12 @@ public class GitLabRepository {
     private JSONObject issue_stats;
     private JSONObject merge_requests;
     private JSONObject branches;
+    private JSONObject contribution;
 
     public GitLabRepository(String id) throws IOException, JSONException {
         this.id=id;
 
-        String repoUrl="https://gitlab.com/api/v4/projects/"+id;
+            String repoUrl="https://gitlab.com/api/v4/projects/"+id;
         //String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
         commits = new JSONObject();
         commits = constructRepoCommits(repoUrl, "master");
@@ -67,7 +69,6 @@ public class GitLabRepository {
                 }
             }
         }
-        int a=0;
 
     }
 
@@ -99,7 +100,35 @@ public class GitLabRepository {
             commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
         }
         branchcommits.put("Timestamps", commitdates);
+        constructRepoContributions(branchcommits);
         return branchcommits;
+    }
+
+    public void constructRepoContributions(JSONObject myBranchCommits) throws JSONException {
+        int contributions_total=0;
+        contribution = new JSONObject();
+        Iterator<String> keys = myBranchCommits.keys();
+
+        while (keys.hasNext())
+        {
+            String key=keys.next();
+            if (key!="Timestamps")
+            {
+                contributions_total= contributions_total+myBranchCommits.getInt(key);
+            }
+        }
+
+        Iterator<String> commit_iterator = myBranchCommits.keys();
+
+        while (commit_iterator.hasNext())
+        {
+            String name=commit_iterator.next();
+            if (name != "Timestamps") {
+                int contribution_percent = (myBranchCommits.getInt(name) *100/ contributions_total);
+                contribution.put(name, contribution_percent);
+            }
+        }
+        int a=0;
     }
     public JSONObject getInfo() throws IOException, JSONException{
         JSONObject repoInfo = new JSONObject();
@@ -109,6 +138,7 @@ public class GitLabRepository {
         repoInfo.put("issue_stats", issue_stats);
         repoInfo.put("merge_requests", merge_requests);
         repoInfo.put("branches", branches);
+        repoInfo.put("contribution", contribution);
 
         return repoInfo;
     }
