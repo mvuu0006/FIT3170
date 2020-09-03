@@ -6,10 +6,15 @@ import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import AuthcateDisplay from './AuthcateDisplay';
 import HTTPResponseDisplay from './HTTPResponseDisplay';
+import PieChart from "./PieChart";
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
 
+import {Pie, Doughnut} from 'react-chartjs-2';
+
 class App extends React.Component {
+
+
   public authcateDisplayElement;
   public lastGetResponse;
   public projectId;
@@ -27,6 +32,7 @@ class App extends React.Component {
       <div className="App">
         <div className="App-grid">
           <div className="Student-selector">
+
             {/*<Form onSubmit={this.changeStudent}>
               <Form.Label>Select Project</Form.Label>
               <Form.Group controlId="projName">
@@ -39,6 +45,7 @@ class App extends React.Component {
             <AuthcateDisplay ref={this.authcateDisplayElement} />
             <Button variant="primary" disabled>Click Me!</Button>
           </div>
+          <div className="Repo-Viewer"><PieChart /></div>
           <div></div>
           <div className="Repo-adder">
             <Form.Label>Add a Repo to Project:</Form.Label>
@@ -67,6 +74,7 @@ class App extends React.Component {
           <div className="Repo-list">
           </div>
           <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
+
         </div>
       </div>
     );
@@ -80,13 +88,13 @@ class App extends React.Component {
     var gitId = params.get('gitId');
 
     var gitLabCode = params.get('code');
-    /* 
+    /*
       Step 1: If no code is given the the url, redirect to authorise with GitLab
     */
     if (gitLabCode === null) {
-      window.location.href = "https://git.infotech.monash.edu/oauth/authorize" + 
-        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" + 
-        "&response_type=code" + 
+      window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
+        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
+        "&response_type=code" +
         "&redirect_uri=http://localhost:3001";
     }
     /*
@@ -99,10 +107,10 @@ class App extends React.Component {
     this.projectId = projectId;
     this.doGitStuff(projectId, gitId);
     /*
-      Step 6: Store access token in component to submit to future backend calls 
+      Step 6: Store access token in component to submit to future backend calls
      */
     this.gitLabToken = accessToken;
-    
+
   }
 
   async getAuthorisationCode(code) {
@@ -268,6 +276,7 @@ class App extends React.Component {
 
     });
   }
+
 }
 
 export default App;
