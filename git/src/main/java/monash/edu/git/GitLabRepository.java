@@ -7,28 +7,23 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
 
 public class GitLabRepository {
     private String id;
     private String accesstoken;
-    private JSONObject commits;
     private JSONObject issues;
-    private JSONObject issue_stats;
     private JSONObject merge_requests;
     private JSONObject branches;
     private JSONObject contribution;
-    private Set<String> timeSet;
+    private JSONObject allcommits;
 
     public GitLabRepository(String id) throws IOException, JSONException {
         this.id=id;
 
             String repoUrl="https://gitlab.com/api/v4/projects/"+id;
         //String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
-        timeSet = new HashSet<String>();
-        commits = new JSONObject();
-        commits = constructRepoCommits(repoUrl, "master");
+        allcommits = new JSONObject();
+        constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
         constructBranchInfoandMergeRequests(repoUrl);
     }
@@ -36,9 +31,9 @@ public class GitLabRepository {
         this.id=id;
         this.accesstoken = accesstoken;
         String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
-        timeSet = new HashSet<String>();
-        commits = new JSONObject();
-        commits = constructRepoCommits(repoUrl, "master");
+        allcommits = new JSONObject();
+        allcommits.put("Timestamps", new ArrayList<>());
+        constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
         constructBranchInfoandMergeRequests(repoUrl);
 
@@ -103,12 +98,42 @@ public class GitLabRepository {
                 branchcommits.put(name,1);
             }
             commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
-            timeSet.add(jsonArray.getJSONObject(i).getString("created_at"));
         }
         branchcommits.put("Timestamps", commitdates);
         constructRepoContributions(branchcommits);
         return branchcommits;
     }
+
+    public void constructAllCommits(String repoUrl, Integer page_no, ArrayList<String> commitdates) throws IOException, JSONException {
+        String commitsUrl=repoUrl+"/repository/commits?all=true&per_page=100&page="+String.valueOf(page_no);
+        if (this.accesstoken != null) {
+            commitsUrl +="&access_token="+this.accesstoken;}
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(commitsUrl);
+        JSONArray jsonArray = json.getJSONArray("entry");
+        if (jsonArray.length() != 0) {
+
+            for (int i=0; i<jsonArray.length();i++)
+            {
+                String name=jsonArray.getJSONObject(i).getString("author_name");
+
+                if (this.allcommits.has(name))
+                {
+                    int commits_count=this.allcommits.getInt(name) + 1;
+                    this.allcommits.put(name,commits_count);
+                }
+                else
+                {
+                    this.allcommits.put(name,1);
+                }
+                commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
+            }
+            this.allcommits.put("Timestamps", commitdates);
+            constructRepoContributions(this.allcommits);
+            constructAllCommits(repoUrl, page_no+1, commitdates);}
+    }
+
+
 
     public void constructRepoContributions(JSONObject myBranchCommits) throws JSONException {
         int contributions_total=0;
@@ -138,14 +163,12 @@ public class GitLabRepository {
     }
     public JSONObject getInfo() throws IOException, JSONException{
         JSONObject repoInfo = new JSONObject();
-        repoInfo.put("commits",commits);
         repoInfo.put("issues",issues);
         repoInfo.put("gitID", id);
-        repoInfo.put("issue_stats", issue_stats);
         repoInfo.put("merge_requests", merge_requests);
         repoInfo.put("branches", branches);
         repoInfo.put("contribution", contribution);
-        repoInfo.put("time_sets", timeSet);
+        repoInfo.put("all_commits", allcommits);
 
         return repoInfo;
     }
