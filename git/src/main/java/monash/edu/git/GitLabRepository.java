@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
 
 public class GitLabRepository {
     private String id;
@@ -17,12 +19,14 @@ public class GitLabRepository {
     private JSONObject merge_requests;
     private JSONObject branches;
     private JSONObject contribution;
+    private Set<String> timeSet;
 
     public GitLabRepository(String id) throws IOException, JSONException {
         this.id=id;
 
             String repoUrl="https://gitlab.com/api/v4/projects/"+id;
         //String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
+        timeSet = new HashSet<String>();
         commits = new JSONObject();
         commits = constructRepoCommits(repoUrl, "master");
         constructRepoIssues(repoUrl);
@@ -32,6 +36,7 @@ public class GitLabRepository {
         this.id=id;
         this.accesstoken = accesstoken;
         String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
+        timeSet = new HashSet<String>();
         commits = new JSONObject();
         commits = constructRepoCommits(repoUrl, "master");
         constructRepoIssues(repoUrl);
@@ -98,6 +103,7 @@ public class GitLabRepository {
                 branchcommits.put(name,1);
             }
             commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
+            timeSet.add(jsonArray.getJSONObject(i).getString("created_at"));
         }
         branchcommits.put("Timestamps", commitdates);
         constructRepoContributions(branchcommits);
@@ -139,6 +145,7 @@ public class GitLabRepository {
         repoInfo.put("merge_requests", merge_requests);
         repoInfo.put("branches", branches);
         repoInfo.put("contribution", contribution);
+        repoInfo.put("time_sets", timeSet);
 
         return repoInfo;
     }
