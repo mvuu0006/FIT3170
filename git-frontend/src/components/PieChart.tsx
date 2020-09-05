@@ -55,6 +55,7 @@ class PieChart extends  React.Component<any> {
 
 
     render() {
+        console.log(this.props.data);
         return (
             <div>
                 {/*<Pie*/}
