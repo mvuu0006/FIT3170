@@ -110,15 +110,29 @@ class LineChart extends  React.Component<any> {
         this.lineChartAttributes =[];
         for (let i=0;i<length;i++)
         {
-            this.lineChartAttributes.push({
-                    'label': this.labels[i],
-                    'fill':false,
-                    'lineTension': 0,
-                    'backgroundColor': this.backgroundColor[i],
-                    'borderColor': this.borderColor[i],
-                    'data' : this.dataSet[i]
-                }
-            );
+            // if(i==1)
+            // {
+            //     this.lineChartAttributes.push({
+            //             'label': this.labels[i],
+            //             'fill': true,
+            //             'lineTension': 0,
+            //             'backgroundColor': this.backgroundColor[i],
+            //             'borderColor': this.borderColor[i],
+            //             'data': [4, 3, 2,1,1,1,1,1,1,0,0,0]
+            //         }
+            //     );
+            // }
+            // else {
+                this.lineChartAttributes.push({
+                        'label': this.labels[i],
+                        'fill': true,
+                        'lineTension': 0,
+                        'backgroundColor': this.backgroundColor[i],
+                        'borderColor': this.borderColor[i],
+                        'data': this.dataSet[i]
+                    }
+                );
+           // }
         }
         console.log(this.lineChartAttributes);
     }
