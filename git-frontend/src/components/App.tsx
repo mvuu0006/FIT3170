@@ -10,7 +10,7 @@ import { parse } from 'querystring';
 import PageHandler from './PageHandler';
 
 
-class App extends React.Component {
+class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
 
 
   public authcateDisplayElement;
@@ -22,7 +22,7 @@ class App extends React.Component {
     super(props);
     this.authcateDisplayElement = React.createRef();
     this.lastGetResponse = React.createRef();
-    this.state = {data: null};
+    this.state = {data: null, gitInfo: null};
   }
 
   render() {
@@ -43,7 +43,7 @@ class App extends React.Component {
             <AuthcateDisplay ref={this.authcateDisplayElement} />
             <Button variant="primary" disabled>Click Me!</Button>
           </div>
-          <div className="Repo-Viewer"><PieChart ref={this.lastGetResponse}/></div>
+          <div className="Repo-Viewer"><PieChart data = {this.state.gitInfo}/></div>
           <div></div>
           <div className="Repo-adder">
             <Form.Label>Add a Repo to Project:</Form.Label>
@@ -217,6 +217,7 @@ class App extends React.Component {
     }
     else {
       var allInfo = {projectId: this.projectId, repoInfo: repo_data};
+      this.setState({gitInfo: repo_data});
       // Display Info
       this.lastGetResponse.current.updateData(allInfo);
     }

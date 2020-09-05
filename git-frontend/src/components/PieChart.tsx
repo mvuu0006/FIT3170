@@ -8,15 +8,13 @@ class PieChart extends  React.Component<{data?: any}, {data?: any}> {
     public test
     constructor(props) {
         super(props);
-        this.state=null;
-        this.test={data: "{}"};
-        console.log(this.test);
     }
 
     async componentWillMount() {
         await this.getContributions();}
 
     render() {
+        console.log(this.props.data);
         return (
             <div>
                 <Pie
