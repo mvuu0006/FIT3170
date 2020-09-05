@@ -70,8 +70,11 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
                     </div>
           <div className="Repo-list">
           </div>
-          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
-          <div className="Repo-Viewer"><PieChart data = {this.state.gitInfo}/></div>
+          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} />
+            <div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>
+          </div>
+
+
 
         </div>
       </div>
@@ -220,6 +223,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
       this.setState({gitInfo: repo_data});
       // Display Info
       this.lastGetResponse.current.updateData(allInfo);
+
     }
   }
 

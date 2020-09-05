@@ -10,32 +10,40 @@ class PieChart extends  React.Component<any> {
         super(props);
         }
 
+
     render() {
         console.log(this.props.data);
-        if (this.props.data != null)
-        {
-            this.contributions = this.props.data[0].contributions;
-            console.log(Object.values(this.contributions).length)
-            this.getContributions()
+        if (this.props.data != null) {
+            if (this.props.data.length !=0) {
+                this.contributions = this.props.data[0].contributions;
+                console.log(Object.values(this.contributions).length)
+                this.getContributions()
+
+                return (
+                    <div>
+                        <Pie
+                            data={this.pieData}
+                            options={{
+                                borderColor: '#000000',
+                                title: {
+                                    display: true,
+                                    text: 'Contribution (%)',
+                                    fontColor: '##FFFFFF',
+                                    fontSize: 20,
+                                    position: 'top'
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'right'
+                                }
+                            }}
+                        />
+                    </div>
+                );
+            }
         }
-        return (
-            <div>
-                <Pie
-                     data={this.pieData}
-                     options={{
-                         title:{
-                             display:true,
-                             text:'Contribution',
-                             fontSize:20
-                         },
-                         legend:{
-                             display:true,
-                             position:'right'
-                         }
-                     }}
-                />
-            </div>
-        );
+        return <div></div>;
+
     }
 
     getContributions()
@@ -56,7 +64,7 @@ class PieChart extends  React.Component<any> {
     chooseColours(numberOfColours)
     {
         var coloursList=[
-            "#FAEBD7","#00FFFF", "#7FFFD4", "#F0FFFF", "#F5F5DC", "#FFE4C4", "#000000", "#FFEBCD", "#0000FF",
+            "#FAEBD7","#00FFFF", "#7FFFD4", "#f0ffff", "#F5F5DC", "#FFE4C4", "#000000", "#FFEBCD", "#0000FF",
             "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E", "#FF7F50", "#6495ED", "#FFF8DC",
             "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B", "#A9A9A9", "#006400","#A9A9A9", "#BDB76B",
             "#8B008B", "#556B2F", "#FF8C00", "#9932CC", "#8B0000", "#E9967A", "#8FBC8F","#483D8B", "#2F4F4F",
