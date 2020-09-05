@@ -1,6 +1,9 @@
 package monash.edu.git;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,7 +15,14 @@ public class GitRepository {
     private JSONObject repoInfo;
     public String githubUsername;
     public String repoName;
+    private JSONObject commitTime;
     private String gitId;
+    //private JSONObject pieObj;
+
+    private ArrayList<String> label;
+    private ArrayList<String> backgroundColor;
+    private ArrayList<String> borderColor;
+    private ArrayList<int[]> dataSet;
 
     // Constructor that creates the Repository object based on username and reponame
     public GitRepository(String gitUsername, String repoName) throws IOException, JSONException {
@@ -64,6 +74,11 @@ public class GitRepository {
         repoInfo.put("commits", commits);
         repoInfo.put("contributions", contributors);
         repoInfo.put("GitId",gitId);
+
+        repoInfo.put("labels", label);
+        repoInfo.put("backgroundColor", backgroundColor);
+        repoInfo.put("borderColor", borderColor);
+        repoInfo.put("data", dataSet);
     }
 
     private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
@@ -101,6 +116,8 @@ public class GitRepository {
 
     private void constructRepoCommits(String gitUsername, String repoName) throws IOException, JSONException {
         commits=new JSONObject();
+        commitTime= new JSONObject();
+
 
         // Creating the URL
         String commitsUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
@@ -112,20 +129,74 @@ public class GitRepository {
         // Extracting the array from the JSON Object
         JSONArray jsonArray = json.getJSONArray("entry");
 
+        createDataSet(jsonArray);
         // Loop that goes through all the commits and extracts its authors
         // Also increments commit number if author already exists in commit JSONObject
         for (int i=0;i<jsonArray.length();i++)
         {
+
             String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String time=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
             if (commits.has(name))
             {
                 int existingComments=commits.getInt(name)+1;
                 commits.put(name, existingComments);
             }
             else {
+                if(!commitTime.has(time))
+                {
+                    commitTime.put(name,time);
+
+                }
                 commits.put(name,1);
             }
         }
+    }
+
+    private void createDataSet(JSONArray jsonArray) throws JSONException {
+        //pieObj = new JSONObject();
+
+        label=new ArrayList<String>();
+        borderColor=new ArrayList<String>();
+        backgroundColor= new ArrayList<String>();
+        dataSet = new ArrayList<int[]>();
+
+        for(int i=0;i<jsonArray.length();i++)
+        {
+            //pieChartObject pieChartObj = new pieChartObject();
+            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String date=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
+
+
+            if (label.contains(name))
+            {
+                //pieChartObj= (pieChartObject) pieObj.get(name);
+                int month= Integer.parseInt(date.substring(5,7));
+                int[]data = dataSet.get(label.indexOf(name));
+                data[month]=+1;
+                dataSet.set(label.indexOf(name),data);
+            }
+            else{
+
+                label.add(name);
+                String[] colors={"#FAEBD7","#00FFFF", "#7FFFD4", "#f0ffff", "#F5F5DC", "#FFE4C4", "#000000", "#FFEBCD", "#0000FF",
+                        "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E", "#FF7F50", "#6495ED", "#FFF8DC",
+                        "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B", "#A9A9A9", "#006400","#A9A9A9", "#BDB76B",
+                        "#8B008B", "#556B2F", "#FF8C00", "#9932CC", "#8B0000", "#E9967A", "#8FBC8F","#483D8B", "#2F4F4F",
+                        "#2F4F4F", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#696969","#696969", "#1E90FF", "#B22222",
+                        "#FFFAF0", "#228B22", "#FF00FF", "#DCDCDC", "#F8F8FF", "#FFD700", "#DAA520", "#808080", "#008000",
+                        "#ADFF2F", "#808080", "#F0FFF0", "#FF69B4", "#CD5C5C", "#4B0082", "#FFFFF0","#F0E68C", "#E6E6FA",
+                        "#FFF0F5", "#7CFC00", "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2"};
+                backgroundColor.add(colors[i]);
+                borderColor.add(colors[i]);
+
+                int[] data = {0,0,0,0,0,0,0,0,0,0,0,0};
+                int month= Integer.parseInt(date.substring(5,7));
+                data[month]=1;
+                dataSet.add(data);
+            }
+        }
+
     }
 
     public JSONObject getInfo() {

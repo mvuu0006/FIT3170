@@ -8,6 +8,7 @@ import HTTPResponseDisplay from './HTTPResponseDisplay';
 import PieChart from "./PieChart";
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
+import LineChart from "./LineChart";
 
 
 class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
@@ -72,6 +73,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
           </div>
           <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} />
             <div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>
+            <div className="Repo-Line"><LineChart data = {this.state.gitInfo}/></div>
           </div>
 
 

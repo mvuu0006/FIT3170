@@ -15,6 +15,7 @@ public class GitApplication {
 		//String accessToken = "plzEnterOwnAccessToken. This won't work";
 		//GitLabRepository gitLabRepository = new GitLabRepository("10273",accessToken);
 		//JSONObject repoinfo = gitLabRepository.getInfo();
+		//GitRepository gitRepository = new GitRepository("octocat", "Hello-World");
 		SpringApplication.run(GitApplication.class, args);
 	}
 
