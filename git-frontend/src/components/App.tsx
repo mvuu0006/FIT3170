@@ -15,6 +15,7 @@ class App extends React.Component {
 
   public authcateDisplayElement;
   public lastGetResponse;
+  public repoInformation;
   public projectId;
   public gitLabToken;
 
@@ -22,7 +23,7 @@ class App extends React.Component {
     super(props);
     this.authcateDisplayElement = React.createRef();
     this.lastGetResponse = React.createRef();
-    this.state = {data: null};
+    this.state = {gitInfo: null};
   }
 
   render() {
@@ -43,7 +44,6 @@ class App extends React.Component {
             <AuthcateDisplay ref={this.authcateDisplayElement} />
             <Button variant="primary" disabled>Click Me!</Button>
           </div>
-          <div className="Repo-Viewer"><PieChart ref={this.lastGetResponse}/></div>
           <div></div>
           <div className="Repo-adder">
             <Form.Label>Add a Repo to Project:</Form.Label>
@@ -72,7 +72,9 @@ class App extends React.Component {
           <div className="Repo-list">
           </div>
           <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
-
+            {/*{console.log("Repo Info")}*/}
+            {/*{console.log(this.lastGetResponse)}*/}
+          <div className="Repo-chart"><PieChart gitData={this.state.gitInfo}/></div>
         </div>
       </div>
     );
