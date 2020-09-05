@@ -43,7 +43,6 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
             <AuthcateDisplay ref={this.authcateDisplayElement} />
             <Button variant="primary" disabled>Click Me!</Button>
           </div>
-          <div className="Repo-Viewer"><PieChart data = {this.state.gitInfo}/></div>
           <div></div>
           <div className="Repo-adder">
             <Form.Label>Add a Repo to Project:</Form.Label>
@@ -72,6 +71,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
           <div className="Repo-list">
           </div>
           <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
+          <div className="Repo-Viewer"><PieChart data = {this.state.gitInfo}/></div>
 
         </div>
       </div>

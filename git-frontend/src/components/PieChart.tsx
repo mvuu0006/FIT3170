@@ -5,113 +5,70 @@ import {Pie} from 'react-chartjs-2';
 
 class PieChart extends  React.Component<any> {
     public contributions;
-    public test;
+    public pieData;
     constructor(props) {
         super(props);
-        //this.state=props.gitData;
-        //console.log(this.state)
-
-        //console.log("Propsaa");
-        //console.log(props.data);
-        //this.contributions=this.props.data["current"];
-        // if (this.contributions != null)
-        // {
-        //     console.log("Extractor")
-        //     console.log(this.contributions);
-        // }
-        //this.state = {data: "{}"};
-        //this.contributions=this.state.data;
-
-    }
-
-
-    async componentWillMount() {
-        // const projectGETContributions = {
-        //     method: 'GET',
-        // }
-        // var repo_response = await fetch('http://localhost:5001/git/project/'+'2'+"/repos", projectGETContributions);
-        // var repo_check = await repo_response.json();
-        // //if (repo_check !=undefined)
-        // //{
-        //     var repo_data=repo_check;
-        // //}
-        // if (repo_data["status"] == 404) {
-        //     console.log("Repo GET didnt work. SADDD!");
-        // }
-        // else {
-        //         console.log("Repo Data");
-        //         console.log(repo_data[0]["contributions"]);
-        //         this.contributions=repo_data[0]["contributions"];
-        //
-        //         console.log(Object.keys(this.contributions));
-        //
-        //     //var allInfo = {projectId: this.projectId, repoInfo: repo_data};
-        //     //Display Info
-        //     //this.lastGetResponse.current.updateData(allInfo);
-            await this.getContributions()
         }
-
-
-
 
     render() {
         console.log(this.props.data);
+        if (this.props.data != null)
+        {
+            this.contributions = this.props.data[0].contributions;
+            console.log(Object.values(this.contributions).length)
+            this.getContributions()
+        }
         return (
             <div>
-                {/*<Pie*/}
-                {/*     data={this.state}*/}
-                {/*     options={{*/}
-                {/*         title:{*/}
-                {/*             display:true,*/}
-                {/*             text:'Contribution',*/}
-                {/*             fontSize:20*/}
-                {/*         },*/}
-                {/*         legend:{*/}
-                {/*             display:true,*/}
-                {/*             position:'right'*/}
-                {/*         }*/}
-                {/*     }}*/}
-                {/*/>*/}
+                <Pie
+                     data={this.pieData}
+                     options={{
+                         title:{
+                             display:true,
+                             text:'Contribution',
+                             fontSize:20
+                         },
+                         legend:{
+                             display:true,
+                             position:'right'
+                         }
+                     }}
+                />
             </div>
         );
     }
 
-
-
-    async getContributions()
+    getContributions()
     {
-
-        // this.state={
-        //     labels: Object.keys(this.contributions),
-        //     datasets: [
-        //         {
-        //             label: 'Contributions',
-        //             backgroundColor: [
-        //                 '#2FDE00',
-        //                 '#00A6B4'
-        //             ],
-        //             data: Object.values(this.contributions)
-        //         }
-        //     ]
-        // }
-        this.test={
-            labels: ['January', 'February', 'March',
-                'April'],
+        this.pieData={
+            labels: Object.keys(this.contributions),
             datasets: [
                 {
-                    label: 'Rainfall',
-                    backgroundColor: [
-                        '#2FDE00',
-                        '#00A6B4',
-                        '#B21F00',
-                        '#C9DE00',
-                        '#6800B4'
-                    ],
-
-                    data: [75, 10, 5, 2]
+                    label: 'Contributions',
+                    backgroundColor: this.chooseColours(Object.keys(this.contributions).length),
+                    data: Object.values(this.contributions)
                 }
             ]
         }
+
+    }
+
+    chooseColours(numberOfColours)
+    {
+        var coloursList=[
+            "#FAEBD7","#00FFFF", "#7FFFD4", "#F0FFFF", "#F5F5DC", "#FFE4C4", "#000000", "#FFEBCD", "#0000FF",
+            "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E", "#FF7F50", "#6495ED", "#FFF8DC",
+            "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B", "#A9A9A9", "#006400","#A9A9A9", "#BDB76B",
+            "#8B008B", "#556B2F", "#FF8C00", "#9932CC", "#8B0000", "#E9967A", "#8FBC8F","#483D8B", "#2F4F4F",
+            "#2F4F4F", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#696969","#696969", "#1E90FF", "#B22222",
+            "#FFFAF0", "#228B22", "#FF00FF", "#DCDCDC", "#F8F8FF", "#FFD700", "#DAA520", "#808080", "#008000",
+            "#ADFF2F", "#808080", "#F0FFF0", "#FF69B4", "#CD5C5C", "#4B0082", "#FFFFF0","#F0E68C", "#E6E6FA",
+            "#FFF0F5", "#7CFC00", "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2",
+            ]
+
+        var colours=coloursList.slice(0,numberOfColours)
+
+        return colours
     }
 }
 
