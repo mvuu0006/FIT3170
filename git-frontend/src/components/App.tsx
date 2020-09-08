@@ -1,24 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import AuthcateDisplay from './AuthcateDisplay';
 import HTTPResponseDisplay from './HTTPResponseDisplay';
+import PieChart from "./PieChart";
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
+import LineChart from "./LineChart";
 
-class App extends React.Component {
+
+class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
+
+
   public authcateDisplayElement;
   public lastGetResponse;
   public projectId;
+  public gitLabToken;
 
   constructor(props) {
     super(props);
     this.authcateDisplayElement = React.createRef();
     this.lastGetResponse = React.createRef();
-    this.state = {data: null};
+    this.state = {data: null, gitInfo: null};
   }
 
   render() {
@@ -26,6 +31,7 @@ class App extends React.Component {
       <div className="App">
         <div className="App-grid">
           <div className="Student-selector">
+
             {/*<Form onSubmit={this.changeStudent}>
               <Form.Label>Select Project</Form.Label>
               <Form.Group controlId="projName">
@@ -53,24 +59,70 @@ class App extends React.Component {
               <Button variant="light" type="submit">Submit</Button>
             </Form>
           </div>
+                    <div className="Repo-adder-lab">
+                      <Form.Label>Add a LabRepo to Project:</Form.Label>
+                      <Form onSubmit={this.addlabRepo}>
+                        <Form.Group controlId="repoLabLink">
+                          <Badge variant="secondary">GitLab Project ID</Badge>
+                          <Form.Control placeholder="(eg. 10273)"/>
+                        </Form.Group>
+                        <Button variant="light" type="submit">Submit</Button>
+                      </Form>
+                    </div>
           <div className="Repo-list">
           </div>
-          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
+          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} />
+            <div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>
+            <div className="Repo-Line"><LineChart data = {this.state.gitInfo}/></div>
+          </div>
+
+
+
         </div>
       </div>
     );
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
     var projectId = params.get('project');
     var gitId = params.get('gitId');
 
+    var gitLabCode = params.get('code');
+    /*
+      Step 1: If no code is given the the url, redirect to authorise with GitLab
+    */
+    if (gitLabCode === null) {
+      window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
+        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
+        "&response_type=code" +
+        "&redirect_uri=http://localhost:3001";
+    }
+    /*
+      Step 2: Once authorisation code is received, call backend api to get access token
+    */
+    var response = await this.getAuthorisationCode(gitLabCode);
+    // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
+    var accessToken = response["access_token"];
+
     this.projectId = projectId;
     this.doGitStuff(projectId, gitId);
-    
+    /*
+      Step 6: Store access token in component to submit to future backend calls
+     */
+    this.gitLabToken = accessToken;
+
+  }
+
+  async getAuthorisationCode(code) {
+    const requestOptions = {
+      method: 'GET'
+    }
+    var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code ,requestOptions)
+    var response = await promise.json();
+    return response;
   }
 
   changeStudent = (event) => {
@@ -82,7 +134,7 @@ class App extends React.Component {
     }
     // This call to our backend api should provide us with a list of repos currently tracked by the backend
     // Fetch data from the API (replace url below with correct api call)
-    fetch('http://localhost:8080/git/users?name='+event.target.projName.value, requestOptions)
+    fetch('http://localhost:5001/git/users?name='+event.target.projName.value, requestOptions)
       .then(response => response.json())
       .then(data => {
         //this.lastGetResponse.current.updateData(JSON.stringify(data));
@@ -102,6 +154,32 @@ class App extends React.Component {
           body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
         }
         fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/addRepofromName' ,requestOptions)
+          .then(response => {
+            this.authcateDisplayElement.current.updateAuthcate();
+          })
+          .then(data => {
+            this.setState({data});
+            this.updateTable();
+          })
+          .catch(e => { console.error('Error:', e) });
+      }
+    }
+  }
+  addlabRepo = (event) => {
+    event.preventDefault();
+    // Fetch data from the API (replace url below with correct api call)
+    var repoID = event.target.repoLabLink.value;
+    if (!(repoID == '')) {
+      if (this.projectId != null){
+        const requestOptions = {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ repo:  event.target.repoLabLink.value }),
+        }
+        if (this.gitLabToken != null) {
+        var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID;}
+        else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+repoID;}
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID ,requestOptions)
           .then(response => {
             this.authcateDisplayElement.current.updateAuthcate();
           })
@@ -144,8 +222,10 @@ class App extends React.Component {
     }
     else {
       var allInfo = {projectId: this.projectId, repoInfo: repo_data};
+      this.setState({gitInfo: repo_data});
       // Display Info
       this.lastGetResponse.current.updateData(allInfo);
+
     }
   }
 
@@ -203,6 +283,7 @@ class App extends React.Component {
 
     });
   }
+
 }
 
 export default App;

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Project {
     private String projectName;
     private ArrayList<GitRepository> repositories;
+    private ArrayList<GitLabRepository> repositorieslab;
     private String email="";
     private String id;
 
@@ -18,6 +19,7 @@ public class Project {
         this.projectName = name;
         this.id = id;
         repositories = new ArrayList<GitRepository>();
+        repositorieslab = new ArrayList<GitLabRepository>();
     }
 
     public String getProjectName() {
@@ -32,10 +34,13 @@ public class Project {
         return id;
     }
 
-    public JSONArray getRepositories() throws JSONException {
+    public JSONArray getRepositories() throws JSONException, IOException {
         // Loop that returns a JSONArray of all the repos
         JSONArray repos = new JSONArray();
         for (GitRepository repo : repositories) {
+            repos.put(repo.getInfo());
+        }
+        for (GitLabRepository repo : repositorieslab) {
             repos.put(repo.getInfo());
         }
         return repos;
@@ -83,6 +88,33 @@ public class Project {
             try {
                 GitRepository newRepo = new GitRepository(id);
                 repositories.add(newRepo);
+            } catch (IOException | JSONException e) {
+                //e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    throw new NoRepoException();
+                }
+            }
+        }
+    }
+    // Method that adds repository by ID
+    public void addRepositoryByIDandToken(String id, String accesstoken) throws NoRepoException {
+        if (getRepositoryByID(id) == null) {
+            try {
+                GitLabRepository newRepo = new GitLabRepository(id, accesstoken);
+                repositorieslab.add(newRepo);
+            } catch (IOException | JSONException e) {
+                //e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    throw new NoRepoException();
+                }
+            }
+        }
+    }
+    public void addLabRepositoryByID(String id) throws NoRepoException {
+        if (getRepositoryByID(id) == null) {
+            try {
+                GitLabRepository newRepo = new GitLabRepository(id);
+                repositorieslab.add(newRepo);
             } catch (IOException | JSONException e) {
                 //e.printStackTrace();
                 if (e instanceof FileNotFoundException) {
