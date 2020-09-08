@@ -151,9 +151,9 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
         const requestOptions = {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ repo:  event.target.repoLink.value }),
+          body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
         }
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+repoOwner+'/'+repoName ,requestOptions)
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/addRepofromName' ,requestOptions)
           .then(response => {
             this.authcateDisplayElement.current.updateAuthcate();
           })
@@ -247,12 +247,14 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
   }
 
   async addGitToProject(gitId, projectId) {
+    var body = {'repoId': gitId, 'projectId': projectId, 'gitSite': 'github'};
     const projectPUTOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
     }
     this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
-    var response = await fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/'+(gitId as string), projectPUTOptions)
+    var response = await fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/addRepofromID', projectPUTOptions)
     .catch(error => {
       console.error('Error:',error)
     });
