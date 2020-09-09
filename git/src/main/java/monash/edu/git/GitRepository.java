@@ -222,7 +222,7 @@ public class GitRepository {
             String commit_desc=commitInfo.getJSONObject(i).getJSONObject("commit").getString("message");
 
             //2012-03-06T23:06:50Z
-            //date=date.substring(0,10)+ " at "+date.substring(11,19);
+            date=date.substring(0,10)+ " at "+date.substring(11,19);
 
             JSONObject table_entry=new JSONObject();
             table_entry.put("name",name);
