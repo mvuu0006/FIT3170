@@ -17,6 +17,7 @@ public class GitRepository {
     public String repoName;
     private JSONObject commitTime;
     private String gitId;
+    private JSONArray tableData;
     //private JSONObject pieObj;
 
     private ArrayList<String> label;
@@ -79,6 +80,7 @@ public class GitRepository {
         repoInfo.put("backgroundColor", backgroundColor);
         repoInfo.put("borderColor", borderColor);
         repoInfo.put("data", dataSet);
+        repoInfo.put("tableData",tableData);
     }
 
     private void constructRepoContributors(String gitUsername, String repoName) throws IOException, JSONException {
@@ -117,7 +119,7 @@ public class GitRepository {
     private void constructRepoCommits(String gitUsername, String repoName) throws IOException, JSONException {
         commits=new JSONObject();
         commitTime= new JSONObject();
-
+        tableData= new JSONArray();
 
         // Creating the URL
         String commitsUrl = "https://api.github.com/repos/" + gitUsername + "/" + repoName + "/commits";
@@ -130,6 +132,7 @@ public class GitRepository {
         JSONArray jsonArray = json.getJSONArray("entry");
 
         createDataSet(jsonArray);
+        createTableData(jsonArray);
         // Loop that goes through all the commits and extracts its authors
         // Also increments commit number if author already exists in commit JSONObject
         for (int i=0;i<jsonArray.length();i++)
@@ -209,6 +212,22 @@ public class GitRepository {
             }
         }
 
+    }
+
+    public void createTableData(JSONArray commitInfo) throws JSONException {
+        for (int i=0;i<commitInfo.length();i++)
+        {
+            String name=commitInfo.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String date=commitInfo.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
+            String commit_desc=commitInfo.getJSONObject(i).getJSONObject("commit").getString("message");
+
+            JSONObject table_entry=new JSONObject();
+            table_entry.put("name",name);
+            table_entry.put("date",date);
+            table_entry.put("commit_description",commit_desc);
+
+            tableData.put(table_entry);
+        }
     }
 
     public JSONObject getInfo() {

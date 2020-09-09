@@ -17,6 +17,7 @@ class HTTPResponseDisplay extends React.Component<{data?: any}, {data?: any}> {
 
     render () {
         let header = (<div><h6>Current Project ID: {this.state.data["projectId"]}</h6></div>);
+        console.log(this.state)
         
         if (this.state.data["repoInfo"] != null) {
             let arrayOfRepos = this.state.data["repoInfo"].map((repo) => 

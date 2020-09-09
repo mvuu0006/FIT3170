@@ -75,7 +75,6 @@ class LineChart extends  React.Component<any> {
                 );
            // }
         }
-        console.log(this.lineChartAttributes);
     }
 
 }
