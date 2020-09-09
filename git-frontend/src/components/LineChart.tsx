@@ -16,7 +16,6 @@ class LineChart extends  React.Component<any> {
     render() {
         if (this.props.data != null) {
             if (this.props.data.length != 0) {
-                //this.props.data[0].backgroundColor[0]
                 this.backgroundColor = this.props.data[0].backgroundColor;
                 this.borderColor = this.props.data[0].borderColor;
                 this.dataSet = this.props.data[0].data;
@@ -54,51 +53,6 @@ class LineChart extends  React.Component<any> {
             labels: ['January', 'February', 'March',
                 'April', 'May', 'June', 'July', 'August','September', 'October', 'November', 'December'],
             datasets: this.lineChartAttributes,
-            //     [
-            //     {
-            //         label: 'Rainfall',
-            //         fill: false,
-            //         lineTension: 0.5,
-            //         backgroundColor: 'rgba(240,255,255,1)',
-            //         borderColor: 'rgba(240,255,255,1)',
-            //         borderWidth: 2,
-            //         data: [0,0,65, 59, 80,0,0, 81, 56]
-            //     },
-            //
-            //     {
-            //         label: 'Summer',
-            //         fill: false,
-            //         lineTension: 0.5,
-            //         backgroundColor: 'rgb(4,151,151)',
-            //         borderColor: 'rgb(17,194,194)',
-            //         borderWidth: 2,
-            //         data: [6, 79, 24, 55, 34, 89,111]
-            //     }
-            // ],
-            // options:{
-            //     responsive: true,
-            //     scales: {
-            //         xAxes: [{
-            //             display: true,
-            //             gridLines: {
-            //                 display: true,
-            //                 color: "#e82020"
-            //             },
-            //             scaleLabel: {
-            //                 display: true,
-            //                 labelString: 'Month'
-            //             }
-            //         }],
-            //         yAxes: [{
-            //             display: true,
-            //             gridLines: {
-            //                 display: true,
-            //                 color: "#d91818"
-            //             },
-            //
-            //         }]
-            //     }
-            // }
         }
     }
 
@@ -110,19 +64,6 @@ class LineChart extends  React.Component<any> {
         this.lineChartAttributes =[];
         for (let i=0;i<length;i++)
         {
-            // if(i==1)
-            // {
-            //     this.lineChartAttributes.push({
-            //             'label': this.labels[i],
-            //             'fill': true,
-            //             'lineTension': 0,
-            //             'backgroundColor': this.backgroundColor[i],
-            //             'borderColor': this.borderColor[i],
-            //             'data': [4, 3, 2,1,1,1,1,1,1,0,0,0]
-            //         }
-            //     );
-            // }
-            // else {
                 this.lineChartAttributes.push({
                         'label': this.labels[i],
                         'fill': true,
