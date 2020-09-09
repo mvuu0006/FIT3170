@@ -28,7 +28,7 @@ class LineChart extends  React.Component<any> {
                             options={{
                                 title: {
                                     display: true,
-                                    text: 'Average Rainfall per month',
+                                    text: 'Commits Timeline',
                                     fontSize: 20
                                 },
                                 legend: {

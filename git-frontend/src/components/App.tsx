@@ -71,14 +71,13 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
                     </div>
           <div className="Repo-list">
           </div>
-          <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} />
-            <div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>
-            <div className="Repo-Line"><LineChart data = {this.state.gitInfo}/></div>
-          </div>
-
-
 
         </div>
+        {/*<div className="Repo-viewer"><HTTPResponseDisplay/>*/}
+        <div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>
+          <div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>
+          <div className="Repo-Line"><LineChart data = {this.state.gitInfo}/></div>
+
       </div>
     );
   }
