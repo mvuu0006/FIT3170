@@ -2,15 +2,12 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge';
-import AuthcateDisplay from './AuthcateDisplay';
 import { parse } from 'querystring';
 import PageHandler from './PageHandler';
 import Table from 'react-bootstrap/Table';
 import ContactComponents from './ContactComponents';
 
-class Contacts extends React.Component <{}, {users: any}>{
+class Contacts extends React.Component <{}, {users: any, projectId: any, projectName: any}>{
   public projectId;
   public emailaddress;
   public projectName;
@@ -18,7 +15,7 @@ class Contacts extends React.Component <{}, {users: any}>{
 
   constructor(props) {
     super(props);
-    this.state = {users: null};
+    this.state = {users: null, projectId: null, projectName: null};
     this.projectName = "";
 
   }
@@ -30,8 +27,9 @@ class Contacts extends React.Component <{}, {users: any}>{
           <div className="Student-selector">
             <Form.Label><h2>Contacts Page </h2></ Form.Label>
             <h6>Project Name: {this.projectName}</h6>
-            <ContactComponents users={this.state.users}/>
-           </div>
+            <h6>Project Id: {this.projectId}</h6>
+            <ContactComponents users={this.state.users} projectName={this.state.projectName} projectId = {this.state.projectId}/>
+             </div>
         </div>
       </div>
     );
@@ -47,6 +45,7 @@ class Contacts extends React.Component <{}, {users: any}>{
 
     // Current test params are project=2&email=testemail@gmail.com
     this.projectId = params.get('project');
+    this.setState({projectId: this.projectId});
     var emailaddress = params.get('email');
     if (this.projectId != null){
         var projectmemberslink = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-projectusers?email="+emailaddress+"&projectId="+this.projectId;
@@ -58,8 +57,9 @@ class Contacts extends React.Component <{}, {users: any}>{
             var init_data = await init_response.json();
             if (init_data["status"] != 404) {
                 if (init_data.users != null) {
-                    this.projectName = init_data.projects.projectName;
-                    this.setState({users: init_data});}
+                           this.projectName = init_data.projects.projectName;
+                           this.setState({users: init_data});
+                           this.setState({projectName: this.projectName});}
             }
             else {console.log("Boo. Something went wrong :(");}
          }

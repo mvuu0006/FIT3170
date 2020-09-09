@@ -153,7 +153,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
         }
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/addRepofromName' ,requestOptions)
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ repoOwner+"/"+repoName ,requestOptions)
           .then(response => {
             this.authcateDisplayElement.current.updateAuthcate();
           })

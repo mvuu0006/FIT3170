@@ -1,7 +1,7 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 
-class ContactComponents extends React.Component<{users: any}, {users: any}>{
+class ContactComponents extends React.Component<{users: any, projectId: any, projectName: any}, {}>{
     constructor(props) {
         super(props);
     }
@@ -18,7 +18,8 @@ class ContactComponents extends React.Component<{users: any}, {users: any}>{
                 let arrayOfPeople = this.props.users.users.map((repo) =>
                 (<tr key={repo.emailAddress}>
                     <td>{repo.firstName} {repo.lastName}</td>
-                    <td>{repo.emailAddress}</td>
+                    <td><a href={"mailto:"+ repo.emailAddress+"?Subject="+ this.props.projectName + ", " + this.props.projectId} target="_top">
+                                {repo.emailAddress}</a></td>
                     <td>{repo.userGroup}</td>
                 </tr>));
                 let table = (<Table variant="light" striped bordered hover>
@@ -37,12 +38,6 @@ class ContactComponents extends React.Component<{users: any}, {users: any}>{
             }
             return <div></div>;
         }
-
-//     createHtml(){
-//     for (let i = 0; i < this.props.users.users["length"]; i++)){
-//             html += <div><h4>{this.props.users.users[i].firstName} {this.props.users.users[i].lastName}</h4><h5>{this.props.users.users[i].emailAddress}</h5></div>;}
-//     return html}
-
 }
 
 export default ContactComponents;

@@ -136,15 +136,14 @@ public class GitController {
         if (projectId.equals("") || githubUsername.equals("") || repoName.equals("")) {
             return;
         }
-        projects.add(new Project("Moo","Moo")); // Delete this line once done refactoring
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
-                if (gitSite.equals("github")) {
+                //if (gitSite.equals("github")) {
                         project.addRepositoryByUsername(githubUsername, repoName);
                         String gitId = project.getRepositoryByUserName(githubUsername, repoName).getGitId();
                         postToUserService(projectId, gitId);
                         return;
-                }
+                //}
             }
         }
         throw new ForbiddenException();
@@ -226,11 +225,11 @@ public class GitController {
         }
         for (Project project : projects) {
             if (project.getId().equals(projectId)) {
-                if (gitSite.equals("github")) {
+                //if (gitSite.equals("github")) {
                     project.addRepositoryByID(gitId);
                     postToUserService(projectId, gitId);
                     return;
-                }
+                //}
             }
         }
         throw new ForbiddenException();
