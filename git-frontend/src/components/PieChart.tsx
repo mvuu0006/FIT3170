@@ -12,9 +12,9 @@ class PieChart extends  React.Component<any> {
 
 
     render() {
-        if (this.props.data != null) {
-            if (this.props.data.length !=0) {
-                this.contributions = this.props.data[0].contributions;
+        if (this.props.data.state != null) {
+            if (this.props.data.state.length !=0) {
+                this.contributions = this.props.data.state[0].contributions;
                 this.getContributions()
 
                 return (

@@ -1,114 +1,20 @@
 import React from 'react';
 import {MDBDataTable} from 'mdbreact';
 
-class HTTPResponseDisplay extends React.Component<{data?: any}, {data?: any}> {
-    private tableData;
+class HTTPResponseDisplay extends React.Component<any> {
+    public tableData;
     constructor(props) {
         super(props);
-        this.state = {data: "{}"};
     }
 
     render () {
-        const test_data = {
-            columns: [
-                {
-                    label: '#',
-                    field: 'id',
-                                    },
-                {
-                    label: 'First',
-                    field: 'first',
 
-                },
-                {
-                    label: 'Last',
-                    field: 'last',
-                    //sort: 'asc'
-                },
-                {
-                    label: 'Handle',
-                    field: 'handle',
-                    //sort: 'asc'
-                }
-            ],
-            rows: [
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-                {
-                    'id': 1,
-                    'first': 'Mark',
-                    'last': 'Otto',
-                    'handle': '@mdo'
-                },
-                {
-                    'id': 2,
-                    'first': 'Jacob',
-                    'last': 'Thornton',
-                    'handle': '@fat'
-                },
-            ]
-        };
-        console.log(this.state)
-        if (this.state.data!="{}" && this.state.data["repoInfo"].length!=0) {
+        if (this.props.data.state.length!=0) {
+            console.log("table");
+            console.log(this.props);
+        //     if(this.props.data.state[0].length!=0) {
             this.formatTableData()
+        //     }
         }
         return (<MDBDataTable
                 scrollY
@@ -126,12 +32,12 @@ class HTTPResponseDisplay extends React.Component<{data?: any}, {data?: any}> {
         let row=new Array();
 
 
-        for(let i=0;i<this.state.data["repoInfo"][0]["tableData"].length;i++)
+        for(let i=0;i<this.props.data.state[0].tableData.length;i++)
         {
             let row_element={
-                'author':this.state.data["repoInfo"][0]["tableData"][i]["name"],
-                'commitMessage':this.state.data["repoInfo"][0]["tableData"][i]["commit_description"],
-                'dateAndTime':this.state.data["repoInfo"][0]["tableData"][i]["date"]
+                'author':this.props.data.state[0].tableData[i]["name"],
+                'commitMessage':this.props.data.state[0].tableData[i]["commit_description"],
+                'dateAndTime':this.props.data.state[0].tableData[i]["date"]
             }
 
             row.push(row_element);
@@ -154,9 +60,104 @@ class HTTPResponseDisplay extends React.Component<{data?: any}, {data?: any}> {
             rows:row
         };
     }
-    updateData (data) {
-        this.setState({data: data});
-    }
 }
 
 export default HTTPResponseDisplay;
+
+const test_data = {
+    columns: [
+        {
+            label: '#',
+            field: 'id',
+        },
+        {
+            label: 'First',
+            field: 'first',
+
+        },
+        {
+            label: 'Last',
+            field: 'last',
+            //sort: 'asc'
+        },
+        {
+            label: 'Handle',
+            field: 'handle',
+            //sort: 'asc'
+        }
+    ],
+    rows: [
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+        {
+            'id': 1,
+            'first': 'Mark',
+            'last': 'Otto',
+            'handle': '@mdo'
+        },
+        {
+            'id': 2,
+            'first': 'Jacob',
+            'last': 'Thornton',
+            'handle': '@fat'
+        },
+    ]
+};

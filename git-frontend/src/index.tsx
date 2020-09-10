@@ -2,13 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
+import { BrowserRouter as Router } from 'react-router-dom';
 import PageHandler from './components/PageHandler';
 //import * as serviceWorker from './serviceWorker';
 
+
 ReactDOM.render(
-  <React.StrictMode>
+    // <Router>
+    //     <div>
+    //         <PageHandler />
+    //         <Routes />
+    //     </div>
+    // </Router>,
+    // document.getElementById('root')
+   <React.StrictMode>
     <PageHandler />
-  </React.StrictMode>,
+   </React.StrictMode>,
   document.getElementById('root')
 );
 
