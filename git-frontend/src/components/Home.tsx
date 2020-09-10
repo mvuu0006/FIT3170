@@ -4,7 +4,6 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import AuthcateDisplay from './AuthcateDisplay';
-import HTTPResponseDisplay from "./HTTPResponseDisplay";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import history from "./history";
 
@@ -28,12 +27,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
             <div className="App">
               <div className="App-grid">
                 <div className="Student-selector">
-
-                  <Form.Label>Current Task</ Form.Label>
                   <AuthcateDisplay ref={this.authcateDisplayElement} />
-                  <Button variant="primary" disabled>Click Me!</Button>
                 </div>
-                <div></div>
                 <div className="Repo-adder">
                   <Form.Label>Add a Repo to Project:</Form.Label>
                   <Form onSubmit={this.addRepo}>
@@ -63,22 +58,14 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                           </div>
                 <div className="Repo-list">
                 </div>
-
               </div>
-              {/*<div className="Repo-viewer"><HTTPResponseDisplay/>*/}
-              {/*<div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>*/}
-
-              {/*<div className="Repo-viewer"><HTTPResponseDisplay ref={this.lastGetResponse} /></div>*/}
-              {/*<div className="Repo-chart"><PieChart data = {this.state.gitInfo}/></div>*/}
-
-
             </div>
         );
     }
 
   handleButtonClick()
     {
-      history.push({ //browserHistory.push should also work here
+      history.push({
         pathname: '/DisplayCharts',
         state: this.state.gitInfo
       });
@@ -141,9 +128,10 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         //this.lastGetResponse.current.updateData(JSON.stringify(data));
       });
   }
-
+   public event;
   addRepo = (event) => {
     event.preventDefault();
+    this.event=event;
     // Fetch data from the API (replace url below with correct api call)
     var repoOwner = event.target.repoUser.value;
     var repoName = event.target.repoLink.value;
@@ -187,7 +175,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
           })
           .then(data => {
             this.setState({data});
-            this.updateTable();
+              this.updateTable();
           })
           .catch(e => { console.error('Error:', e) });
       }
@@ -210,7 +198,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     // Add repos to the project
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
     // Display Project Information
-    this.updateTable();
+    await this.updateTable();
   }
 
   async updateTable() {
