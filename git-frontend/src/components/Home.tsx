@@ -22,35 +22,33 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     render() {
         return (
             <div className="App">
-              <div className="App-grid">
-                <div className="Repo-adder">
-                  <Form.Label>Add a Repo to Project:</Form.Label>
-                  <Form onSubmit={this.addRepo}>
-                    <Form.Group controlId="repoUser">
-                      <Badge variant="secondary">GitHub username</Badge>
-                      <Form.Control placeholder="(eg. hbak0001)"/>
-                    </Form.Group>
-                    <Form.Group controlId="repoLink">
-                      <Badge variant="secondary">GitHub repository name</Badge>
-                      <Form.Control placeholder="(eg. fit3170-asgn1)"/>
-                    </Form.Group>
-                    <Button variant="light" type="submit">Submit</Button>
-                    </Form>
-                </div>
-                          <div className="Repo-adder-lab">
-                            <Form.Label>Add a LabRepo to Project:</Form.Label>
-                            <Form onSubmit={this.addlabRepo}>
-                              <Form.Group controlId="repoLabLink">
+                <div className="App-grid">
+                    <div className="Repo-adder">
+                        <Form.Label>Add a Repo to Project:</Form.Label>
+                        <Form onSubmit={this.addRepo}>
+                            <Form.Group controlId="repoUser">
+                                <Badge variant="secondary">GitHub username</Badge>
+                                <Form.Control placeholder="(eg. hbak0001)"/>
+                            </Form.Group>
+                            <Form.Group controlId="repoLink">
+                                <Badge variant="secondary">GitHub repository name</Badge>
+                                <Form.Control placeholder="(eg. fit3170-asgn1)"/>
+                            </Form.Group>
+                        <Button variant="light" type="submit">Submit</Button>
+                        </Form>
+                    </div>
+                    <div className="Repo-adder-lab">
+                        <Form.Label>Add a LabRepo to Project:</Form.Label>
+                        <Form onSubmit={this.addlabRepo}>
+                            <Form.Group controlId="repoLabLink">
                                 <Badge variant="secondary">GitLab Project ID</Badge>
                                 <Form.Control placeholder="(eg. 10273)"/>
-                              </Form.Group>
-                              <Button variant="light" type="submit">Submit</Button>
-
-                            </Form>
-                          </div>
-                <div className="Repo-list">
+                            </Form.Group>
+                        <Button variant="light" type="submit">Submit</Button>
+                        </Form>
+                    </div>
+                    <div className="Repo-list"></div>
                 </div>
-              </div>
             </div>
         );
     }
