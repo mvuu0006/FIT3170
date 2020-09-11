@@ -3,21 +3,18 @@ import './App.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
-import AuthcateDisplay from './AuthcateDisplay';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import history from "./history";
 
 
 
 class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
-    public authcateDisplayElement;
     public lastGetResponse;
     public projectId;
     public gitLabToken;
 
     constructor(props) {
         super(props);
-        this.authcateDisplayElement = React.createRef();
         this.lastGetResponse = React.createRef();
         this.state = {data: null, gitInfo: null};
     }
@@ -26,9 +23,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         return (
             <div className="App">
               <div className="App-grid">
-                <div className="Student-selector">
-                  <AuthcateDisplay ref={this.authcateDisplayElement} />
-                </div>
                 <div className="Repo-adder">
                   <Form.Label>Add a Repo to Project:</Form.Label>
                   <Form onSubmit={this.addRepo}>
@@ -40,10 +34,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                       <Badge variant="secondary">GitHub repository name</Badge>
                       <Form.Control placeholder="(eg. fit3170-asgn1)"/>
                     </Form.Group>
-
                     <Button variant="light" type="submit">Submit</Button>
-                    {/*<Button variant="light" type="submit" onClick={() => history.push('/DisplayCharts')}>Submit</Button>*/}
-                  </Form>
+                    </Form>
                 </div>
                           <div className="Repo-adder-lab">
                             <Form.Label>Add a LabRepo to Project:</Form.Label>
@@ -115,7 +107,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
   changeStudent = (event) => {
     event.preventDefault();
-    this.authcateDisplayElement.current.updateAuthcate(event.target.projName.value);
     // May possibly add in an initial GET that checks if the user has been registered in the backend
     const requestOptions = {
       method: 'GET'
@@ -143,15 +134,12 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
           body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
         }
         fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ repoOwner+"/"+repoName ,requestOptions)
-          .then(response => {
-            this.authcateDisplayElement.current.updateAuthcate();
-          })
           .then(data => {
             this.setState({data});
             this.updateTable();
           })
           .catch(e => { console.error('Error:', e) });
-        this.handleButtonClick();
+        // this.handleButtonClick();
       }
     }
   }
@@ -170,10 +158,9 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID;}
         else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+repoID;}
         fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID ,requestOptions)
-          .then(response => {
-            this.authcateDisplayElement.current.updateAuthcate();
-          })
           .then(data => {
+            console.log("data")
+            console.log({data})
             this.setState({data});
               this.updateTable();
           })
@@ -189,7 +176,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
     }
-    this.authcateDisplayElement.current.updateAuthcate("Attempting to GET project");
     var init_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"], projectGETOptions)
     var init_data = await init_response.json();
     if (init_data["status"] == 404) {
@@ -198,7 +184,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     // Add repos to the project
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
     // Display Project Information
-    await this.updateTable();
+    //await this.updateTable();
   }
 
   async updateTable() {
@@ -213,6 +199,11 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     else {
       var allInfo = {projectId: this.projectId, repoInfo: repo_data};
       this.setState({gitInfo: repo_data});
+
+      if(repo_data.length!=0)
+      {
+        this.handleButtonClick();
+      }
       // Display Info
       //this.lastGetResponse.current.updateData(allInfo);
 
@@ -221,7 +212,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
   async createNewProject(projectData) {
     var body = {'projectId': projectData["projectId"], 'projectName': projectData["projectName"]};
-    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT project");
     const projectPUTOptions = {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
@@ -243,14 +233,12 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body),
     }
-    this.authcateDisplayElement.current.updateAuthcate("Attempting to PUT repository");
     var response = await fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos/addRepofromID', projectPUTOptions)
     .catch(error => {
       console.error('Error:',error)
     });
     if (response["status"] == 201) {
       console.log("Repo with ID: "+gitId+" successfully added to Project with ID: "+projectId);
-      this.authcateDisplayElement.current.updateAuthcate("None");
     }
     else if (response["status"] == 400) {
       var message = "Repo with ID: "+gitId+" failed to be added to Project with ID: "+projectId;
