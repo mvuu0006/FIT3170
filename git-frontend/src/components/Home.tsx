@@ -9,13 +9,11 @@ import history from "./history";
 
 
 class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
-    public lastGetResponse;
     public projectId;
     public gitLabToken;
 
     constructor(props) {
         super(props);
-        this.lastGetResponse = React.createRef();
         this.state = {data: null, gitInfo: null};
     }
 
@@ -48,6 +46,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                         </Form>
                     </div>
                     <div className="Repo-list"></div>
+
                 </div>
             </div>
         );
@@ -113,9 +112,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     // Fetch data from the API (replace url below with correct api call)
     fetch('http://localhost:5001/git/users?name='+event.target.projName.value, requestOptions)
       .then(response => response.json())
-      .then(data => {
-        //this.lastGetResponse.current.updateData(JSON.stringify(data));
-      });
   }
    public event;
   addRepo = (event) => {
@@ -157,12 +153,11 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+repoID;}
         fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID ,requestOptions)
           .then(data => {
-            console.log("data")
-            console.log({data})
             this.setState({data});
               this.updateTable();
           })
           .catch(e => { console.error('Error:', e) });
+        var a=0;
       }
     }
   }
@@ -181,8 +176,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     }
     // Add repos to the project
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
-    // Display Project Information
-    //await this.updateTable();
   }
 
   async updateTable() {
@@ -195,16 +188,11 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       console.log("Repo GET didnt work. SAD!");
     }
     else {
-      var allInfo = {projectId: this.projectId, repoInfo: repo_data};
       this.setState({gitInfo: repo_data});
-
       if(repo_data.length!=0)
       {
         this.handleButtonClick();
       }
-      // Display Info
-      //this.lastGetResponse.current.updateData(allInfo);
-
     }
   }
 
@@ -252,9 +240,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     }
     fetch('http://localhost:5001/git/project/'+(projectId as string)+'/repos', requestOptions)
     .then(response => response.json())
-    .then(data => {
-      //this.lastGetResponse.current.updateData(JSON.stringify(data));
-    })
     .catch(error => {
 
     });
