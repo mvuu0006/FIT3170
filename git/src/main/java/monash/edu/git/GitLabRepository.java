@@ -19,6 +19,11 @@ public class GitLabRepository {
     private JSONObject allcommits;
     private JSONArray tableData;
 
+    private ArrayList<String> label;
+    private ArrayList<String> backgroundColor;
+    private ArrayList<String> borderColor;
+    private ArrayList<int[]> dataSet;
+
     public GitLabRepository(String id) throws IOException, JSONException {
         this.id=id;
 
@@ -126,7 +131,7 @@ public class GitLabRepository {
     }
 
     public void constructAllCommits(String repoUrl, Integer page_no, ArrayList<String> commitdates) throws IOException, JSONException {
-        String commitsUrl=repoUrl+"/repository/commits?all=true&per_page=100&page="+String.valueOf(page_no);
+        String commitsUrl=repoUrl+"/repository/commits?all=true&per_page=10000&page="+String.valueOf(page_no);
         if (this.accesstoken != null) {
             commitsUrl +="&access_token="+this.accesstoken;}
         GetJSONReader jsonReader= new GetJSONReader();
@@ -134,6 +139,7 @@ public class GitLabRepository {
         JSONArray jsonArray = json.getJSONArray("entry");
         tableData=new JSONArray();
         createTableData(jsonArray);
+        createDataSet(jsonArray);
         if (jsonArray.length() != 0) {
 
             for (int i=0; i<jsonArray.length();i++)
@@ -194,6 +200,7 @@ public class GitLabRepository {
         repoInfo.put("all_commits", allcommits);
         repoInfo.put("repoName", repoName);
         repoInfo.put("tableData",tableData);
+        repoInfo.put("data", dataSet);
 
         return repoInfo;
     }
@@ -241,7 +248,6 @@ public class GitLabRepository {
     }
 
     public void createTableData(JSONArray commitInfo) throws JSONException {
-        String a=commitInfo.getJSONObject(0).getString("author_name");
         for (int i=0;i<commitInfo.length();i++)
         {
             String name=commitInfo.getJSONObject(i).getString("author_name");
@@ -255,6 +261,52 @@ public class GitLabRepository {
 
             tableData.put(table_entry);
        }
+    }
+
+    private void createDataSet(JSONArray jsonArray) throws JSONException {
+        label=new ArrayList<String>();
+        borderColor=new ArrayList<String>();
+        backgroundColor= new ArrayList<String>();
+        dataSet = new ArrayList<int[]>();
+
+        for(int i=0;i<jsonArray.length();i++)
+        {
+            String name=jsonArray.getJSONObject(i).getString("author_name");
+            String date=jsonArray.getJSONObject(i).getString("committed_date");
+
+
+            if (label.contains(name))
+            {
+                int month= Integer.parseInt(date.substring(5,7))-1;
+                int[]data = dataSet.get(label.indexOf(name));
+                data[month]=data[month]+1;
+                dataSet.set(label.indexOf(name),data);
+            }
+            else{
+
+                label.add(name);
+                String[] colors={
+                        "rgba(  255,165,0,0.5)","rgba(  0,255,127,0.5)","rgba(0,0,255,0.5)", "rgba(0,255,2550,0.5)", "rgba(127,255,212,0.5)",
+                        "rgba(240,255,255,0.5)", "rgba(  245,245,220,0.5)", "rgba(  255,228,196,0.5)",
+                        "rgba(  0,0,0,0.5)", "rgba(  255,235,205,0.5)", "rgba(  0,0,255,0.5)",
+                        "rgba(  138,43,226,0.5)", "rgba(  165,42,42,0.5)", "rgba(  222,184,135,0.5)",
+                        "rgba(  127,255,0,0.5)", "rgba(  210,105,30,0.5)",
+                        "rgba(  255,127,80,0.5)", "rgba(  100,149,237,0.5)", "rgba(  255,248,220,0.5)",
+                        "rgba(  220,20,60,0.5)", "rgba(  0,255,255,0.5)", "rgba(  0,0,139,0.5)",
+                        "rgba(  184,134,11,0.5)", "rgba(  169,169,169,0.5)",
+                        "rgba(  0,100,0,0.5)", "rgba(  169,169,169,0.5)", "rgba(  189,183,107,0.5)",
+                        "rgba(  139,0,139,0.5)", "rgba(  85,107,47,0.5)",
+                };
+                backgroundColor.add(colors[i%29]);
+                borderColor.add(colors[i%29]);
+
+                int[] data = {0,0,0,0,0,0,0,0,0,0,0,0};
+                int month= Integer.parseInt(date.substring(5,7))-1;
+                data[month]=1;
+                dataSet.add(data);
+            }
+        }
+
     }
 
 }

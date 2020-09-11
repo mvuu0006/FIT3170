@@ -173,9 +173,9 @@ public class GitRepository {
             if (label.contains(name))
             {
                 //pieChartObj= (pieChartObject) pieObj.get(name);
-                int month= Integer.parseInt(date.substring(5,7));
+                int month= Integer.parseInt(date.substring(5,7))-1;
                 int[]data = dataSet.get(label.indexOf(name));
-                data[month]=+1;
+                data[month]=data[month]+1;
                 dataSet.set(label.indexOf(name),data);
             }
             else{
@@ -205,7 +205,7 @@ public class GitRepository {
                 borderColor.add(colors[i]);
 
                 int[] data = {0,0,0,0,0,0,0,0,0,0,0,0};
-                int month= Integer.parseInt(date.substring(5,7));
+                int month= Integer.parseInt(date.substring(5,7))-1;
                 data[month]=1;
                 dataSet.add(data);
             }
