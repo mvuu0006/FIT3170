@@ -18,7 +18,6 @@ public class GitRepository {
     private JSONObject commitTime;
     private String gitId;
     private JSONArray tableData;
-    //private JSONObject pieObj;
 
     private ArrayList<String> label;
     private ArrayList<String> backgroundColor;
