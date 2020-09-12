@@ -20,8 +20,6 @@ public class GitLabRepository {
     private JSONArray tableData;
 
     private ArrayList<String> label;
-    private ArrayList<String> backgroundColor;
-    private ArrayList<String> borderColor;
     private ArrayList<int[]> dataSet;
 
     public GitLabRepository(String id) throws IOException, JSONException {
@@ -201,6 +199,7 @@ public class GitLabRepository {
         repoInfo.put("repoName", repoName);
         repoInfo.put("tableData",tableData);
         repoInfo.put("data", dataSet);
+        repoInfo.put("labels", label);
 
         return repoInfo;
     }
@@ -265,8 +264,6 @@ public class GitLabRepository {
 
     private void createDataSet(JSONArray jsonArray) throws JSONException {
         label=new ArrayList<String>();
-        borderColor=new ArrayList<String>();
-        backgroundColor= new ArrayList<String>();
         dataSet = new ArrayList<int[]>();
 
         for(int i=0;i<jsonArray.length();i++)
@@ -285,20 +282,6 @@ public class GitLabRepository {
             else{
 
                 label.add(name);
-                String[] colors={
-                        "rgba(  255,165,0,0.5)","rgba(  0,255,127,0.5)","rgba(0,0,255,0.5)", "rgba(0,255,2550,0.5)", "rgba(127,255,212,0.5)",
-                        "rgba(240,255,255,0.5)", "rgba(  245,245,220,0.5)", "rgba(  255,228,196,0.5)",
-                        "rgba(  0,0,0,0.5)", "rgba(  255,235,205,0.5)", "rgba(  0,0,255,0.5)",
-                        "rgba(  138,43,226,0.5)", "rgba(  165,42,42,0.5)", "rgba(  222,184,135,0.5)",
-                        "rgba(  127,255,0,0.5)", "rgba(  210,105,30,0.5)",
-                        "rgba(  255,127,80,0.5)", "rgba(  100,149,237,0.5)", "rgba(  255,248,220,0.5)",
-                        "rgba(  220,20,60,0.5)", "rgba(  0,255,255,0.5)", "rgba(  0,0,139,0.5)",
-                        "rgba(  184,134,11,0.5)", "rgba(  169,169,169,0.5)",
-                        "rgba(  0,100,0,0.5)", "rgba(  169,169,169,0.5)", "rgba(  189,183,107,0.5)",
-                        "rgba(  139,0,139,0.5)", "rgba(  85,107,47,0.5)",
-                };
-                backgroundColor.add(colors[i%29]);
-                borderColor.add(colors[i%29]);
 
                 int[] data = {0,0,0,0,0,0,0,0,0,0,0,0};
                 int month= Integer.parseInt(date.substring(5,7))-1;
