@@ -99,16 +99,19 @@ public class GitRepository {
         }
 
         // Calculating the contribution percentage of each team member in the repo
+        int other = 0;
         for(int i=0;i<jsonArray.length();i++)
         {
             int individualContribution=jsonArray.getJSONObject(i).getInt("contributions");
             double contributionPercent=((double)individualContribution/totalContributions)*100;
             contributionPercent=Math.round(contributionPercent*100.0)/100.0;
+            if (contributionPercent <= 3) {
+                other += contributionPercent;}
+            else{
             String name=jsonArray.getJSONObject(i).getString("login");
-
-            contributors.put(name,contributionPercent);
+            contributors.put(name,contributionPercent);}
         }
-
+        if (other != 0){contributors.put("Other", other);}
     }
 
     private void constructRepoCommits(String gitUsername, String repoName) throws IOException, JSONException {
@@ -133,7 +136,7 @@ public class GitRepository {
         for (int i=0;i<jsonArray.length();i++)
         {
 
-            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("name");
             String time=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
             if (commits.has(name))
             {
@@ -160,7 +163,7 @@ public class GitRepository {
         for(int i=0;i<jsonArray.length();i++)
         {
             //pieChartObject pieChartObj = new pieChartObject();
-            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("name");
             String date=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
 
 
@@ -187,7 +190,7 @@ public class GitRepository {
     public void createTableData(JSONArray commitInfo) throws JSONException {
         for (int i=0;i<commitInfo.length();i++)
         {
-            String name=commitInfo.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
+            String name=commitInfo.getJSONObject(i).getJSONObject("commit").getJSONObject("author").getString("name");
             String date=commitInfo.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date");
             String commit_desc=commitInfo.getJSONObject(i).getJSONObject("commit").getString("message");
 

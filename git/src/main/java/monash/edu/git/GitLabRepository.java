@@ -183,15 +183,19 @@ public class GitLabRepository {
         }
 
         Iterator<String> commit_iterator = myBranchCommits.keys();
-
+        int other = 0;
         while (commit_iterator.hasNext())
         {
             String name=commit_iterator.next();
             if (name != "Timestamps") {
                 int contribution_percent = (myBranchCommits.getInt(name) *100/ contributions_total);
-                contributions.put(name, contribution_percent);
+                if (contribution_percent <= 3) {
+                    other += contribution_percent;}
+                else{
+                    contributions.put(name, contribution_percent);}
             }
         }
+        if (other != 0){contributions.put("Other", other);}
         return contributions;
     }
     public JSONObject getInfo() throws IOException, JSONException{
@@ -253,11 +257,12 @@ public class GitLabRepository {
     }
 
     public void createTableData(JSONArray commitInfo) throws JSONException {
-        for (int i=0;i<commitInfo.length();i++)
+        int len = commitInfo.length();
+        for (int i=1;i<len;i++)
         {
-            String name=commitInfo.getJSONObject(i).getString("author_name");
-            String date=commitInfo.getJSONObject(i).getString("committed_date");
-            String commit_desc=commitInfo.getJSONObject(i).getString("message");
+            String name=commitInfo.getJSONObject(len-i).getString("author_name");
+            String date=commitInfo.getJSONObject(len-i).getString("committed_date");
+            String commit_desc=commitInfo.getJSONObject(len-i).getString("message");
 
             JSONObject table_entry=new JSONObject();
             table_entry.put("name",name);
