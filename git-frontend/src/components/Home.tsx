@@ -11,6 +11,9 @@ import history from "./history";
 class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?: any}> {
     public projectId;
     public gitLabToken;
+    private repoOwner;
+    private repoName;
+    private gitId;
 
     constructor(props) {
         super(props);
@@ -54,8 +57,13 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
   handleButtonClick()
     {
+    var extraparam = '?projectId='+this.projectId;
+    if (!(this.repoOwner == null) && !(this.repoName == null)) {
+          extraparam += '&repoOwner='+this.repoOwner+'&repoName='+this.repoName;}
+    else if (this.gitId != null){extraparam += '&gitId='+this.gitId;}
       history.push({
         pathname: '/DisplayCharts',
+        search:extraparam,
         state: this.state.gitInfo
       });
     }
@@ -118,16 +126,16 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     event.preventDefault();
     this.event=event;
     // Fetch data from the API (replace url below with correct api call)
-    var repoOwner = event.target.repoUser.value;
-    var repoName = event.target.repoLink.value;
-    if (!(repoOwner == '') && !(repoName == '')) {
+    this.repoOwner = event.target.repoUser.value;
+    this.repoName = event.target.repoLink.value;
+    if (!(this.repoOwner == '') && !(this.repoName == '')) {
       if (this.projectId != null){
         const requestOptions = {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ 'repoName':  repoName, 'projectId': this.projectId, 'githubUsername': repoOwner,'gitSite': 'github' }),
+          body: JSON.stringify({ 'repoName':  this.repoName, 'projectId': this.projectId, 'githubUsername': this.repoOwner,'gitSite': 'github' }),
         }
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ repoOwner+"/"+repoName ,requestOptions)
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ this.repoOwner+"/"+this.repoName ,requestOptions)
           .then(data => {
             this.setState({data});
             this.updateTable();
@@ -140,8 +148,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
   addlabRepo = (event) => {
     event.preventDefault();
     // Fetch data from the API (replace url below with correct api call)
-    var repoID = event.target.repoLabLink.value;
-    if (!(repoID == '')) {
+    this.gitId = event.target.repoLabLink.value;
+    if (!(this.gitId == '')) {
       if (this.projectId != null){
         const requestOptions = {
           method: 'PUT',
@@ -149,9 +157,9 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
           body: JSON.stringify({ repo:  event.target.repoLabLink.value }),
         }
         if (this.gitLabToken != null) {
-        var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID;}
-        else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+repoID;}
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+repoID ,requestOptions)
+        var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId;}
+        else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitId;}
+        fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId ,requestOptions)
           .then(data => {
             this.setState({data});
               this.updateTable();

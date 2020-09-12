@@ -193,23 +193,48 @@ public class GitController {
         throw new NoEntryException();
     }
 
+//
+//    // This method returns repo info based on github id
+//    @GetMapping(path = "/github/project/{projId}/repos/{gitID}")
+//    @ResponseBody
+//    public String getRepoByID(@PathVariable("projId") String projectId,
+//                              @PathVariable("gitID") String gitID) throws NoEntryException, JSONException {
+//        if (projectId.equals("") || gitID.equals("")) {
+//            throw new NoEntryException();
+//        }
+//        for (Project project : projects) {
+//            GitRepository repo = project.getRepositoryByID(gitID);
+//            if (repo != null && project.getId().equals(projectId)) {
+//                return repo.getInfo().toString();
+//            }
+//        }
+//        throw new NoEntryException();
+//    }
 
-    // This method returns repo info based on github id
-    @GetMapping(path = "/github/project/{projId}/repos/{gitID}")
+    // This method returns repo info based on git id
+    @GetMapping(path = "/git/project/{projId}/repos/{gitID}")
     @ResponseBody
-    public String getRepoByID(@PathVariable("projId") String projectId,
-                              @PathVariable("gitID") String gitID) throws NoEntryException, JSONException {
+    public String getLabRepoByID(@PathVariable("projId") String projectId,
+                              @PathVariable("gitID") String gitID) throws NoEntryException, JSONException, IOException {
         if (projectId.equals("") || gitID.equals("")) {
             throw new NoEntryException();
+        }
+        for (Project project : projects) {
+            GitLabRepository repo = project.getLabRepositoryByID(gitID);
+            if (repo != null && project.getId().equals(projectId)) {
+                return repo.getInfo().toString();
+            }
         }
         for (Project project : projects) {
             GitRepository repo = project.getRepositoryByID(gitID);
             if (repo != null && project.getId().equals(projectId)) {
                 return repo.getInfo().toString();
             }
-        }
         throw new NoEntryException();
+        }
+        return null;
     }
+
 
     // This method adds a repo to the project based on github id
     @CrossOrigin

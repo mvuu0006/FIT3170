@@ -206,7 +206,7 @@ public class GitLabRepository {
         repoInfo.put("branches", branches);
         repoInfo.put("contributions", contribution);
         repoInfo.put("all_commits", allcommits);
-        repoInfo.put("repoName", repoName);
+        repoInfo.put("RepositoryName", repoName);
         repoInfo.put("tableData",tableData);
         repoInfo.put("data", dataSet);
         repoInfo.put("labels", label);
@@ -298,6 +298,10 @@ public class GitLabRepository {
             }
         }
 
+    }
+
+    public String getGitId() {
+        return id;
     }
 
 }

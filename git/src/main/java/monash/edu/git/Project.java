@@ -66,6 +66,16 @@ public class Project {
         return null;
     }
 
+    // Method that gets a lab repo from the project by ID
+    public GitLabRepository getLabRepositoryByID(String id) {
+        for (GitLabRepository repo : repositorieslab) {
+            if (id.equals(repo.getGitId())) {
+                return repo;
+            }
+        }
+        return null;
+    }
+
     // Method that adds repository by username
     public void addRepositoryByUsername(String gitUsername, String gitURL) {
         if (getRepositoryByUserName(gitUsername, gitURL) == null) {
@@ -84,7 +94,7 @@ public class Project {
 
     // Method that adds repository by ID
     public void addRepositoryByID(String id) throws NoRepoException {
-        if (getRepositoryByID(id) == null) {
+        if ((getRepositoryByID(id) == null)) {
             try {
                 GitRepository newRepo = new GitRepository(id);
                 repositories.add(newRepo);
@@ -98,7 +108,7 @@ public class Project {
     }
     // Method that adds repository by ID
     public void addRepositoryByIDandToken(String id, String accesstoken) throws NoRepoException {
-        if (getRepositoryByID(id) == null) {
+        if (getLabRepositoryByID(id) == null) {
             try {
                 GitLabRepository newRepo = new GitLabRepository(id, accesstoken);
                 repositorieslab.add(newRepo);
@@ -111,7 +121,7 @@ public class Project {
         }
     }
     public void addLabRepositoryByID(String id) throws NoRepoException {
-        if (getRepositoryByID(id) == null) {
+        if (getLabRepositoryByID(id) == null) {
             try {
                 GitLabRepository newRepo = new GitLabRepository(id);
                 repositorieslab.add(newRepo);
