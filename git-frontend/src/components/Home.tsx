@@ -55,6 +55,11 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         );
     }
 
+    sendDataToParent()
+    {
+        this.props.data.storeProject(this.state.gitInfo)
+    }
+
   handleButtonClick()
     {
     var extraparam = '?projectId='+this.projectId;
@@ -199,6 +204,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       this.setState({gitInfo: repo_data});
       if(repo_data.length!=0)
       {
+        this.sendDataToParent()
         this.handleButtonClick();
       }
     }
