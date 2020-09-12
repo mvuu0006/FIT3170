@@ -28,6 +28,9 @@ public class GitLabRepository {
         String repoUrl="https://gitlab.com/api/v4/projects/"+id;
         //String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
         allcommits = new JSONObject();
+        tableData=new JSONArray();
+        label=new ArrayList<String>();
+        dataSet = new ArrayList<int[]>();
         constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
         constructBranchInfoandMergeRequests(repoUrl);
@@ -39,6 +42,9 @@ public class GitLabRepository {
         this.accesstoken = accesstoken;
         String repoUrl="https://git.infotech.monash.edu/api/v4/projects/"+id;
         allcommits = new JSONObject();
+        tableData=new JSONArray();
+        label=new ArrayList<String>();
+        dataSet = new ArrayList<int[]>();
         allcommits.put("Timestamps", new ArrayList<>());
         constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
@@ -124,18 +130,17 @@ public class GitLabRepository {
             commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
         }
         branchcommits.put("Timestamps", commitdates);
-        constructRepoContributions(branchcommits);
+        branchcommits = constructRepoContributions(branchcommits);
         return branchcommits;
     }
 
     public void constructAllCommits(String repoUrl, Integer page_no, ArrayList<String> commitdates) throws IOException, JSONException {
-        String commitsUrl=repoUrl+"/repository/commits?all=true&per_page=10000&page="+String.valueOf(page_no);
+        String commitsUrl=repoUrl+"/repository/commits?all=true&per_page=100&page="+String.valueOf(page_no);
         if (this.accesstoken != null) {
             commitsUrl +="&access_token="+this.accesstoken;}
         GetJSONReader jsonReader= new GetJSONReader();
         JSONObject json = jsonReader.readJsonFromUrl(commitsUrl);
         JSONArray jsonArray = json.getJSONArray("entry");
-        tableData=new JSONArray();
         createTableData(jsonArray);
         createDataSet(jsonArray);
         if (jsonArray.length() != 0) {
@@ -156,15 +161,16 @@ public class GitLabRepository {
                 commitdates.add(jsonArray.getJSONObject(i).getString("created_at"));
             }
             this.allcommits.put("Timestamps", commitdates);
-            constructRepoContributions(this.allcommits);
+            contribution = new JSONObject();
+            contribution = constructRepoContributions(this.allcommits);
             constructAllCommits(repoUrl, page_no+1, commitdates);}
     }
 
 
 
-    public void constructRepoContributions(JSONObject myBranchCommits) throws JSONException {
+    public JSONObject constructRepoContributions(JSONObject myBranchCommits) throws JSONException {
         int contributions_total=0;
-        contribution = new JSONObject();
+        JSONObject contributions = new JSONObject();
         Iterator<String> keys = myBranchCommits.keys();
 
         while (keys.hasNext())
@@ -183,18 +189,18 @@ public class GitLabRepository {
             String name=commit_iterator.next();
             if (name != "Timestamps") {
                 int contribution_percent = (myBranchCommits.getInt(name) *100/ contributions_total);
-                contribution.put(name, contribution_percent);
+                contributions.put(name, contribution_percent);
             }
         }
-        int a=0;
+        return contributions;
     }
     public JSONObject getInfo() throws IOException, JSONException{
         JSONObject repoInfo = new JSONObject();
         repoInfo.put("issues",issues);
-        repoInfo.put("gitID", id);
+        repoInfo.put("GitId", id);
         repoInfo.put("merge_requests", merge_requests);
         repoInfo.put("branches", branches);
-        repoInfo.put("contribution", contribution);
+        repoInfo.put("contributions", contribution);
         repoInfo.put("all_commits", allcommits);
         repoInfo.put("repoName", repoName);
         repoInfo.put("tableData",tableData);
@@ -263,9 +269,6 @@ public class GitLabRepository {
     }
 
     private void createDataSet(JSONArray jsonArray) throws JSONException {
-        label=new ArrayList<String>();
-        dataSet = new ArrayList<int[]>();
-
         for(int i=0;i<jsonArray.length();i++)
         {
             String name=jsonArray.getJSONObject(i).getString("author_name");
