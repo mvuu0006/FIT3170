@@ -165,6 +165,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId ,requestOptions)
           .then(data => {
             this.setState({data});
+            this.postGitData(this.projectId, this.gitId)
               this.handleButtonClick();
           })
           .catch(e => { console.error('Error:', e) });
@@ -237,6 +238,33 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
     });
   }
+
+
+  postGitData(projectId, gitId){
+          const request = {
+              method: "POST",
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  gitName:"testName",
+                  emailAddress:"test123@gmail.com",
+                  gitId: gitId,
+                  projectId: projectId
+              })
+          }
+          return fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-git", request).then(
+              response => {
+                  if (response.ok) {
+                      console.log(`Returned integration id successfully? Hooray?'`)
+                  } else {
+                      response.text()
+                          .then(JSON.parse)
+                          .then(result => console.log(result.message))
+                  }
+              }
+          )
+      }
 
 }
 
