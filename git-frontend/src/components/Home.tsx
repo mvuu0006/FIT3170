@@ -68,8 +68,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     else if (this.gitId != null){extraparam += '&gitId='+this.gitId;}
       history.push({
         pathname: '/DisplayCharts',
-        search:extraparam,
-        state: this.state.gitInfo
+        search:extraparam
       });
     }
 
@@ -143,7 +142,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ this.repoOwner+"/"+this.repoName ,requestOptions)
           .then(data => {
             this.setState({data});
-            this.updateTable();
+            this.handleButtonClick();
           })
           .catch(e => { console.error('Error:', e) });
         // this.handleButtonClick();
@@ -167,7 +166,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId ,requestOptions)
           .then(data => {
             this.setState({data});
-              this.updateTable();
+              this.handleButtonClick();
           })
           .catch(e => { console.error('Error:', e) });
         var a=0;
@@ -189,25 +188,6 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     }
     // Add repos to the project
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
-  }
-
-  async updateTable() {
-    const projectGETOptions = {
-      method: 'GET',
-    };
-    var repo_response = await fetch('http://localhost:5001/git/project/'+this.projectId+"/repos", projectGETOptions);
-    var repo_data = await repo_response.json();
-    if (repo_data["status"] == 404) {
-      console.log("Repo GET didnt work. SAD!");
-    }
-    else {
-      this.setState({gitInfo: repo_data});
-      if(repo_data.length!=0)
-      {
-        this.sendDataToParent()
-        this.handleButtonClick();
-      }
-    }
   }
 
   async createNewProject(projectData) {

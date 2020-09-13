@@ -28,19 +28,7 @@ class DisplayCharts extends Component<any,{data: any, gitInfo: any}> {
                         <div className="Repo-viewer row"><HTTPResponseDisplay data={this.state.gitInfo} /></div>
                     </div>)
                 ;}
-        if (this.props.history.location.state == null){return <div>Oops. It's not working yet :( </div>;}
-        return (
-            <div className="Info-Page container">
-                <div className="Page-Title row justify-content-md-center">
-                    {this.props.history.location.state[0].RepositoryName}
-                </div>
-                <div className="Chart-Container row justify-content-md-center">
-                    <div className="col-md-5 col-sm-12"><PieChart data = {this.props.history.location}/></div>
-                    <div className="col-md-5 col-sm-12"><LineChart data = {this.props.history.location}/></div>
-                </div>
-                <div className="Repo-viewer row"><HTTPResponseDisplay data={this.props.history.location} /></div>
-            </div>
-        );
+        return <div>Oops. Something went wrong :(</div>
     }
 
     async componentDidMount() {

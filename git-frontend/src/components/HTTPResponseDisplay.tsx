@@ -14,7 +14,7 @@ class HTTPResponseDisplay extends React.Component<any> {
                             console.log("table");
                             console.log(this.props);
                         //     if(this.props.data.state[0].length!=0) {
-                            this.formatTableData2()
+                            this.formatTableData()
                         //     }
                         }
                 return (<MDBDataTable
@@ -27,50 +27,11 @@ class HTTPResponseDisplay extends React.Component<any> {
                          data={this.tableData}
                     />
                 )}
-        if (this.props.data.state.length!=0) {
-            console.log("table");
-            console.log(this.props);
-        //     if(this.props.data.state[0].length!=0) {
-            this.formatTableData()
-        //     }
-        }
         return <div></div>
     }
 
-    formatTableData(){
-        let row=new Array();
 
-
-        for(let i=0;i<this.props.data.state[0].tableData.length;i++)
-        {
-            let row_element={
-                'author':this.props.data.state[0].tableData[i]["name"],
-                'commitMessage':this.props.data.state[0].tableData[i]["commit_description"],
-                'dateAndTime':this.props.data.state[0].tableData[i]["date"]
-            }
-
-            row.push(row_element);
-        }
-        this.tableData={
-            columns:[
-                {
-                    label: 'Author',
-                    field: 'author'
-                },
-                {
-                    label: 'Commit Message',
-                    field: 'commitMessage'
-                },
-                {
-                    label: 'Commit Date and Time (GMT)',
-                    field:'dateAndTime'
-                }
-                ],
-            rows:row
-        };
-    }
-
-        formatTableData2(){
+        formatTableData(){
             let row=new Array();
 
 
