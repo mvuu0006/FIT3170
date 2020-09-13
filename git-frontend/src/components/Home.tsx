@@ -74,8 +74,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
-    var projectId = params.get('project');
-    var gitId = params.get('gitId');
+    var projectId = params.get('project-id');
+    var gitId = params.get('git-id');
 
     var gitLabCode = params.get('code');
     /*
