@@ -35,8 +35,8 @@ class DisplayCharts extends Component<any,{data: any, gitInfo: any}> {
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
-    var projectId = params.get('projectId');
-    var gitId = params.get('gitId');
+    var projectId = params.get('project-id');
+    var gitId = params.get('git-id');
     const projectGETOptions = {
           method: 'GET',
         };

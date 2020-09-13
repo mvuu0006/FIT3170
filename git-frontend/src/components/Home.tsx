@@ -62,10 +62,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
   handleButtonClick()
     {
-    var extraparam = '?projectId='+this.projectId;
-    if (!(this.repoOwner == null) && !(this.repoName == null)) {
-          extraparam += '&repoOwner='+this.repoOwner+'&repoName='+this.repoName;}
-    else if (this.gitId != null){extraparam += '&gitId='+this.gitId;}
+    var extraparam = '?project-id='+this.projectId;
+    if (this.gitId != null){extraparam += '&git-id='+this.gitId;}
       history.push({
         pathname: '/DisplayCharts',
         search:extraparam
