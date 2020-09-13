@@ -27,11 +27,7 @@ class Contacts extends React.Component <{}, {users: any, projectId: any, project
                   <Form.Label>Contacts Page</ Form.Label>
                   <h6>Project Name: {this.projectName}</h6>
                   <h6>Project Id: {this.projectId}</h6></div>
-        <div className="Repo-adder">
-            <div className="Repo-viewer">
             <ContactComponents users={this.state.users} projectName={this.state.projectName} projectId = {this.state.projectId}/>
-             </div>
-        </div>
       </div>
     );
   }
