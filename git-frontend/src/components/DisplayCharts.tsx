@@ -48,7 +48,12 @@ class DisplayCharts extends Component<any,{data: any, gitInfo: any}> {
           console.log("Repo GET didnt work. SAD!");
         }
         else {
-          this.setState({gitInfo: repo_data[0]});}}
+            for (let i = 0; i<repo_data.length; i++){
+            if (repo_data[i].GitId == gitId){
+                this.setState({gitInfo: repo_data[i]});}
+            else{
+                this.setState({gitInfo: repo_data[0]});}
+                }}}
 
 }
 
