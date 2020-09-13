@@ -11,12 +11,8 @@ class HTTPResponseDisplay extends React.Component<any> {
         if (this.props.data == null){return <div></div>}
         if (this.props.data.state == null){
                 if (this.props.data.length!=0) {
-                            console.log("table");
-                            console.log(this.props);
-                        //     if(this.props.data.state[0].length!=0) {
-                            this.formatTableData()
-                        //     }
-                        }
+                    this.formatTableData()
+                }
                 return (<MDBDataTable
                         scrollY
                         maxHeight="300px"
