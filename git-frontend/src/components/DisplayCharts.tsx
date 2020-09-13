@@ -50,10 +50,13 @@ class DisplayCharts extends Component<any,{data: any, gitInfo: any}> {
         else {
             for (let i = 0; i<repo_data.length; i++){
             if (repo_data[i].GitId == gitId){
-                this.setState({gitInfo: repo_data[i]});}
+                this.setState({gitInfo: repo_data[i]});
+                break;
+            }
             else{
                 this.setState({gitInfo: repo_data[0]});}
-                }}}
+                }
+        }}
 
 }
 

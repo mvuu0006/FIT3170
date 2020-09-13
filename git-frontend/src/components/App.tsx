@@ -20,7 +20,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
                      render={(props) => (<Test {...props}
                                                data={{name:"Keshav",
                                                fa:this.childtoParent.bind(this)}} />)} />
-              {/*<Route path="gitfrontend?project-id=${as}&git-id=234"/>*/}
+              <Route path="/gitfrontend" exact component={DisplayCharts} />
               <Route path="/"
                      render={(props) => (<Home {...props}
                                                data={{storeProject:this.storeProject.bind(this)}} />)} />

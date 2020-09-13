@@ -65,7 +65,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     var extraparam = '?project-id='+this.projectId;
     if (this.gitId != null){extraparam += '&git-id='+this.gitId;}
       history.push({
-        pathname: '/DisplayCharts',
+        pathname: '/gitfrontend',
         search:extraparam
       });
     }
