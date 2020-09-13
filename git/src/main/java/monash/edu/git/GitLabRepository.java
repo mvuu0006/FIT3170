@@ -33,7 +33,7 @@ public class GitLabRepository {
         dataSet = new ArrayList<int[]>();
         constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
-        constructBranchInfoandMergeRequests(repoUrl);
+        //constructBranchInfoandMergeRequests(repoUrl);
         constructBasicInfo(repoUrl);
         getInfo();
     }
@@ -48,7 +48,7 @@ public class GitLabRepository {
         allcommits.put("Timestamps", new ArrayList<>());
         constructAllCommits(repoUrl, 1, new ArrayList<String>());
         constructRepoIssues(repoUrl);
-        constructBranchInfoandMergeRequests(repoUrl);
+        //constructBranchInfoandMergeRequests(repoUrl);
         constructBasicInfo(repoUrl);
         //System.out.print(repoName);
         getInfo();
@@ -214,47 +214,47 @@ public class GitLabRepository {
         return repoInfo;
     }
 
-    public void constructBranchInfoandMergeRequests(String repoUrl) throws IOException, JSONException {
-
-        String merge_requestsUrl=repoUrl+"/merge_requests";
-        if (this.accesstoken != null) {
-            merge_requestsUrl +="?access_token="+this.accesstoken;}
-        merge_requests = new JSONObject();
-        JSONArray mergearray = new JSONArray();
-        GetJSONReader jsonReader= new GetJSONReader();
-        JSONObject json = jsonReader.readJsonFromUrl(merge_requestsUrl);
-        mergearray = json.getJSONArray("entry");
-
-        for (int i=0; i<mergearray.length();i++)
-        {
-            String created=mergearray.getJSONObject(i).getString("created_at");
-            JSONObject mergeinfo = new JSONObject();
-            mergeinfo.put("title", mergearray.getJSONObject(i).getString("title"));
-            mergeinfo.put("author",(mergearray.getJSONObject(i).getJSONObject("author").getString("name")));
-            merge_requests.put(created, mergeinfo);
-        }
-
-        String branchesUrl=repoUrl+"/repository/branches";
-        if (this.accesstoken != null) {
-            branchesUrl +="?access_token="+this.accesstoken;}
-        branches = new JSONObject();
-        JSONArray branchesarray = new JSONArray();
-
-        jsonReader= new GetJSONReader();
-        json = jsonReader.readJsonFromUrl(branchesUrl);
-        branchesarray = json.getJSONArray("entry");
-        for (int i=0; i<mergearray.length();i++)
-        {
-            String name=branchesarray.getJSONObject(i).getString("name");
-            JSONObject branchinfo = new JSONObject();
-            branchinfo.put("mergedStatus", branchesarray.getJSONObject(i).getString("merged"));
-            branchinfo.put("lastAuthor",(branchesarray.getJSONObject(i).getJSONObject("commit").getString("author_name")));
-            branchinfo.put("lastCommitTime",(branchesarray.getJSONObject(i).getJSONObject("commit").getString("created_at")));
-            branchinfo.put("branchCommits", constructRepoCommits(repoUrl, name));
-            branches.put(name, branchinfo);
-        }
-
-    }
+//    public void constructBranchInfoandMergeRequests(String repoUrl) throws IOException, JSONException {
+//
+//        String merge_requestsUrl=repoUrl+"/merge_requests";
+//        if (this.accesstoken != null) {
+//            merge_requestsUrl +="?access_token="+this.accesstoken;}
+//        merge_requests = new JSONObject();
+//        JSONArray mergearray = new JSONArray();
+//        GetJSONReader jsonReader= new GetJSONReader();
+//        JSONObject json = jsonReader.readJsonFromUrl(merge_requestsUrl);
+//        mergearray = json.getJSONArray("entry");
+//
+//        for (int i=0; i<mergearray.length();i++)
+//        {
+//            String created=mergearray.getJSONObject(i).getString("created_at");
+//            JSONObject mergeinfo = new JSONObject();
+//            mergeinfo.put("title", mergearray.getJSONObject(i).getString("title"));
+//            mergeinfo.put("author",(mergearray.getJSONObject(i).getJSONObject("author").getString("name")));
+//            merge_requests.put(created, mergeinfo);
+//        }
+//
+//        String branchesUrl=repoUrl+"/repository/branches";
+//        if (this.accesstoken != null) {
+//            branchesUrl +="?access_token="+this.accesstoken;}
+//        branches = new JSONObject();
+//        JSONArray branchesarray = new JSONArray();
+//
+//        jsonReader= new GetJSONReader();
+//        json = jsonReader.readJsonFromUrl(branchesUrl);
+//        branchesarray = json.getJSONArray("entry");
+//        for (int i=0; i<mergearray.length();i++)
+//        {
+//            String name=branchesarray.getJSONObject(i).getString("name");
+//            JSONObject branchinfo = new JSONObject();
+//            branchinfo.put("mergedStatus", branchesarray.getJSONObject(i).getString("merged"));
+//            branchinfo.put("lastAuthor",(branchesarray.getJSONObject(i).getJSONObject("commit").getString("author_name")));
+//            branchinfo.put("lastCommitTime",(branchesarray.getJSONObject(i).getJSONObject("commit").getString("created_at")));
+//            branchinfo.put("branchCommits", constructRepoCommits(repoUrl, name));
+//            branches.put(name, branchinfo);
+//        }
+//
+//    }
 
     public void createTableData(JSONArray commitInfo) throws JSONException {
         int len = commitInfo.length();
