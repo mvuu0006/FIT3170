@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+    margin-top: 10px;
 }
 
 .App-logo {
@@ -38,8 +39,6 @@
 }
 
 .App-grid {
-  background-color: #282c34;
-  color: #FFFFFF;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 50% 50%;
@@ -54,16 +53,16 @@
 }
 
 .Repo-adder {
-  padding: 1em;
+  padding: 2em;
   grid-area: repo-adder;
 }
 .Repo-adder-lab {
-  padding: 1em;
+  padding: 2em;
   grid-area: repo-adder-lab;
 }
 
 .Repo-list {
-  padding: 1em;
+  padding: 2em;
   min-height: 40vh;
   grid-area: repo-list;
 }

@@ -23,9 +23,10 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     render() {
         return (
             <div className="App">
+            <div className="Page-Title"><Form.Label>Add a New Git Repository</Form.Label></div>
                 <div className="App-grid">
                     <div className="Repo-adder">
-                        <Form.Label>Add a Repo to Project:</Form.Label>
+                        <Form.Label>Add a GitHub Repo to Project:</Form.Label>
                         <Form onSubmit={this.addRepo}>
                             <Form.Group controlId="repoUser">
                                 <Badge variant="secondary">GitHub username</Badge>
@@ -39,7 +40,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                         </Form>
                     </div>
                     <div className="Repo-adder-lab">
-                        <Form.Label>Add a LabRepo to Project:</Form.Label>
+                        <Form.Label>Add a GitLab Repo to Project:</Form.Label>
                         <Form onSubmit={this.addlabRepo}>
                             <Form.Group controlId="repoLabLink">
                                 <Badge variant="secondary">GitLab Project ID</Badge>
@@ -74,8 +75,8 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
-    var projectId = params.get('project');
-    var gitId = params.get('gitId');
+    var projectId = params.get('project-id');
+    var gitId = params.get('git-id');
 
     var gitLabCode = params.get('code');
     /*

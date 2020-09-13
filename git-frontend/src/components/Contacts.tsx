@@ -22,16 +22,14 @@ class Contacts extends React.Component <{}, {users: any, projectId: any, project
 
   render() {
     return (
-      <div className="Contacts">
-        <div className="Contacts-grid">
-          <div className="Student-selector">
-            <Form.Label><h2>Contacts Page </h2></ Form.Label>
-            <h6>Project Name: {this.projectName}</h6>
-            <h6>Project Id: {this.projectId}</h6>
+      <div className="Info-Page">
+                <div className="Page-Title">
+                  <Form.Label>Contacts Page</ Form.Label>
+                  <h6>Project Name: {this.projectName}</h6>
+                  <h6>Project Id: {this.projectId}</h6></div>
+                  <div className="Repo-adder">
             <ContactComponents users={this.state.users} projectName={this.state.projectName} projectId = {this.state.projectId}/>
-             </div>
-        </div>
-      </div>
+      </div></div>
     );
   }
 
