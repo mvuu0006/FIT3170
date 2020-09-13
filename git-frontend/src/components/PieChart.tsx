@@ -40,6 +40,32 @@ class PieChart extends  React.Component<any> {
                 );
             }
         }
+        else if (this.props.data != null)
+        {this.contributions = this.props.data.contributions;
+                                  this.getContributions()
+
+                                  return (
+                                      <div>
+                                          <Pie
+                                              data={this.pieData}
+                                              options={{
+                                                  borderColor: '#000000',
+                                                  title: {
+                                                      display: true,
+                                                      text: 'Contribution (%)',
+                                                      fontColor: '##FFFFFF',
+                                                      fontSize: 20,
+                                                      position: 'top'
+                                                  },
+                                                  legend: {
+                                                      display: true,
+                                                      position: 'right'
+                                                  }
+                                              }}
+                                          />
+                                      </div>
+                                  );
+                              }
         return <div></div>;
 
     }

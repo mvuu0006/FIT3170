@@ -41,8 +41,33 @@ class LineChart extends  React.Component<any> {
                 );
             }
         }
-    return <div></div>
-}
+        if (this.props.data != null) {
+                    if (this.props.data.length != 0) {
+                        this.backgroundColor = this.props.data.backgroundColor;
+                        this.borderColor = this.props.data.borderColor;
+                        this.dataSet = this.props.data.data;
+                        this.labels=this.props.data.labels;
+                        this.getContributions();
+                        return (
+                            <div>
+                                <Line
+                                    data={this.state}
+                                    options={{
+                                        title: {
+                                            display: true,
+                                            text: 'Commits Timeline',
+                                            fontSize: 20
+                                        },
+                                        legend: {
+                                            display: true,
+                                            position: 'right'
+                                        }
+                                    }}
+                                />
+                            </div>
+                        );
+                    }}
+    return <div></div>}
 
 
 
