@@ -20,7 +20,7 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
                      render={(props) => (<Test {...props}
                                                data={{name:"Keshav",
                                                fa:this.childtoParent.bind(this)}} />)} />
-              {/*<Route path="/"  component={Home} />*/}
+              {/*<Route path="gitfrontend?project-id=${as}&git-id=234"/>*/}
               <Route path="/"
                      render={(props) => (<Home {...props}
                                                data={{storeProject:this.storeProject.bind(this)}} />)} />
@@ -36,9 +36,12 @@ class App extends React.Component<{data?: any, gitInfo?: any}, {data?: any, gitI
       console.log(this.b)
   }
 
-  storeProject(projectInfo)
-  {
-      let gitID=projectInfo[0]["GitId"]
+  storeProject(projectInfo) {
+      let gitID = projectInfo["GitId"];
+
+      if (!(gitID in this.projects)) {
+          this.projects[gitID] = projectInfo
+      }
   }
 
  }

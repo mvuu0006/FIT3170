@@ -57,7 +57,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
 
     sendDataToParent()
     {
-        this.props.data.storeProject(this.state.gitInfo)
+        this.props.data.storeProject(this.state.gitInfo[this.state.gitInfo.length-1])
     }
 
   handleButtonClick()
