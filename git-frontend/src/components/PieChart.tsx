@@ -12,34 +12,32 @@ class PieChart extends  React.Component<any> {
 
 
     render() {
-        if (this.props.data.state != null) {
-            if (this.props.data.state.length !=0) {
-                this.contributions = this.props.data.state[0].contributions;
-                this.getContributions()
+        if (this.props.data != null)
+        {this.contributions = this.props.data.contributions;
+                                  this.getContributions()
 
-                return (
-                    <div>
-                        <Pie
-                            data={this.pieData}
-                            options={{
-                                borderColor: '#000000',
-                                title: {
-                                    display: true,
-                                    text: 'Contribution (%)',
-                                    fontColor: '##FFFFFF',
-                                    fontSize: 20,
-                                    position: 'top'
-                                },
-                                legend: {
-                                    display: true,
-                                    position: 'right'
-                                }
-                            }}
-                        />
-                    </div>
-                );
-            }
-        }
+                                  return (
+                                      <div>
+                                          <Pie
+                                              data={this.pieData}
+                                              options={{
+                                                  borderColor: '#000000',
+                                                  title: {
+                                                      display: true,
+                                                      text: 'Contribution (%)',
+                                                      fontColor: '##FFFFFF',
+                                                      fontSize: 20,
+                                                      position: 'top'
+                                                  },
+                                                  legend: {
+                                                      display: true,
+                                                      position: 'right'
+                                                  }
+                                              }}
+                                          />
+                                      </div>
+                                  );
+                              }
         return <div></div>;
 
     }

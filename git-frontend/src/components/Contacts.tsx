@@ -44,7 +44,7 @@ class Contacts extends React.Component <{}, {users: any, projectId: any, project
     var params = new URLSearchParams(search);
 
     // Current test params are project=2&email=testemail@gmail.com
-    this.projectId = params.get('project');
+    this.projectId = params.get('project-id');
     this.setState({projectId: this.projectId});
     var emailaddress = params.get('email');
     if (this.projectId != null){
