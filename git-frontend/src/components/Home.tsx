@@ -141,18 +141,13 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
   }
 
   async getAuthorisationCode(code) {
-    const requestOptions = {
-      method: 'GET'
-    }
-
-    async getAuthorisationCode(code) {
-        const requestOptions = {
-            method: 'GET'
-        }
-        var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code, requestOptions)
-        var response = await promise.json();
-        return response;
-    }
+      const requestOptions = {
+          method: 'GET'
+      }
+      var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code, requestOptions)
+      var response = await promise.json();
+      return response;
+  }
 
     changeStudent = (event) => {
         event.preventDefault();
