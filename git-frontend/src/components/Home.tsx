@@ -23,7 +23,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     render() {
         return (
             <div className="App">
-            <div className="Page-Title"><Form.Label>Add a New Git Repository</Form.Label></div>
+                <div className="Page-Title"><Form.Label>Add a New Git Repository</Form.Label></div>
                 <div className="App-grid">
                     <div className="Repo-adder">
                         <Form.Label>Add a GitHub Repo to Project:</Form.Label>
@@ -36,7 +36,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                                 <Badge variant="secondary">GitHub repository name</Badge>
                                 <Form.Control placeholder="(eg. fit3170-asgn1)"/>
                             </Form.Group>
-                        <Button variant="light" type="submit">Submit</Button>
+                            <Button variant="light" type="submit">Submit</Button>
                         </Form>
                     </div>
                     <div className="Repo-adder-lab">
@@ -46,7 +46,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
                                 <Badge variant="secondary">GitLab Project ID</Badge>
                                 <Form.Control placeholder="(eg. 10273)"/>
                             </Form.Group>
-                        <Button variant="light" type="submit">Submit</Button>
+                            <Button variant="light" type="submit">Submit</Button>
                         </Form>
                     </div>
                     <div className="Repo-list"></div>
@@ -56,123 +56,152 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
         );
     }
 
-    sendDataToParent()
-    {
-        this.props.data.storeProject(this.state.gitInfo[this.state.gitInfo.length-1])
+    sendDataToParent() {
+        this.props.data.storeProject(this.state.gitInfo[this.state.gitInfo.length - 1])
     }
 
-  handleButtonClick()
-    {
-    var extraparam = '?project-id='+this.projectId;
-    if (this.gitId != null){extraparam += '&git-id='+this.gitId;}
-      history.push({
-        pathname: '/gitfrontend',
-        search:extraparam
-      });
-    }
-
-      async componentDidMount() {
-    var search = window.location.search;
-    var params = new URLSearchParams(search);
-
-    var projectId = params.get('project-id');
-    var gitId = params.get('git-id');
-
-    var gitLabCode = params.get('code');
-    /*
-      Step 1: If no code is given the the url, redirect to authorise with GitLab
-    */
-    if (gitLabCode === null) {
-      window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
-        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
-        "&response_type=code" +
-        "&redirect_uri=http://localhost:3001";
-    }
-    /*
-      Step 2: Once authorisation code is received, call backend api to get access token
-    */
-    var response = await this.getAuthorisationCode(gitLabCode);
-    // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
-    var accessToken = response["access_token"];
-
-    this.projectId = projectId;
-    this.doGitStuff(projectId, gitId);
-    /*
-      Step 6: Store access token in component to submit to future backend calls
-     */
-    this.gitLabToken = accessToken;
-
-  }
-
-  async getAuthorisationCode(code) {
-    const requestOptions = {
-      method: 'GET'
-    }
-    var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code ,requestOptions)
-    var response = await promise.json();
-    return response;
-  }
-
-  changeStudent = (event) => {
-    event.preventDefault();
-    // May possibly add in an initial GET that checks if the user has been registered in the backend
-    const requestOptions = {
-      method: 'GET'
-    }
-    // This call to our backend api should provide us with a list of repos currently tracked by the backend
-    // Fetch data from the API (replace url below with correct api call)
-    fetch('http://localhost:5001/git/users?name='+event.target.projName.value, requestOptions)
-      .then(response => response.json())
-  }
-   public event;
-  addRepo = (event) => {
-    event.preventDefault();
-    this.event=event;
-    // Fetch data from the API (replace url below with correct api call)
-    this.repoOwner = event.target.repoUser.value;
-    this.repoName = event.target.repoLink.value;
-    if (!(this.repoOwner == '') && !(this.repoName == '')) {
-      if (this.projectId != null){
-        const requestOptions = {
-          method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ 'repoName':  this.repoName, 'projectId': this.projectId, 'githubUsername': this.repoOwner,'gitSite': 'github' }),
+    handleButtonClick() {
+        var extraparam = '?project-id=' + this.projectId;
+        if (this.gitId != null) {
+            extraparam += '&git-id=' + this.gitId;
         }
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/repos/'+ this.repoOwner+"/"+this.repoName ,requestOptions)
-          .then(data => {
-            this.setState({data});
-            this.handleButtonClick();
-          })
-          .catch(e => { console.error('Error:', e) });
-        // this.handleButtonClick();
-      }
+        history.push({
+            pathname: '/gitfrontend',
+            search: extraparam
+        });
     }
-  }
-  addlabRepo = (event) => {
-    event.preventDefault();
-    // Fetch data from the API (replace url below with correct api call)
-    this.gitId = event.target.repoLabLink.value;
-    if (!(this.gitId == '')) {
-      if (this.projectId != null){
-        const requestOptions = {
-          method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ repo:  event.target.repoLabLink.value }),
+
+    async componentDidMount() {
+        var search = window.location.search;
+        var params = new URLSearchParams(search);
+
+        var projectId = params.get('project-id');
+        var gitId = params.get('git-id');
+
+        var gitLabCode = params.get('code');
+        /*
+          Step 1: If no code is given the the url, redirect to authorise with GitLab
+        */
+        if (gitLabCode === null) {
+            window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
+                "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
+                "&response_type=code" +
+                "&redirect_uri=http://localhost:3001";
         }
-        if (this.gitLabToken != null) {
-        var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId;}
-        else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitId;}
-        fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId ,requestOptions)
-          .then(data => {
-            this.setState({data});
-            this.postGitData(this.projectId, this.gitId)
-              this.handleButtonClick();
-          })
-          .catch(e => { console.error('Error:', e) });
-        var a=0;
-      }
+        /*
+          Step 2: Once authorisation code is received, call backend api to get access token
+        */
+        var response = await this.getAuthorisationCode(gitLabCode);
+        // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
+        var accessToken = response["access_token"];
+
+        this.projectId = projectId;
+        this.doGitStuff(projectId, gitId);
+        /*
+          Step 6: Store access token in component to submit to future backend calls
+         */
+        this.gitLabToken = accessToken;
+
     }
-  }
+
+    async getAuthorisationCode(code) {
+        const requestOptions = {
+            method: 'GET'
+        }
+        var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code, requestOptions)
+        var response = await promise.json();
+        return response;
+    }
+
+    changeStudent = (event) => {
+        event.preventDefault();
+        // May possibly add in an initial GET that checks if the user has been registered in the backend
+        const requestOptions = {
+            method: 'GET'
+        }
+        // This call to our backend api should provide us with a list of repos currently tracked by the backend
+        // Fetch data from the API (replace url below with correct api call)
+        fetch('http://localhost:5001/git/users?name=' + event.target.projName.value, requestOptions)
+            .then(response => response.json())
+    }
+    public event;
+    addRepo = (event) => {
+        event.preventDefault();
+        this.event = event;
+        // Fetch data from the API (replace url below with correct api call)
+        this.repoOwner = event.target.repoUser.value;
+        this.repoName = event.target.repoLink.value;
+        if (!(this.repoOwner == '') && !(this.repoName == '')) {
+            if (this.projectId != null) {
+                const requestOptions = {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        'repoName': this.repoName,
+                        'projectId': this.projectId,
+                        'githubUsername': this.repoOwner,
+                        'gitSite': 'github'
+                    }),
+                }
+                this.getGitHubID(this.projectId);
+                fetch('http://localhost:5001/git/project/' + this.projectId + '/repos/' + this.repoOwner + "/" + this.repoName, requestOptions)
+                    .then(data => {
+                        this.setState({data});
+                        this.postGitData(this.projectId, this.gitId)
+                        this.handleButtonClick();
+                    })
+                    .catch(e => {
+                        console.error('Error:', e)
+                    });
+            }
+        }
+    }
+    addlabRepo = (event) => {
+        event.preventDefault();
+        // Fetch data from the API (replace url below with correct api call)
+        this.gitId = event.target.repoLabLink.value;
+        if (!(this.gitId == '')) {
+            if (this.projectId != null) {
+                const requestOptions = {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({repo: event.target.repoLabLink.value}),
+                }
+                if (this.gitLabToken != null) {
+                    var fetchurl = 'http://localhost:5001/git/project/' + this.projectId + '/labRepos/' + this.gitLabToken + '/' + this.gitId;
+                } else {
+                    fetchurl = 'http://localhost:5001/git/project/' + this.projectId + '/labRepos/' + this.gitId;
+                }
+                fetch('http://localhost:5001/git/project/' + this.projectId + '/labRepos/' + this.gitLabToken + '/' + this.gitId, requestOptions)
+                    .then(data => {
+                        this.setState({data});
+                        this.postGitData(this.projectId, this.gitId)
+                        this.handleButtonClick();
+                    })
+                    .catch(e => {
+                        console.error('Error:', e)
+                    });
+            }
+        }
+    }
+
+    async getGitHubID(projID) {
+        const projectGETOptions = {
+            method: 'GET',
+        };
+        var repo_response = await fetch('http://localhost:5001/git/project/' + projID + "/repos", projectGETOptions);
+
+        var repo_data = await repo_response.json();
+        if (repo_data["status"] == 404) {
+            console.log("Repo GET didnt work. SAD!");
+        }
+        else {
+            this.gitId=repo_data[0].GitId;
+            console.log("getGitHubID")
+            console.log(this.gitId)
+        }
+    }
+
 
   async doGitStuff(projectId, gitId) {
     var receivedInfo = {"projectId":projectId,"projectGitId":gitId};
