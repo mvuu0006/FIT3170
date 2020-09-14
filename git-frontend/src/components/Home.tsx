@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import history from "./history";
+import { access } from "fs";
 
 
 
@@ -71,37 +72,72 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       });
     }
 
-      async componentDidMount() {
+  async componentDidMount() {
     var search = window.location.search;
     var params = new URLSearchParams(search);
 
-    var projectId = params.get('project-id');
-    var gitId = params.get('git-id');
+    let projectId : string | null = params.get('project-id');
+    let gitId : string | null = params.get('git-id');
+
+    // Store the project-id and git-id in localstorage before redirect
+    if (projectId != null){
+      localStorage.setItem("spmd-git-pid", projectId);
+    }
+    if (gitId != null){
+      localStorage.setItem("spmd-git-gid", gitId);
+    }
 
     var gitLabCode = params.get('code');
     /*
       Step 1: If no code is given the the url, redirect to authorise with GitLab
     */
+    let redirecting = false;
     if (gitLabCode === null) {
+      redirecting = true;
+      console.log("Redirecting to GL...");
+      // Redirect
       window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
         "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
         "&response_type=code" +
         "&redirect_uri=http://localhost:3001";
     }
+    // Retrieve the saved pid and gid from localstorage
+    projectId = localStorage.getItem("spmd-git-pid");
+    gitId = localStorage.getItem("spmd-git-gid");
+    console.log("Retrieved from localstorage: pid = "+projectId+", gid = "+gitId);
+    // Remove them from localstorage or else it will cause complications when trying to add new repo
+    if (!redirecting) {
+      console.log("removing the ids");
+      localStorage.removeItem("spmd-git-pid");
+      localStorage.removeItem("spmd-git-gid");
+    }
     /*
       Step 2: Once authorisation code is received, call backend api to get access token
     */
-    var response = await this.getAuthorisationCode(gitLabCode);
-    // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
-    var accessToken = response["access_token"];
+    // Check if access-token exists in localstorage
+    var accessToken;
+    if (localStorage.getItem("spmd-git-labtoken") === null) {
+      var response = await this.getAuthorisationCode(gitLabCode);
+      // TODO: Handle scenario in which access code call returns 404 (Happens when auth code is reused)
+      accessToken = response["access_token"];
+      localStorage.setItem("spmd-git-labtoken", accessToken);
+    }
+    else {
+      accessToken = localStorage.getItem("spmd-git-labtoken");
+    }
+    console.log(accessToken);
 
     this.projectId = projectId;
-    this.doGitStuff(projectId, gitId);
+    //this.doGitStuff(projectId, gitId);
+    
     /*
       Step 6: Store access token in component to submit to future backend calls
      */
     this.gitLabToken = accessToken;
-
+    // Add the repo to the project then redirect (only for gitlab)
+    if (gitId != null && gitId != undefined) {
+      this.hackAddRepoThenRedir(gitId);
+    }
   }
 
   async getAuthorisationCode(code) {
@@ -186,6 +222,7 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     if (init_data["status"] == 404) {
       await this.createNewProject(receivedInfo);
     }
+
     // Add repos to the project
     await this.addGitToProject(receivedInfo["projectGitId"], receivedInfo["projectId"]);
   }
@@ -237,6 +274,48 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
     .catch(error => {
 
     });
+  }
+
+  async hackAddRepoThenRedir(gitid) {
+    // *******************************
+    // Adding Project to backend
+    // *******************************
+    var receivedInfo = {"projectId":this.projectId,"projectGitId":gitid};
+    // See if project is already registered
+    const projectGETOptions = {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+    }
+    var init_response = await fetch('http://localhost:5001/git/project/'+receivedInfo["projectId"], projectGETOptions)
+    var init_data = await init_response.json();
+    if (init_data["status"] == 404) {
+      await this.createNewProject(receivedInfo);
+    }
+    // *******************************
+    // Adding Repo to backend
+    // *******************************
+    this.gitId = gitid;
+    if (this.projectId != null){
+      const requestOptions = {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ repo:  this.gitId }),
+      }
+      if (this.gitLabToken != null) {
+      var fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId;}
+      else {fetchurl = 'http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitId;}
+      console.log(this.gitLabToken);
+      try {
+        let data = await fetch('http://localhost:5001/git/project/'+this.projectId+'/labRepos/'+this.gitLabToken+'/'+this.gitId ,requestOptions);
+        this.postGitData(this.projectId, this.gitId);
+        this.handleButtonClick();
+      }
+      catch (error){
+        console.error(error);
+      }
+      
+      var a=0;
+    }
   }
 
 
