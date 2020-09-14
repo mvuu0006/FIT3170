@@ -22,8 +22,8 @@ class DisplayCharts extends Component<any,{data: any, gitInfo: any}> {
                             {this.state.gitInfo.RepositoryName}
                         </div>
                         <div className="Chart-Container row justify-content-md-center">
-                            <div className="col-md-5 col-sm-12"><PieChart data = {this.state.gitInfo}/></div>
-                            <div className="col-md-5 col-sm-12"><LineChart data = {this.state.gitInfo}/></div>
+                            <div className="col-md-6 col-sm-12"><PieChart data = {this.state.gitInfo}/></div>
+                            <div className="col-md-6 col-sm-12"><LineChart data = {this.state.gitInfo}/></div>
                         </div>
                         <div className="Repo-viewer row"><HTTPResponseDisplay data={this.state.gitInfo} /></div>
                     </div>)
