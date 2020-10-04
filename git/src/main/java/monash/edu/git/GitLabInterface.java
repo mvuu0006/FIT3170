@@ -75,21 +75,16 @@ public class GitLabInterface {
             for (int i=0;i<jsonArray.length();i++)
             {  
                 if (firstpage || i != 0){
-                    String name=jsonArray.getJSONObject(i).getString("author_name");
-                    boolean exists = false;
-                    for (int j=0; j < commits.length(); j++) {
-                        JSONObject commitor = commits.getJSONObject(j);
-                        if (commitor.get("name").equals(name)) {
-                            commitor.put("commits", commitor.getInt("commits")+1);
-                            exists = true;
-                        }
-                    }
-                    if (!exists) {
-                        JSONObject newCommitor = new JSONObject();
-                        newCommitor.put("name", name);
-                        newCommitor.put("commits", 1);
-                        commits.put(newCommitor);
-                    }
+                    // Add nicely-formatted commits to list
+                    JSONObject commit_info = new JSONObject();
+                    // Add author name to commit_info
+                    commit_info.put("author", jsonArray.getJSONObject(i).getString("author_name"));
+                    // Add commit message to commit_info
+                    commit_info.put("message", jsonArray.getJSONObject(i).getString("message"));
+                    // Add commit date to commit_info
+                    commit_info.put("date", jsonArray.getJSONObject(i).getString("authored_date"));
+                    // Add commit to array
+                    commits.put(commit_info);
                 }
             }
             firstpage = false;
