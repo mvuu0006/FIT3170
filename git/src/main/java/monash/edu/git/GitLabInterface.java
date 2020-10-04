@@ -72,7 +72,6 @@ public class GitLabInterface {
             response = jsonReader.readJsonFromUrl(extendedUrl);
             // Extracting the array from the JSON Object
             jsonArray = response.getJSONArray("entry");
-            System.out.println(jsonArray.toString());
             for (int i=0;i<jsonArray.length();i++)
             {  
                 if (firstpage || i != 0){

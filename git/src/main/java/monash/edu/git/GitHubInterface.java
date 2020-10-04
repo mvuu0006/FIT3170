@@ -66,26 +66,18 @@ public class GitHubInterface {
 
         // Extracting the array from the JSON Object
         JSONArray jsonArray = json.getJSONArray("entry");
-
-        // Loop that goes through all the commits and extracts its authors
-        // Also increments commit number if author already exists in commit JSONObject
+        // Collate commits list
         for (int i=0;i<jsonArray.length();i++)
         {
-            String name=jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name");
-            boolean exists = false;
-            for (int j=0; j < commits.length(); j++) {
-                JSONObject commitor = commits.getJSONObject(j);
-                if (commitor.get("name").equals(name)) {
-                    commitor.put("commits", commitor.getInt("commits")+1);
-                    exists = true;
-                }
-            }
-            if (!exists) {
-                JSONObject newCommitor = new JSONObject();
-                newCommitor.put("name", name);
-                newCommitor.put("commits", 1);
-                commits.put(newCommitor);
-            }
+            JSONObject commit_info = new JSONObject();
+            // Add author name to commit_info
+            commit_info.put("author", jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("name"));
+            // Add commit message to commit_info
+            commit_info.put("message", jsonArray.getJSONObject(i).getJSONObject("commit").getString("message"));
+            // Add commit date to commit_info
+            commit_info.put("date", jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date"));
+            // Add commit to array
+            commits.put(commit_info);
         }
         return commits;
     }

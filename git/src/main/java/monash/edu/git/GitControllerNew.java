@@ -48,7 +48,6 @@ public class GitControllerNew {
         // Add project to database
         String addScript = "INSERT INTO gitdb.Project(projectId) VALUES ("+id+")";
         int rowsChanged = dbHandler.executeUpdate(addScript);
-        System.out.println(rowsChanged);
         // Throw error if row wasn't added
         if (rowsChanged == 0) {
             throw new ForbiddenException();
@@ -67,7 +66,6 @@ public class GitControllerNew {
             throw new ForbiddenException();
         }
         rowsChanged = dbHandler.executeUpdate(addScript);
-        System.out.println(rowsChanged);
         // Throw error if row wasn't added
         if (rowsChanged == 0) {
             throw new ForbiddenException();
@@ -125,7 +123,58 @@ public class GitControllerNew {
 
 
     /*
-     GET: Repository Commits (name of commitor and number of commits)
+     GET: Repository Commits (name of commitor and number of commits). Use for timeline and pie chart??
+     */
+    @GetMapping(path = "/project/{project-id}/repository/contribution")
+    @ResponseBody
+    public String getRepoContribution(@PathVariable("project-id") String id, @RequestParam("email") String email,
+        @RequestParam("url") String url,
+        @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        if( id.equals("")  || url.equals("") || email.equals("")) {
+            throw new NoEntryException();
+        }
+        // Database code: 404 is returned if email does not have link to project id
+        String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
+                               "WHERE projectId="+id+" AND EXISTS( " +
+                                    "SELECT * FROM gitdb.StudentProject " +
+                                        "WHERE emailStudent='"+email+"' AND projectId="+id+" " +
+                                ") AND idRepo='"+url+"';";
+        HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
+        fields.put("idRepo", FieldType.STRING);
+        fields.put("projectId", FieldType.INT);
+        JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
+        // Find out service from database
+        findScript = "SELECT service FROM gitdb.Repository WHERE url='"+url+"'";
+        fields.clear();
+        fields.put("service", FieldType.STRING);
+        JSONArray serviceMap = dbHandler.executeQuery(findScript, fields);
+        if (serviceMap.length() > 1){
+            throw new ForbiddenException();
+        }
+        String service = serviceMap.getJSONObject(0).getString("service").toLowerCase();
+        // Get Contributors
+        JSONArray contributors = new JSONArray();
+        switch (service) {
+            case "github":
+                contributors = ghInterface.getRepoCommits(url);
+                break;
+            case "gitlab":
+                if (token.isPresent()){
+                    contributors = glInterface.getRepoCommits(url, token.get());
+                }
+                else {
+                    throw new ForbiddenException();
+                }
+                break;
+            default:
+                break;
+        }
+        return(contributors.toString());
+    }
+
+
+    /*
+     GET: Repository Commits (commit info)
      */
     @GetMapping(path = "/project/{project-id}/repository/commits")
     @ResponseBody
