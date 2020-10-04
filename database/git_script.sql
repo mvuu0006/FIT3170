@@ -51,9 +51,9 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `gitdb`.`ProjectRepo` ;
 
 CREATE TABLE IF NOT EXISTS `gitdb`.`ProjectRepo` (
-  `idProject` INT NOT NULL,
+  `projectId` INT NOT NULL,
   `idRepo` VARCHAR(256) NOT NULL,
-  PRIMARY KEY (`idProject`, `idRepo`),
+  PRIMARY KEY (`projectId`, `idRepo`),
   INDEX `url_idx` (`idRepo` ASC) VISIBLE,
   CONSTRAINT `url`
     FOREIGN KEY (`idRepo`)
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS `gitdb`.`ProjectRepo` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `projectIdForRepo`
-    FOREIGN KEY (`idProject`)
-    REFERENCES `gitdb`.`Project` (`idProject`)
+    FOREIGN KEY (`projectId`)
+    REFERENCES `gitdb`.`Project` (`projectId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -88,12 +88,12 @@ DROP TABLE IF EXISTS `gitdb`.`StudentProject` ;
 
 CREATE TABLE IF NOT EXISTS `gitdb`.`StudentProject` (
   `emailStudent` VARCHAR(64) NOT NULL,
-  `idProject` INT NOT NULL,
-  PRIMARY KEY (`emailStudent`, `idProject`),
-  INDEX `idProject_idx` (`idProject` ASC) VISIBLE,
-  CONSTRAINT `idProject`
-    FOREIGN KEY (`idProject`)
-    REFERENCES `gitdb`.`Project` (`idProject`)
+  `projectId` INT NOT NULL,
+  PRIMARY KEY (`emailStudent`, `projectId`),
+  INDEX `idProject_idx` (`projectId` ASC) VISIBLE,
+  CONSTRAINT `projectId`
+    FOREIGN KEY (`projectId`)
+    REFERENCES `gitdb`.`Project` (`projectId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `idStudent`
@@ -124,12 +124,12 @@ DROP TABLE IF EXISTS `gitdb`.`TeacherProject` ;
 
 CREATE TABLE IF NOT EXISTS `gitdb`.`TeacherProject` (
   `idTeacher` INT NOT NULL,
-  `idProject` INT NOT NULL,
-  PRIMARY KEY (`idTeacher`, `idProject`),
-  INDEX `idProject_idx` (`idProject` ASC) VISIBLE,
+  `projectId` INT NOT NULL,
+  PRIMARY KEY (`idTeacher`, `projectId`),
+  INDEX `idProject_idx` (`projectId` ASC) VISIBLE,
   CONSTRAINT `idProjectForTeacher`
-    FOREIGN KEY (`idProject`)
-    REFERENCES `gitdb`.`Project` (`idProject`)
+    FOREIGN KEY (`projectId`)
+    REFERENCES `gitdb`.`Project` (`projectId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `idTeacher`

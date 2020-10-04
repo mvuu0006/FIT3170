@@ -14,33 +14,33 @@ INSERT INTO gitdb.Student(email)
 VALUES ("sysoo9@student.monash.edu");
 
 -- Project Dummy Data
-INSERT INTO gitdb.Project(projectName)
-VALUES ("Hayden Test Proj 1");
+INSERT INTO gitdb.Project(projectId)
+VALUES (1);
 
-INSERT INTO gitdb.Project(projectName)
-VALUES ("Hayden Test Proj 2");
+INSERT INTO gitdb.Project(projectId)
+VALUES (2);
 
-INSERT INTO gitdb.Project(projectName)
-VALUES ("Hayden Test Proj 3");
+INSERT INTO gitdb.Project(projectId)
+VALUES (3);
 
-INSERT INTO gitdb.Project(projectName)
-VALUES ("Samuel Test Proj 1");
+INSERT INTO gitdb.Project(projectId)
+VALUES (4);
 
 -- StudentProject Dummy Data
 
-INSERT INTO gitdb.StudentProject(emailStudent, idProject)
+INSERT INTO gitdb.StudentProject(emailStudent, projectId)
 VALUES ("hbak0001@student.monash.edu", 1);
 
-INSERT INTO gitdb.StudentProject(emailStudent, idProject)
+INSERT INTO gitdb.StudentProject(emailStudent, projectId)
 VALUES ("hbak0001@student.monash.edu", 2);
 
-INSERT INTO gitdb.StudentProject(emailStudent, idProject)
+INSERT INTO gitdb.StudentProject(emailStudent, projectId)
 VALUES ("hbak0001@student.monash.edu", 3);
 
-INSERT INTO gitdb.StudentProject(emailStudent, idProject)
+INSERT INTO gitdb.StudentProject(emailStudent, projectId)
 VALUES ("ewil0007@student.monash.edu", 3);
 
-INSERT INTO gitdb.StudentProject(emailStudent, idProject)
+INSERT INTO gitdb.StudentProject(emailStudent, projectId)
 VALUES ("sysoo9@student.monash.edu", 4);
 
 -- Repo Data
@@ -53,8 +53,8 @@ VALUES ("https://github.com/LaiSteph/FIT3157-Assignment3", "GitHub");
 
 -- ProjectRepo Data
 
-INSERT INTO gitdb.ProjectRepo(idRepo, idProject)
+INSERT INTO gitdb.ProjectRepo(idRepo, projectId)
 VALUES ("https://github.com/HBAK0001/fit3157-asgn2", 1);
 
-INSERT INTO gitdb.ProjectRepo(idRepo, idProject)
+INSERT INTO gitdb.ProjectRepo(idRepo, projectId)
 VALUES ("https://github.com/LaiSteph/FIT3157-Assignment3", 1);
