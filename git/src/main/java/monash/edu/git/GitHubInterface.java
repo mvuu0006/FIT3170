@@ -33,6 +33,7 @@ public class GitHubInterface {
         {
             totalContributions=totalContributions+jsonArray.getJSONObject(i).getInt("contributions");
         }
+        System.out.println(jsonArray.toString());
 
         // Calculating the contribution percentage of each team member in the repo
         for(int i=0;i<jsonArray.length();i++)

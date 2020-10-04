@@ -156,7 +156,7 @@ public class GitControllerNew {
         JSONArray contributors = new JSONArray();
         switch (service) {
             case "github":
-                contributors = ghInterface.getRepoCommits(url);
+                contributors = ghInterface.getRepoContributors(url);
                 break;
             case "gitlab":
                 if (token.isPresent()){
