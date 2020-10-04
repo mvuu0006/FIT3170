@@ -38,9 +38,11 @@ DROP TABLE IF EXISTS `gitdb`.`Repository` ;
 
 CREATE TABLE IF NOT EXISTS `gitdb`.`Repository` (
   `url` VARCHAR(256) NOT NULL,
+  `id` VARCHAR(32) NOT NULL,
   `service` VARCHAR(6) NOT NULL,
-  PRIMARY KEY (`url`),
-  UNIQUE INDEX `URL_UNIQUE` (`url` ASC) VISIBLE)
+  PRIMARY KEY (`id`, `service`),
+  UNIQUE INDEX `URL_UNIQUE` (`url` ASC) VISIBLE,
+  INDEX `service_idx` (`service` ASC) VISIBLE)
 ENGINE = InnoDB;
 
 
@@ -52,12 +54,18 @@ DROP TABLE IF EXISTS `gitdb`.`ProjectRepo` ;
 
 CREATE TABLE IF NOT EXISTS `gitdb`.`ProjectRepo` (
   `projectId` INT NOT NULL,
-  `idRepo` VARCHAR(256) NOT NULL,
-  PRIMARY KEY (`projectId`, `idRepo`),
+  `idRepo` VARCHAR(32) NOT NULL,
+  `serviceRepo` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`projectId`, `idRepo`, `serviceRepo`),
   INDEX `url_idx` (`idRepo` ASC) VISIBLE,
   CONSTRAINT `url`
     FOREIGN KEY (`idRepo`)
-    REFERENCES `gitdb`.`Repository` (`url`)
+    REFERENCES `gitdb`.`Repository` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+CONSTRAINT `repoIdInProject`
+    FOREIGN KEY (`serviceRepo`)
+    REFERENCES `gitdb`.`Repository` (`service`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `projectIdForRepo`

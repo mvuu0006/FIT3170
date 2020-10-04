@@ -54,12 +54,14 @@ public class GitHubInterface {
     public JSONArray getRepoCommits(String repoURL) throws IOException, JSONException {
         JSONArray commits =new JSONArray();
 
-        // Creating the URL
-        String[] urlComponents = repoURL.split("/");
-        String username = urlComponents[urlComponents.length-2];
-        String repoName = urlComponents[urlComponents.length-1];
+        // Former code that used repository URL instead of ID
+        // // Creating the URL
+        // String[] urlComponents = repoURL.split("/");
+        // String username = urlComponents[urlComponents.length-2];
+        // String repoName = urlComponents[urlComponents.length-1];
 
-        String commitsUrl = "https://api.github.com/repos/" + username + "/" + repoName + "/commits";
+        // String commitsUrl = "https://api.github.com/repos/" + username + "/" + repoName + "/commits";
+        String commitsUrl = "https://api.github.com/repositories/" + repoURL + "/commits";
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
@@ -81,5 +83,19 @@ public class GitHubInterface {
             commits.put(commit_info);
         }
         return commits;
+    }
+
+    public String getIdFromURL(String repoURL) throws IOException, JSONException {
+        // Creating the URL
+        String[] urlComponents = repoURL.split("/");
+        String username = urlComponents[urlComponents.length-2];
+        String repoName = urlComponents[urlComponents.length-1];
+
+        String githubUrl = "https://api.github.com/repos/" + username + "/" + repoName;
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(githubUrl);
+        return json.getJSONObject("entry").getString("id").toString();
     }
 }

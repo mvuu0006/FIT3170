@@ -96,29 +96,50 @@ public class GitControllerNew {
 
 
     /*
-     PUT: Repository into database
+     POST: Repository into database
      */
     @CrossOrigin
-    @PutMapping(path = "/project/{project-id}/repository")
-    public void putRepo(@PathVariable("project-id") String id,
-        @RequestParam("service") String service, @RequestParam("url") String url) throws NoEntryException, ForbiddenException, JSONException, ClassNotFoundException {
+    @ResponseBody
+    @PostMapping(path = "/project/{project-id}/repository")
+    public String putRepo(@PathVariable("project-id") String id,
+        @RequestParam("service") String service, @RequestParam("url") String url, @RequestParam("token") Optional<String> token) throws NoEntryException, ForbiddenException, JSONException, ClassNotFoundException, IOException {
         if( url.equals("")  || service.equals("") || id.equals("") ) {
             throw new NoEntryException();
         }
-        // TODO: Add restrictions to database to standardise service syntax (eg. all lower case)
-        String putScript = "INSERT INTO gitdb.Repository(url, service) VALUES('"+url+"', '"+service+"')";
-        int rowsChanged = dbHandler.executeUpdate(putScript);
-        // Throw error if row wasn't added
-        if (rowsChanged == 0) {
-            throw new ForbiddenException();
+        String repo_id = null;
+        switch (service) {
+            case "gitlab":
+                if (token.isPresent()){
+                    repo_id = glInterface.getIdFromURL(url, token.get());
+                }
+                else {
+                    throw new ForbiddenException();
+                }
+                break;
+            case "github":
+                repo_id = ghInterface.getIdFromURL(url);
+                break;
+            default:
         }
-        putScript = "INSERT INTO gitdb.ProjectRepo(idRepo, projectId) VALUES('"+url+"', '"+id+"')";
+        System.out.println(repo_id);
+        // TODO: Add restrictions to database to standardise service syntax (eg. all lower case)
+        String putScript = "INSERT INTO gitdb.Repository(url, service, id) VALUES('"+url+"', '"+service+"', '"+repo_id+"')";
+        int rowsChanged = dbHandler.executeUpdate(putScript);
+        // Throw error if row wasn't added (Don't)
+        if (rowsChanged == 0) {
+            //throw new ForbiddenException();
+        }
+        putScript = "INSERT INTO gitdb.ProjectRepo(idRepo, projectId, serviceRepo) VALUES('"+repo_id+"', '"+id+"', '"+service+"')";
         rowsChanged = dbHandler.executeUpdate(putScript);
         // Throw error if row wasn't added
         if (rowsChanged == 0) {
             throw new ForbiddenException();
         }
-        return;
+        JSONObject returnObject = new JSONObject();
+        returnObject.put("repo-id", repo_id);
+        returnObject.put("repo-url", url);
+        returnObject.put("repo-service", service);
+        return returnObject.toString();
     }
 
 
@@ -128,9 +149,9 @@ public class GitControllerNew {
     @GetMapping(path = "/project/{project-id}/repository/contribution")
     @ResponseBody
     public String getRepoContribution(@PathVariable("project-id") String id, @RequestParam("email") String email,
-        @RequestParam("url") String url,
+        @RequestParam("repo-id") String repo_id,
         @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
-        if( id.equals("")  || url.equals("") || email.equals("")) {
+        if( id.equals("")  || repo_id.equals("") || email.equals("")) {
             throw new NoEntryException();
         }
         // Database code: 404 is returned if email does not have link to project id
@@ -138,29 +159,23 @@ public class GitControllerNew {
                                "WHERE projectId="+id+" AND EXISTS( " +
                                     "SELECT * FROM gitdb.StudentProject " +
                                         "WHERE emailStudent='"+email+"' AND projectId="+id+" " +
-                                ") AND idRepo='"+url+"';";
+                                ") AND idRepo='"+repo_id+"';";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("idRepo", FieldType.STRING);
+        fields.put("serviceRepo", FieldType.STRING);
         fields.put("projectId", FieldType.INT);
         JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
-        // Find out service from database
-        findScript = "SELECT service FROM gitdb.Repository WHERE url='"+url+"'";
-        fields.clear();
-        fields.put("service", FieldType.STRING);
-        JSONArray serviceMap = dbHandler.executeQuery(findScript, fields);
-        if (serviceMap.length() > 1){
-            throw new ForbiddenException();
-        }
-        String service = serviceMap.getJSONObject(0).getString("service").toLowerCase();
+        System.out.println(rowMap);
+        String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
         // Get Contributors
         JSONArray contributors = new JSONArray();
         switch (service) {
             case "github":
-                contributors = ghInterface.getRepoContributors(url);
+                contributors = ghInterface.getRepoContributors(repo_id);
                 break;
             case "gitlab":
                 if (token.isPresent()){
-                    contributors = glInterface.getRepoCommits(url, token.get());
+                    contributors = glInterface.getRepoCommits(repo_id, token.get());
                 }
                 else {
                     throw new ForbiddenException();
@@ -178,40 +193,37 @@ public class GitControllerNew {
      */
     @GetMapping(path = "/project/{project-id}/repository/commits")
     @ResponseBody
-    public String getRepoCommits(@PathVariable("project-id") String id, @RequestParam("email") String email,
-        @RequestParam("url") String url,
+    public String getRepoCommits(@PathVariable("project-id") String project_id, @RequestParam("email") String email,
+        @RequestParam("repo-id") String repo_id,
         @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
-        if( id.equals("")  || url.equals("") || email.equals("")) {
+        if( project_id.equals("")  || repo_id.equals("") || email.equals("")) {
             throw new NoEntryException();
         }
         // Database code: 404 is returned if email does not have link to project id
         String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
-                               "WHERE projectId="+id+" AND EXISTS( " +
+                               "WHERE projectId="+project_id+" AND EXISTS( " +
                                     "SELECT * FROM gitdb.StudentProject " +
-                                        "WHERE emailStudent='"+email+"' AND projectId="+id+" " +
-                                ") AND idRepo='"+url+"';";
+                                        "WHERE emailStudent='"+email+"' AND projectId="+project_id+" " +
+                                ") AND idRepo='"+repo_id+"';";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("idRepo", FieldType.STRING);
+        fields.put("serviceRepo", FieldType.STRING);
         fields.put("projectId", FieldType.INT);
         JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
-        // Find out service from database
-        findScript = "SELECT service FROM gitdb.Repository WHERE url='"+url+"'";
-        fields.clear();
-        fields.put("service", FieldType.STRING);
-        JSONArray serviceMap = dbHandler.executeQuery(findScript, fields);
-        if (serviceMap.length() > 1){
+        System.out.println(rowMap.toString());
+        if (rowMap.length() > 1){
             throw new ForbiddenException();
         }
-        String service = serviceMap.getJSONObject(0).getString("service").toLowerCase();
+        String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
         // Get Contributors
         JSONArray contributors = new JSONArray();
         switch (service) {
             case "github":
-                contributors = ghInterface.getRepoCommits(url);
+                contributors = ghInterface.getRepoCommits(repo_id);
                 break;
             case "gitlab":
                 if (token.isPresent()){
-                    contributors = glInterface.getRepoCommits(url, token.get());
+                    contributors = glInterface.getRepoCommits(repo_id, token.get());
                 }
                 else {
                     throw new ForbiddenException();

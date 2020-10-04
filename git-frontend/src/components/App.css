@@ -106,3 +106,8 @@ h1 {
 .Chart-Container {
   margin-top: 3em;
 }
+
+.Form-Grid {
+  display: grid;
+  grid-template-columns: 20% 70% 10%;
+}

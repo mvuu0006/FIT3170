@@ -51,7 +51,10 @@ public class GitLabInterface {
     public JSONArray getRepoCommits(String repoURL, String accessToken) throws IOException, JSONException {
         JSONArray commits =new JSONArray();
 
-        String commitsUrl = "https://git.infotech.monash.edu/api/v4/projects/" + getBaseAPIURL(repoURL) + "/repository/commits?" +
+        // Former code that uses repo URL, not repo ID
+        // String commitsUrl = "https://git.infotech.monash.edu/api/v4/projects/" + getBaseAPIURL(repoURL) + "/repository/commits?" +
+        // "access_token="+accessToken+"";
+        String commitsUrl = "https://git.infotech.monash.edu/api/v4/projects/" + repoURL + "/repository/commits?" +
         "access_token="+accessToken+"";
 
         // Class that reads from a URL and returns info in JSON format
@@ -107,5 +110,16 @@ public class GitLabInterface {
             }
         }
         return returnValue;
+    }
+
+    public String getIdFromURL(String repoURL, String accessToken) throws IOException, JSONException {
+        // Creating the URL
+        String gitlabUrl = "https://git.infotech.monash.edu/api/v4/projects/" + getBaseAPIURL(repoURL) + "?" +
+        "access_token="+accessToken+"";
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(gitlabUrl);
+        return json.getJSONObject("entry").getString("id").toString();
     }
 }
