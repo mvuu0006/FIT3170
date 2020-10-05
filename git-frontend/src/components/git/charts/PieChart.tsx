@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 
 import {Pie} from 'react-chartjs-2';
 

@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PieChart from "./charts/PieChart";
 import LineChart from "./charts/LineChart";
 import CommitTable from "./charts/CommitTable";
-import './App.css';
 
 class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_id: any, git_id: any, data: any}> {
 
@@ -29,7 +28,7 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
         // Get gitlab token from localstorage
         let gitlab_token = localStorage.getItem("spmd-git-labtoken");
         // Get commits information from backend
-        let url = "http://localhost:5001/git-db/project/"+this.state.project_id+"/repository/commits?";
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository/commits?";
         let params = "repo-id="+this.state.git_id+"&token="+gitlab_token+"&email="+"hbak0001@student.monash.edu"; // email is hardcoded for testing purposes
         let uri = url + params;
         const requestOptions = {

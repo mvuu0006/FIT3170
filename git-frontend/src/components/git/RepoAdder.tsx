@@ -1,11 +1,8 @@
 import React, {Component} from "react";
-import './App.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import history from "./history";
-import { access } from "fs";
 
 
 
@@ -68,7 +65,7 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
     async addRepoLogic(service, id) {
         let token = window.sessionStorage.getItem('gl-access-token');
         // Add repo to project
-        let url = "http://localhost:5001/git-db/project/"+this.state.project_id+"/repository?";
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository?";
         let params = "service="+service.toLowerCase()+"&url="+id;
         if (token !== null) {
             params += "&token="+token;
@@ -161,7 +158,7 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         const requestOptions = {
             method: 'GET'
         }
-        var promise = await fetch("http://localhost:5001/git-db/gitlab-access-code?code=" + code +
+        var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code +
         "&redirect_uri="+encodeURIComponent(redirect_uri), requestOptions)
         var response = await promise.json();
         return response;
