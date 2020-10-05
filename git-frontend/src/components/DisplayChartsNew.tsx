@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PieChartNew from "./PieChartNew";
-import LineChartNew from "./LineChart";
+import LineChartNew from "./LineChartNew";
 import HTTPResponseDisplay from "./HTTPResponseDisplay";
 import './App.css';
 
@@ -22,7 +22,7 @@ class DisplayChartsNew extends Component<{project_id: any, git_id: any}, {projec
                 </div>
                 <div className="Chart-Container row justify-content-md-center">
                    <div className="col-md-6 col-sm-12"><PieChartNew data = {this.state.data}/></div>
-                    <div className="col-md-6 col-sm-12">{/*<LineChartNew data = {this.state.data}/>*/}</div>
+                    <div className="col-md-6 col-sm-12"><LineChartNew data = {this.state.data}/></div>
                 </div>
                 <div className="Repo-viewer row"><HTTPResponseDisplay data={this.state.data} /></div>
             </div>);

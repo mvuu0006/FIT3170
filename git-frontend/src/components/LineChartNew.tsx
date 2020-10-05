@@ -3,38 +3,70 @@ import './App.css';
 
 import {Line} from 'react-chartjs-2';
 
-class LineChartNew extends  React.Component<any> {
+class LineChartNew extends  React.Component<{data?: any}, {data?: any}> {
     
     constructor(props) {
         super(props);
+        this.state = {data: props.data}
     }
 
     render() {
-        return (
-            <div>
-                <Line
-                    data={this.getLineData()}
-                    options={{
-                        title: {
-                            display: true,
-                            text: 'Commits Timeline',
-                            fontSize: 20
-                        },
-                        legend: {
-                            display: true,
-                            position: 'right'
-                        }
-                    }}
-                />
-            </div>
-        );
+
+        if (this.state.data != null){
+            return (
+                <div>
+                    <Line
+                        data={this.getLineData()}
+                        options={{
+                            title: {
+                                display: true,
+                                text: 'Commits Timeline',
+                                fontSize: 20
+                            },
+                            legend: {
+                                display: true,
+                                position: 'right'
+                            }
+                        }}
+                    />
+                </div>
+            );
+        }
+        else return <div></div>
     }
 
 
     getLineData() {
-        let line_data = {labels: ['Jan', 'Feb', 'March',
-        'April', 'May', 'June', 'July', 'Aug','Sept', 'Oct', 'Nov', 'Dec']};
-        let datasets = [];
+        // Get commits per month for each contributor
+        let commit_timeline = {}
+        for (let i = 0; i < this.state.data.length; i++) {
+            if (commit_timeline[this.state.data[i]["author"]] === undefined) {
+                commit_timeline[this.state.data[i]["author"]] = [0,0,0,0,0,0,0,0,0,0,0,0];
+            }
+            commit_timeline[this.state.data[i]["author"]][new Date(this.state.data[i]["date"]).getUTCMonth()-1]++;
+            
+        }
+        // Add each line to a list
+        let line_data: Object[] = [];
+        let x = 0;
+        for (var key of Object.keys(commit_timeline)) {
+            let entry = {
+                label: key,
+                fill: true,
+                lineTension: 0,
+                backgroundColor: this.chooseColour(x),
+                borderColor: this.chooseColour(x),
+                data: commit_timeline[key]
+            }
+            x++;
+            line_data.push(entry);
+        }
+        console.log(line_data);
+        return {
+            datasets: line_data,
+            labels: ['Jan', 'Feb', 'March',
+            'April', 'May', 'June', 'July', 'Aug','Sept', 'Oct', 'Nov', 'Dec']
+        };
         
     }
 
