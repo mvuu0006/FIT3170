@@ -23,7 +23,7 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
                 <div className="Page-Title"><Form.Label>Add a New Git Repository</Form.Label></div>
                 <div className="Repo-adder">
                     <Form.Label>Add a Repo to Project with ID {this.state.project_id}:</Form.Label>
-                    <Form onSubmit={this.addRepo}>
+                    <Form onSubmit={this.addRepoButtonHandler}>
                         <div className="Form-Grid">
                             <div>
                                 <Form.Group controlId="repoService">
@@ -51,13 +51,31 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         );
     }
 
-    addRepo = async (event) => {
+    addRepoButtonHandler = async (event) => {
         event.preventDefault();
         console.log(event.target.repoService.value);
         console.log(event.target.repoId.value);
+
+        let redirect = false;
+        if (event.target.repoService.value.toLowerCase() === "gitlab"){
+            redirect = true;
+            this.redirectToGitLab(event.target.repoId.value);
+        }
+
+        if (!redirect){
+            this.addRepoLogic(event.target.repoService.value,
+                event.target.repoId.value);
+        }
+    }
+
+    async addRepoLogic(service, id) {
+        let token = window.sessionStorage.getItem('gl-access-token');
         // Add repo to project
         let url = "http://localhost:5001/git-db/project/"+this.state.project_id+"/repository?";
-        let params = "service="+event.target.repoService.value.toLowerCase()+"&url="+event.target.repoId.value;
+        let params = "service="+service.toLowerCase()+"&url="+id;
+        if (token !== null) {
+            params += "&token="+token;
+        }
         let uri = url + params;
         const requestOptions = {
             method: 'POST',
@@ -72,6 +90,22 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         else {
             console.log("Repo add unsuccessful");
         }
+    }
+
+    redirectToGitLab(gitlab_url) {
+        console.log("Redirecting to GL...");
+        // Redirect
+        let redirect_uri = "http://localhost:3001";
+        if (this.state.project_id != null) {
+            redirect_uri += "?project-id="+this.state.project_id;
+        }
+        redirect_uri += "%26git-to-add="+gitlab_url;
+        console.log(redirect_uri);
+
+        window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
+            "?client_id=2b2676dd243b35a0cef351c2a5a03cbf5360221219967226d4393b3715a50bef" +
+            "&response_type=code" +
+            "&redirect_uri="+redirect_uri;
     }
 
     async postToUserService(repo_info) {
@@ -100,6 +134,44 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
             console.log("something went wrong when attempting to send git id to user-service");
         }
         return;
+    }
+
+    async componentDidMount() {
+        var search = window.location.search;
+        var params = new URLSearchParams(search);
+
+        let git_to_add : string | null = params.get('git-to-add');
+        let gl_auth_code = params.get('code'); 
+        let gl_access_token = window.sessionStorage.getItem('gl-access-token');
+        console.log(gl_access_token);
+
+        if (gl_auth_code !== null && gl_access_token === null) {
+            let response = await this.getAuthorisationCode(gl_auth_code, git_to_add);
+            let token = response["access_token"];
+            window.sessionStorage.setItem('gl-access-token', token);
+        }
+
+        if (git_to_add !== null) {
+            this.addRepoLogic('gitlab', decodeURIComponent(git_to_add));
+        }
+    }
+
+    async getAuthorisationCode(code, uri) {
+
+        let redirect_uri = "http://localhost:3001/";
+        if (this.state.project_id != null) {
+            redirect_uri += "?project-id="+this.state.project_id;
+        }
+        redirect_uri += "%26git-to-add="+encodeURIComponent(uri);
+        console.log(redirect_uri);
+
+        const requestOptions = {
+            method: 'GET'
+        }
+        var promise = await fetch("http://localhost:5001/git-db/gitlab-access-code?code=" + code +
+        "&redirect_uri="+encodeURIComponent(redirect_uri), requestOptions)
+        var response = await promise.json();
+        return response;
     }
 }
 

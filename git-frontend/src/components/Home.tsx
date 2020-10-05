@@ -96,10 +96,17 @@ class Home extends Component <{data?: any, gitInfo?: any}, {data?: any, gitInfo?
       redirecting = true;
       console.log("Redirecting to GL...");
       // Redirect
+      let redirect_uri = "http://localhost:3001";
+      if (projectId != null) {
+        redirect_uri += "?project-id="+projectId;
+      }
+      if (gitId != null) {
+        redirect_uri += "%26git-id="+gitId;
+      }
       window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
-        "?client_id=25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
+        "?client_id=2b2676dd243b35a0cef351c2a5a03cbf5360221219967226d4393b3715a50bef" +
         "&response_type=code" +
-        "&redirect_uri=http://localhost:3001";
+        "&redirect_uri="+redirect_uri;
     }
     // Retrieve the saved pid and gid from localstorage
     projectId = localStorage.getItem("spmd-git-pid");

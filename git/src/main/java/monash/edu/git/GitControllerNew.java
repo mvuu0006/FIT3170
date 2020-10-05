@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
@@ -242,16 +243,16 @@ public class GitControllerNew {
     @GetMapping(path = "/gitlab-access-code")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
-    public String getAccessToken(@RequestParam String code) throws NoEntryException, JSONException {
+    public String getAccessToken(@RequestParam String code, @RequestParam String redirect_uri) throws NoEntryException, JSONException {
         /*
             STEP 3: Get access token from gitlab using authorisation code (see frontend for previous steps)
         */
         String getAccessCodeURL = "https://git.infotech.monash.edu/oauth/token" +
                 "?code=" + code +
-                "&client_id=" + "25202383ac02265444e0ea55882782b3f85ba6baf53da0565652b3f9054613dc" +
-                "&client_secret=" + "264287a16f1a7228d0444f94f68ba268c9d77a17adfbaf0bab1892d22192276c" +
+                "&client_id=" + "2b2676dd243b35a0cef351c2a5a03cbf5360221219967226d4393b3715a50bef" +
+                "&client_secret=" + "30a8af89112f5ba74383f307d69cf08093d8a13e52480bd53740de0b8ca8fab9" +
                 "&grant_type=authorization_code" +
-                "&redirect_uri=http://localhost:3001";
+                "&redirect_uri="+redirect_uri;
 
         JSONArray jsonArray = new JSONArray();
 
@@ -260,6 +261,7 @@ public class GitControllerNew {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             int tokenStatus = con.getResponseCode();
+            System.out.println(tokenStatus);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream())
             );
