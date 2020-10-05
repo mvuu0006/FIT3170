@@ -1,13 +1,11 @@
 import React from 'react';
 import './App.css';
 import history from "./history";
-import DisplayCharts from "./DisplayCharts";
-import DisplayChartsNew from "./DisplayChartsNew";
+import DisplayCharts from "./git/DisplayCharts";
 import { Router, Switch, Route } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Home from "./Home";
 import Loading from "./Loading";
-import RepoAdder from './RepoAdder';
+import RepoAdder from './git/RepoAdder';
 
 
 class App extends React.Component<{window?: any, project_id?: any, git_id?: any},
@@ -21,23 +19,12 @@ class App extends React.Component<{window?: any, project_id?: any, git_id?: any}
     }
 
     render() {
-    // return (
-    //     <Router history={history}>
-    //       <Switch>
-    //         <Route path="/DisplayCharts" exact component={DisplayCharts} />
-    //           <Route path="/gitfrontend" exact component={DisplayCharts} />
-    //           <Route path="/"
-    //                  render={(props) => (<Home {...props}
-    //                                            data={{storeProject:this.storeProject.bind(this)}} />)} />
-    //       </Switch>
-    //     </Router>
-    // );
     console.log("rendering "+this.state.window);
     switch (this.state.window){
       case "loading":
         return (<Loading />);
       case "charts":
-        return (<DisplayChartsNew project_id={this.state.project_id} git_id={this.state.git_id} />);
+        return (<DisplayCharts project_id={this.state.project_id} git_id={this.state.git_id} />);
       case "adder":
         return (<RepoAdder project_id={this.state.project_id} />);
       default:
@@ -51,7 +38,6 @@ class App extends React.Component<{window?: any, project_id?: any, git_id?: any}
 
     let projectId : string | null = params.get('project-id');
     let gitId : string | null = params.get('git-id');
-    console.log(projectId);
 
     if (projectId != null && gitId != null) {
       this.setState({window: "charts", project_id: projectId, git_id: gitId});

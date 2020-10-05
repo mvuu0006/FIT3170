@@ -6,7 +6,7 @@ import {
   Link
 } from "react-router-dom";
 import App from './App';
-import Contacts from './Contacts';
+import Contacts from './contacts/Contacts';
 
 export default function PageHandler() {
     return (

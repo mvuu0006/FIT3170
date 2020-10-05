@@ -3,7 +3,7 @@ import './App.css';
 
 import {Line} from 'react-chartjs-2';
 
-class LineChartNew extends  React.Component<{data?: any}, {data?: any}> {
+class LineChart extends  React.Component<{data?: any}, {data?: any}> {
     
     constructor(props) {
         super(props);
@@ -61,7 +61,6 @@ class LineChartNew extends  React.Component<{data?: any}, {data?: any}> {
             x++;
             line_data.push(entry);
         }
-        console.log(line_data);
         return {
             datasets: line_data,
             labels: ['Jan', 'Feb', 'March',
@@ -91,4 +90,4 @@ class LineChartNew extends  React.Component<{data?: any}, {data?: any}> {
     }
 }
 
-export default LineChartNew;
+export default LineChart;

@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import Form from 'react-bootstrap/Form';
 import { parse } from 'querystring';
-import PageHandler from './PageHandler';
+import PageHandler from '../PageHandler';
 import Table from 'react-bootstrap/Table';
 import ContactComponents from './ContactComponents';
 

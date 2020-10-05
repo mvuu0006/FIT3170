@@ -1,12 +1,10 @@
 import React, { Component } from "react";
-import PieChartNew from "./PieChartNew";
-import LineChartNew from "./LineChartNew";
-import HTTPResponseDisplay from "./HTTPResponseDisplay";
+import PieChart from "./charts/PieChart";
+import LineChart from "./charts/LineChart";
+import CommitTable from "./charts/CommitTable";
 import './App.css';
 
-class DisplayChartsNew extends Component<{project_id: any, git_id: any}, {project_id: any, git_id: any, data: any}> {
-    private projectId;
-    private name;
+class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_id: any, git_id: any, data: any}> {
 
     constructor(props) {
         super(props);
@@ -14,17 +12,16 @@ class DisplayChartsNew extends Component<{project_id: any, git_id: any}, {projec
     }
 
     render() {
-        console.log(this.state);
         return (
             <div className="Info-Page container">
                 <div className="Page-Title row justify-content-md-center">
                     Placeholder
                 </div>
                 <div className="Chart-Container row justify-content-md-center">
-                   <div className="col-md-6 col-sm-12"><PieChartNew data = {this.state.data}/></div>
-                    <div className="col-md-6 col-sm-12"><LineChartNew data = {this.state.data}/></div>
+                   <div className="col-md-6 col-sm-12"><PieChart data = {this.state.data}/></div>
+                    <div className="col-md-6 col-sm-12"><LineChart data = {this.state.data}/></div>
                 </div>
-                <div className="Repo-viewer row"><HTTPResponseDisplay data={this.state.data} /></div>
+                <div className="Repo-viewer row"><CommitTable data={this.state.data} /></div>
             </div>);
     }
 
@@ -45,4 +42,4 @@ class DisplayChartsNew extends Component<{project_id: any, git_id: any}, {projec
 
 }
 
-export default DisplayChartsNew;
+export default DisplayCharts;

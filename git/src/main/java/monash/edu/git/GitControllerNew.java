@@ -122,7 +122,6 @@ public class GitControllerNew {
                 break;
             default:
         }
-        System.out.println(repo_id);
         // TODO: Add restrictions to database to standardise service syntax (eg. all lower case)
         String putScript = "INSERT INTO gitdb.Repository(url, service, id) VALUES('"+url+"', '"+service+"', '"+repo_id+"')";
         int rowsChanged = dbHandler.executeUpdate(putScript);
@@ -166,7 +165,6 @@ public class GitControllerNew {
         fields.put("serviceRepo", FieldType.STRING);
         fields.put("projectId", FieldType.INT);
         JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
-        System.out.println(rowMap);
         String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
         // Get Contributors
         JSONArray contributors = new JSONArray();
@@ -211,7 +209,6 @@ public class GitControllerNew {
         fields.put("serviceRepo", FieldType.STRING);
         fields.put("projectId", FieldType.INT);
         JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
-        System.out.println(rowMap.toString());
         if (rowMap.length() > 1){
             throw new ForbiddenException();
         }
@@ -261,7 +258,6 @@ public class GitControllerNew {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             int tokenStatus = con.getResponseCode();
-            System.out.println(tokenStatus);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream())
             );

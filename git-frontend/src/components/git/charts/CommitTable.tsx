@@ -1,11 +1,10 @@
 import React from 'react';
 import {MDBDataTable} from 'mdbreact';
 
-class HTTPResponseDisplay extends React.Component< {data?: any}, {data?: any}> {
+class CommitTable extends React.Component< {data?: any}, {data?: any}> {
     public tableData;
     constructor(props) {
         super(props);
-        console.log(props);
         this.state = {data: props.data};
     }
 
@@ -66,4 +65,4 @@ class HTTPResponseDisplay extends React.Component< {data?: any}, {data?: any}> {
     }
 }
 
-export default HTTPResponseDisplay;
+export default CommitTable;

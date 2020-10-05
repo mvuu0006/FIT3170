@@ -13,7 +13,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
 
     constructor(props) {
         super(props);
-        console.log(props.project_id);
         this.state = {project_id: props.project_id};
     }
 
@@ -53,8 +52,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
 
     addRepoButtonHandler = async (event) => {
         event.preventDefault();
-        console.log(event.target.repoService.value);
-        console.log(event.target.repoId.value);
 
         let redirect = false;
         if (event.target.repoService.value.toLowerCase() === "gitlab"){
@@ -82,7 +79,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         }
         const promise = await fetch(uri, requestOptions);
         const response = await promise.json();
-        console.log(response);
         if (promise.status == 200){
             console.log("Repo add successful");
             this.postToUserService(response);
@@ -100,7 +96,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
             redirect_uri += "?project-id="+this.state.project_id;
         }
         redirect_uri += "%26git-to-add="+gitlab_url;
-        console.log(redirect_uri);
 
         window.location.href = "https://git.infotech.monash.edu/oauth/authorize" +
             "?client_id=2b2676dd243b35a0cef351c2a5a03cbf5360221219967226d4393b3715a50bef" +
@@ -143,7 +138,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         let git_to_add : string | null = params.get('git-to-add');
         let gl_auth_code = params.get('code'); 
         let gl_access_token = window.sessionStorage.getItem('gl-access-token');
-        console.log(gl_access_token);
 
         if (gl_auth_code !== null && gl_access_token === null) {
             let response = await this.getAuthorisationCode(gl_auth_code, git_to_add);
@@ -163,7 +157,6 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
             redirect_uri += "?project-id="+this.state.project_id;
         }
         redirect_uri += "%26git-to-add="+encodeURIComponent(uri);
-        console.log(redirect_uri);
 
         const requestOptions = {
             method: 'GET'

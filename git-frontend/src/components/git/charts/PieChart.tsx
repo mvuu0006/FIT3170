@@ -3,7 +3,7 @@ import './App.css';
 
 import {Pie} from 'react-chartjs-2';
 
-class PieChartNew extends  React.Component<{data?: any}, {data?: any}> {
+class PieChart extends  React.Component<{data?: any}, {data?: any}> {
     public contributions;
     public pieData;
 
@@ -89,4 +89,4 @@ class PieChartNew extends  React.Component<{data?: any}, {data?: any}> {
     }
 }
 
-export default PieChartNew;
+export default PieChart;
