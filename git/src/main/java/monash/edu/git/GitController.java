@@ -77,7 +77,7 @@ public class GitController {
     public String getProjectRepos(@PathVariable("project-id") String id,
     @RequestParam("email") Optional<String> email, @RequestParam("user-type") Optional<String> user_type,
     @RequestParam Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
-        if( id.equals("") || email.equals("") || user_type.equals("")) {
+        if( id.equals("")) {
             throw new NoEntryException();
         }
         String getScript = "SELECT * FROM gitdb.Repository " +
@@ -87,7 +87,13 @@ public class GitController {
         fields.put("url", FieldType.STRING);
         fields.put("service", FieldType.STRING);
         fields.put("id", FieldType.STRING);
-        JSONArray repos = dbHandler.executeQuery(getScript, fields);
+        JSONArray repos = new JSONArray();
+        try {
+            repos = dbHandler.executeQuery(getScript, fields);
+        }
+        catch (NoEntryException e) {
+            return repos.toString();
+        }
         for (int i = 0; i < repos.length(); i++) {
             if (repos.getJSONObject(i).getString("service").equals("gitlab") && token.isPresent()) {
                 JSONObject repoInfo = glInterface.getRepoInfo(repos.getJSONObject(i).getString("id"), token.get());
@@ -97,6 +103,9 @@ public class GitController {
                 JSONObject repoInfo = ghInterface.getRepoInfo(repos.getJSONObject(i).getString("id"));
                 repos.getJSONObject(i).put("name", repoInfo.getString("name"));
             }
+        }
+        if (repos.length() == 0) {
+            return new JSONArray().toString();
         }
         return repos.toString();
     }

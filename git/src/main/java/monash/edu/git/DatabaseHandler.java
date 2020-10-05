@@ -61,10 +61,10 @@ public class DatabaseHandler {
                         }
                         rowArray.put(row);
                     }
+                    conn.close();
                     if (empty) {
                         throw new NoEntryException();
                     }
-                    conn.close();
                 }
             } 
             catch (SQLException | JSONException ex) {
