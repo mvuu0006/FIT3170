@@ -1,64 +1,69 @@
 import React from 'react';
 import {MDBDataTable} from 'mdbreact';
 
-class HTTPResponseDisplay extends React.Component<any> {
+class HTTPResponseDisplay extends React.Component< {data?: any}, {data?: any}> {
     public tableData;
     constructor(props) {
         super(props);
+        console.log(props);
+        this.state = {data: props.data};
     }
 
-    render () {
-        if (this.props.data == null){return <div></div>}
-        if (this.props.data.state == null){
-                if (this.props.data.length!=0) {
-                    this.formatTableData()
-                }
-                return (<MDBDataTable
+
+    render() {
+        if (this.state.data === null) { // No data to tabulate
+            return(<div>Table was unable to render</div>)
+        }
+        else {
+            let table_data = this.getTableData();
+            return(
+                <MDBDataTable
                         scrollY
                         maxHeight="300px"
                         striped
                         bordered
                         small
-                        //data={test_data}
-                         data={this.tableData}
+                         data={table_data}
                     />
-                )}
-        return <div></div>
+            );
+        }
     }
 
 
-        formatTableData(){
-            let row=new Array();
-
-
-            for(let i=0;i<this.props.data.tableData.length;i++)
-            {
-                let row_element={
-                    'author':this.props.data.tableData[i]["name"],
-                    'commitMessage':this.props.data.tableData[i]["commit_description"],
-                    'dateAndTime':this.props.data.tableData[i]["date"]
-                }
-
-                row.push(row_element);
+    getTableData(){
+        let row=new Array();
+        for(let i=0;i<this.state.data.length;i++)
+        {
+            let row_element={
+                'author':this.state.data[i]["author"],
+                'commitMessage':this.props.data[i]["message"],
+                'dateAndTime':this.props.data[i]["date"]
             }
-            this.tableData={
-                columns:[
-                    {
-                        label: 'Author',
-                        field: 'author'
-                    },
-                    {
-                        label: 'Commit Message',
-                        field: 'commitMessage'
-                    },
-                    {
-                        label: 'Commit Date and Time (GMT)',
-                        field:'dateAndTime'
-                    }
-                    ],
-                rows:row
-            };
+
+            row.push(row_element);
         }
+        return({
+            columns:[
+                {
+                    label: 'Author',
+                    field: 'author'
+                },
+                {
+                    label: 'Commit Message',
+                    field: 'commitMessage'
+                },
+                {
+                    label: 'Commit Date and Time (GMT)',
+                    field:'dateAndTime'
+                }
+                ],
+            rows:row
+        });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({data: nextProps.data});
+    }
 }
 
 export default HTTPResponseDisplay;

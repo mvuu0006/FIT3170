@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import history from "./history";
 import DisplayCharts from "./DisplayCharts";
+import DisplayChartsNew from "./DisplayChartsNew";
 import { Router, Switch, Route } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from "./Home";
@@ -9,13 +10,14 @@ import Loading from "./Loading";
 import RepoAdder from './RepoAdder';
 
 
-class App extends React.Component<{window?: any, project_id?: any}, {window?: any, project_id?: any}> {
+class App extends React.Component<{window?: any, project_id?: any, git_id?: any},
+  {window?: any, project_id?: any, git_id?: any}> {
     public projects={}
     public b;
 
     constructor(props) {
       super(props);
-      this.state = {window: "loading", project_id: null};
+      this.state = {window: "loading", project_id: null, git_id: null};
     }
 
     render() {
@@ -35,7 +37,7 @@ class App extends React.Component<{window?: any, project_id?: any}, {window?: an
       case "loading":
         return (<Loading />);
       case "charts":
-        return (<DisplayCharts />);
+        return (<DisplayChartsNew project_id={this.state.project_id} git_id={this.state.git_id} />);
       case "adder":
         return (<RepoAdder project_id={this.state.project_id} />);
       default:
@@ -52,7 +54,7 @@ class App extends React.Component<{window?: any, project_id?: any}, {window?: an
     console.log(projectId);
 
     if (projectId != null && gitId != null) {
-      this.setState({window: "charts", project_id: projectId});
+      this.setState({window: "charts", project_id: projectId, git_id: gitId});
     }
     else if (projectId != null) {
       this.setState({window: "adder", project_id: projectId});

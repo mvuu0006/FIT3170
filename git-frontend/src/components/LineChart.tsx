@@ -88,8 +88,7 @@ class LineChart extends  React.Component<any> {
         "rgba(  184,134,11,0.5)", "rgba(  169,169,169,0.5)",
         "rgba(  0,100,0,0.5)", "rgba(  169,169,169,0.5)", "rgba(  189,183,107,0.5)",
         "rgba(  139,0,139,0.5)", "rgba(  85,107,47,0.5)",
-    ];
-
+        ];
         return colors[index%29]
     }
 
