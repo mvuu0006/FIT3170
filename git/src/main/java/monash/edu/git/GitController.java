@@ -72,20 +72,32 @@ public class GitController {
     /*
      GET: Repos currently attached to a project
      */
-    @GetMapping(path = "/project")
+    @GetMapping(path = "/project/{project-id}")
     @ResponseBody
-    public String getProjectRepos(@RequestParam("project-id") String id,
-    @RequestParam("email") String email, @RequestParam("user-type") String user_type) throws NoEntryException, JSONException, ClassNotFoundException {
+    public String getProjectRepos(@PathVariable("project-id") String id,
+    @RequestParam("email") Optional<String> email, @RequestParam("user-type") Optional<String> user_type,
+    @RequestParam Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
         if( id.equals("") || email.equals("") || user_type.equals("")) {
             throw new NoEntryException();
         }
         String getScript = "SELECT * FROM gitdb.Repository " +
-            "WHERE url IN (SELECT idRepo FROM gitdb.ProjectRepo " +
+            "WHERE id IN (SELECT idRepo FROM gitdb.ProjectRepo " +
                 "WHERE projectId="+id+");";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("url", FieldType.STRING);
         fields.put("service", FieldType.STRING);
+        fields.put("id", FieldType.STRING);
         JSONArray repos = dbHandler.executeQuery(getScript, fields);
+        for (int i = 0; i < repos.length(); i++) {
+            if (repos.getJSONObject(i).getString("service").equals("gitlab") && token.isPresent()) {
+                JSONObject repoInfo = glInterface.getRepoInfo(repos.getJSONObject(i).getString("id"), token.get());
+                repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+            }
+            else if (repos.getJSONObject(i).getString("service").equals("github")) {
+                JSONObject repoInfo = ghInterface.getRepoInfo(repos.getJSONObject(i).getString("id"));
+                repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+            }
+        }
         return repos.toString();
     }
 

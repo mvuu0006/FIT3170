@@ -97,4 +97,17 @@ public class GitHubInterface {
         JSONObject json = jsonReader.readJsonFromUrl(githubUrl);
         return json.getJSONObject("entry").getString("id").toString();
     }
+
+    public JSONObject getRepoInfo(String repoURL) throws IOException, JSONException {
+        // Creating the URL
+        String infoURL = "https://api.github.com/repositories/" + repoURL;
+
+        // Class that reads from a URL and returns info in JSON format
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(infoURL);
+
+        // Extracting the array from the JSON Object
+        JSONObject jsonObject = json.getJSONObject("entry");
+        return jsonObject;
+    }
 }

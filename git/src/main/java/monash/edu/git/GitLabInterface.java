@@ -100,6 +100,19 @@ public class GitLabInterface {
         return commits;
     }
 
+    public JSONObject getRepoInfo(String repoURL, String accessToken) throws IOException, JSONException {
+        // Creating the URL
+        String infoUrl = "https://git.infotech.monash.edu/api/v4/projects/"+repoURL+"?" +
+        "access_token="+accessToken+"";
+
+        GetJSONReader jsonReader= new GetJSONReader();
+        JSONObject json = jsonReader.readJsonFromUrl(infoUrl);
+
+        // Extracting the array from the JSON Object
+        JSONObject jsonObject = json.getJSONObject("entry");
+        return jsonObject;
+    }
+
     private String getBaseAPIURL(String baseURL) {
         String[] urlComponents = baseURL.split("/");
         String returnValue = "";

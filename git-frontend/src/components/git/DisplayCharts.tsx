@@ -3,18 +3,18 @@ import PieChart from "./charts/PieChart";
 import LineChart from "./charts/LineChart";
 import CommitTable from "./charts/CommitTable";
 
-class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_id: any, git_id: any, data: any}> {
+class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_id: any, git_id: any, data: any, project_name?: any}> {
 
     constructor(props) {
         super(props);
-        this.state = {project_id: props.project_id, git_id: props.git_id, data: null};
+        this.state = {project_id: props.project_id, git_id: props.git_id, data: null, project_name: ""};
     }
 
     render() {
         return (
             <div className="Info-Page container">
                 <div className="Page-Title row justify-content-md-center">
-                    Placeholder
+                    {this.state.project_name}
                 </div>
                 <div className="Chart-Container row justify-content-md-center">
                    <div className="col-md-6 col-sm-12"><PieChart data = {this.state.data}/></div>
@@ -37,6 +37,27 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
         let response = await fetch(uri, requestOptions);
         let content = await response.json();
         this.setState({data: content});
+
+        this.getRepositoryName();
+    }
+
+    async getRepositoryName() {
+           // Get gitlab token from localstorage
+        let gitlab_token = localStorage.getItem("spmd-git-labtoken");
+        // Get commits information from backend
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/?";
+        let params = "token="+gitlab_token;
+        let uri = url + params;
+        const requestOptions = {
+            method: 'GET'
+        }
+        let response = await fetch(uri, requestOptions);
+        let content = await response.json();
+        for (let i = 0; i < content.length; i++) {
+            if (content[i]["id"] === this.state.git_id) {
+                this.setState({project_name: content[i]["name"]});
+            }
+        }
     }
 
 }

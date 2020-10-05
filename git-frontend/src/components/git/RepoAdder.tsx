@@ -4,6 +4,8 @@ import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import AddedReposTable from './AddedReposTable';
+
 
 
 class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
@@ -42,7 +44,9 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
                         </div>
                     </Form>
                 </div>
-                <div className="Repo-list"></div>
+                <div className="Repo-list">
+                    <AddedReposTable project_id={this.state.project_id}/>
+                </div>
             </div>
         );
     }
