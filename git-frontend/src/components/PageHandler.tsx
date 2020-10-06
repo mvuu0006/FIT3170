@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import App from './App';
 import Contacts from './contacts/Contacts';
+import UsefulResources from './UsefulSafeResources'
 
 export default function PageHandler() {
     return (
@@ -14,6 +15,9 @@ export default function PageHandler() {
             <Switch>
                 <Route path="/contacts">
                     <Contacts />
+                 </Route>
+                <Route path="/useful-websites-frontend">
+                    <UsefulResources />
                  </Route>
                 <Route path="/">
                     <App />
