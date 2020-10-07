@@ -86,6 +86,8 @@ public class GitLabInterface {
                     commit_info.put("message", jsonArray.getJSONObject(i).getString("message"));
                     // Add commit date to commit_info
                     commit_info.put("date", jsonArray.getJSONObject(i).getString("authored_date"));
+                    // Add author email to commit_info
+                    commit_info.put("email", jsonArray.getJSONObject(i).getString("author_email"));
                     // Add commit to array
                     commits.put(commit_info);
                 }
@@ -98,6 +100,18 @@ public class GitLabInterface {
         // Loop that goes through all the commits and extracts its authors
         // Also increments commit number if author already exists in commit JSONObject
         return commits;
+    }
+
+    public JSONObject getLastContributions(String repoURL, String accessToken) throws IOException, JSONException {
+        JSONArray contributors = new JSONArray();
+        contributors = this.getRepoCommits(repoURL, accessToken);
+        JSONObject lastchanged = new JSONObject();
+        for (int i = 0; i < contributors.length(); i++){
+            if (!lastchanged.has(contributors.getJSONObject(i).getString("email"))){
+                lastchanged.put(contributors.getJSONObject(i).getString("email"), contributors.getJSONObject(i).getString("date"));
+            }
+        }
+        return lastchanged;
     }
 
     public JSONObject getRepoInfo(String repoURL, String accessToken) throws IOException, JSONException {

@@ -78,10 +78,24 @@ public class GitHubInterface {
             commit_info.put("message", jsonArray.getJSONObject(i).getJSONObject("commit").getString("message"));
             // Add commit date to commit_info
             commit_info.put("date", jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("date"));
+            // Add author email to commit_info
+            commit_info.put("author", jsonArray.getJSONObject(i).getJSONObject("commit").getJSONObject("committer").getString("email"));
             // Add commit to array
             commits.put(commit_info);
         }
         return commits;
+    }
+
+    public JSONObject getLastContributions(String repoURL) throws IOException, JSONException {
+        JSONArray contributors = new JSONArray();
+        contributors = this.getRepoCommits(repoURL);
+        JSONObject lastchanged = new JSONObject();
+        for (int i = 0; i < contributors.length(); i++){
+            if (!lastchanged.has(contributors.getJSONObject(i).getString("email"))){
+                lastchanged.put(contributors.getJSONObject(i).getString("email"), contributors.getJSONObject(i).getString("date"));
+            }
+        }
+        return lastchanged;
     }
 
     public String getIdFromURL(String repoURL) throws IOException, JSONException {

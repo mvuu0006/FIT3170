@@ -251,6 +251,53 @@ public class GitController {
 
 
     /*
+     GET: Repository Commits (commit info)
+     */
+    @GetMapping(path = "/project/{project-id}/repository/last-changed-email")
+    @ResponseBody
+    public String getLastChangedEmail(@PathVariable("project-id") String project_id, @RequestParam("email") String email,
+                                 @RequestParam("repo-id") String repo_id,
+                                 @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        if( project_id.equals("")  || repo_id.equals("") || email.equals("")) {
+            throw new NoEntryException();
+        }
+        // Database code: 404 is returned if email does not have link to project id
+        String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
+                "WHERE projectId="+project_id+" AND EXISTS( " +
+                "SELECT * FROM gitdb.StudentProject " +
+                "WHERE emailStudent='"+email+"' AND projectId="+project_id+" " +
+                ") AND idRepo='"+repo_id+"';";
+        HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
+        fields.put("idRepo", FieldType.STRING);
+        fields.put("serviceRepo", FieldType.STRING);
+        fields.put("projectId", FieldType.INT);
+        JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
+        if (rowMap.length() > 1){
+            throw new ForbiddenException();
+        }
+        String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
+        // Get last changed contributors
+        JSONObject lastchanged = new JSONObject();
+        switch (service) {
+            case "github":
+                lastchanged = ghInterface.getLastContributions(repo_id);
+                break;
+            case "gitlab":
+                if (token.isPresent()){
+                    lastchanged = glInterface.getLastContributions(repo_id, token.get());
+                }
+                else {
+                    throw new ForbiddenException();
+                }
+                break;
+            default:
+                break;
+        }
+        return(lastchanged.toString());
+    }
+
+
+    /*
      GET: GitLab Access Token
      */
     @GetMapping(path = "/gitlab-access-code")
