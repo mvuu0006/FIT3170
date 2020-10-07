@@ -55,7 +55,7 @@ public class GitLabInterface {
         // String commitsUrl = "https://git.infotech.monash.edu/api/v4/projects/" + getBaseAPIURL(repoURL) + "/repository/commits?" +
         // "access_token="+accessToken+"";
         String commitsUrl = "https://git.infotech.monash.edu/api/v4/projects/" + repoURL + "/repository/commits?" +
-        "access_token="+accessToken+"";
+        "access_token="+accessToken+"&all=true";
 
         // Class that reads from a URL and returns info in JSON format
         GetJSONReader jsonReader= new GetJSONReader();
@@ -69,13 +69,14 @@ public class GitLabInterface {
         JSONArray jsonArray;
         // TODO: Wrap in a try catch to handle potential errors
         boolean firstpage = true;
+        int page = 1;
         do {
             // Add extra parameters to URL
-            extendedUrl = commitsUrl+"&until="+commitDate;
+            extendedUrl = commitsUrl+"&page="+page;
             response = jsonReader.readJsonFromUrl(extendedUrl);
             // Extracting the array from the JSON Object
             jsonArray = response.getJSONArray("entry");
-            for (int i=0;i<jsonArray.length();i++)
+            for (int i=jsonArray.length()-1;i>0;i--)
             {  
                 if (firstpage || i != 0){
                     // Add nicely-formatted commits to list
@@ -93,6 +94,7 @@ public class GitLabInterface {
                 }
             }
             firstpage = false;
+            page += 1;
             previous = jsonArray.getJSONObject(jsonArray.length()-1);
             commitDate = ((JSONObject) jsonArray.get(jsonArray.length()-1)).get("authored_date").toString();
             //constructRepoContributions(branchcommits);
