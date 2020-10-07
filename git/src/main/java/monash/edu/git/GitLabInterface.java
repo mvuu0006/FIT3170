@@ -104,16 +104,27 @@ public class GitLabInterface {
         return commits;
     }
 
-    public JSONObject getLastContributions(String repoURL, String accessToken) throws IOException, JSONException {
-        JSONArray contributors = new JSONArray();
-        contributors = this.getRepoCommits(repoURL, accessToken);
-        JSONObject lastchanged = new JSONObject();
+    public JSONArray getLastContributions(String repoURL, String accessToken) throws IOException, JSONException {
+        JSONArray lastmodified = new JSONArray();
+        JSONObject lastthing;
+        JSONArray contributors = this.getRepoCommits(repoURL, accessToken);
+        boolean found = false;
         for (int i = 0; i < contributors.length(); i++){
-            if (!lastchanged.has(contributors.getJSONObject(i).getString("email"))){
-                lastchanged.put(contributors.getJSONObject(i).getString("email"), contributors.getJSONObject(i).getString("date"));
+            found = false;
+            for (int j = 0; j < lastmodified.length(); j++){
+                if (lastmodified.getJSONObject(j).getString("email").equals(contributors.getJSONObject(i).getString("email"))){
+                    found = true;
+                    break;
+                }
+            }
+            if (found == false){
+                lastthing = new JSONObject();
+                lastthing.put("email",contributors.getJSONObject(i).getString("email"));
+                lastthing.put("date", contributors.getJSONObject(i).getString("date"));
+                lastmodified.put(lastthing);
             }
         }
-        return lastchanged;
+        return lastmodified;
     }
 
     public JSONObject getRepoInfo(String repoURL, String accessToken) throws IOException, JSONException {

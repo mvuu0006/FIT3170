@@ -277,7 +277,7 @@ public class GitController {
         }
         String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
         // Get last changed contributors
-        JSONObject lastchanged = new JSONObject();
+        JSONArray lastchanged = new JSONArray();
         switch (service) {
             case "github":
                 lastchanged = ghInterface.getLastContributions(repo_id);
