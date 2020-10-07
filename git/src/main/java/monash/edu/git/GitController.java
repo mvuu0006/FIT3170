@@ -256,7 +256,7 @@ public class GitController {
     @GetMapping(path = "/project/{project-id}/repository/last-changed-email")
     @ResponseBody
     public String getLastChangedEmail(@PathVariable("project-id") String project_id, @RequestParam("email") String email,
-                                 @RequestParam("repo-id") String repo_id,
+                                 @RequestParam("git-id") String repo_id,
                                  @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
         if( project_id.equals("")  || repo_id.equals("") || email.equals("")) {
             throw new NoEntryException();
