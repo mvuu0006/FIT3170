@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,11 +29,16 @@ public class DatabaseHandler {
     }
 
     public JSONArray executeQuery(String sqlScript, HashMap<String, FieldType> fields) throws ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+        // Class.forName("com.mysql.cj.jdbc.Driver");
         Connection conn = null;
         JSONArray rowArray = new JSONArray();
         try {
-            conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+            // conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+            MysqlDataSource dataSource = new MysqlDataSource();
+            dataSource.setUser(databaseUsername);
+            dataSource.setURL(databaseURL);
+            dataSource.setPassword(databasePassword);
+            conn = dataSource.getConnection();
         } 
         catch (SQLException e) {
             throw new Error("Problem", e);
