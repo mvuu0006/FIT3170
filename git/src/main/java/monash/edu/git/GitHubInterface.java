@@ -86,27 +86,16 @@ public class GitHubInterface {
         return commits;
     }
 
-    public JSONArray getLastContributions(String repoURL) throws IOException, JSONException {
-        JSONArray lastmodified = new JSONArray();
-        JSONObject lastthing;
-        JSONArray contributors = this.getRepoCommits(repoURL);
-        boolean found = false;
+    public JSONObject getLastContributions(String repoURL) throws IOException, JSONException {
+        JSONArray contributors = new JSONArray();
+        contributors = this.getRepoCommits(repoURL);
+        JSONObject lastchanged = new JSONObject();
         for (int i = 0; i < contributors.length(); i++){
-            found = false;
-            for (int j = 0; j < lastmodified.length(); j++){
-                if (lastmodified.getJSONObject(j).getString("email").equals(contributors.getJSONObject(i).getString("email"))){
-                    found = true;
-                    break;
-                }
-            }
-            if (found == false){
-                lastthing = new JSONObject();
-                lastthing.put("email",contributors.getJSONObject(i).getString("email"));
-                lastthing.put("date", contributors.getJSONObject(i).getString("date"));
-                lastmodified.put(lastthing);
+            if (!lastchanged.has(contributors.getJSONObject(i).getString("email"))){
+                lastchanged.put(contributors.getJSONObject(i).getString("email"), contributors.getJSONObject(i).getString("date"));
             }
         }
-        return lastmodified;
+        return lastchanged;
     }
 
     public String getIdFromURL(String repoURL) throws IOException, JSONException {
