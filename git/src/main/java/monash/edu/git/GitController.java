@@ -27,6 +27,7 @@ public class GitController {
     "admin", "0xFDMui5vQoChrpit32x"); // Database username and password
     private GitHubInterface ghInterface = new GitHubInterface();
     private GitLabInterface glInterface = new GitLabInterface();
+    private JSONObject export_data = new JSONObject();
 
 
     /*
@@ -199,6 +200,9 @@ public class GitController {
             default:
                 break;
         }
+        String projectId = rowMap.getJSONObject(0).getString("projectId").toLowerCase();
+        String repoId = rowMap.getJSONObject(0).getString("idRepo").toLowerCase();
+        export_data.put(projectId,new JSONObject().put(repoId,contributors));
         return(contributors.toString());
     }
 
@@ -293,6 +297,42 @@ public class GitController {
 
         throw new NoEntryException();
 
+    }
+
+    @GetMapping(path = "/git_export/{project-id}")
+    @ResponseBody
+    public String exportyGit(@PathVariable("project-id") String project_id,
+                                 @RequestParam("repo-id") String repo_id
+                                 ) throws NoEntryException, JSONException, ClassNotFoundException {
+        if( project_id.equals("")  || repo_id.equals("") ) {
+            throw new NoEntryException();
+        }
+        // Database code: 404 is returned if email does not have link to project id
+        String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
+                "WHERE projectId="+project_id+" AND EXISTS( " +
+                "SELECT * FROM gitdb.StudentProject " +
+                "WHERE  projectId="+project_id+" " +
+                ") AND idRepo='"+repo_id+"';";
+        HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
+        fields.put("idRepo", FieldType.STRING);
+        fields.put("serviceRepo", FieldType.STRING);
+        fields.put("projectId", FieldType.INT);
+        JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
+        if (rowMap.length() > 1){
+            throw new ForbiddenException();
+        }
+        String projectId = rowMap.getJSONObject(0).getString("projectId").toLowerCase();
+        String repoId = rowMap.getJSONObject(0).getString("idRepo").toLowerCase();
+
+        for(int i=0;i<export_data.length();i++)
+        {
+            JSONObject projects= (JSONObject) export_data.get(projectId);
+            if (projects.has(repoId))
+            {
+                return (projects.get(repoId)).toString();
+            }
+        }
+        return null;
     }
 
 }
