@@ -8,8 +8,8 @@ var exec = require('child_process').exec;
 const paths = {
   prod_build: '../prod-build',
   server_file_name: 'server.bundle.js',
-  react_src: '../my-app/build/**/*',
-  react_dist: '../prod-build/my-app/build',
+  react_src: '../git-frontend/build/**/*',
+  react_dist: '../prod-build/git-frontend/build',
   zipped_file_name: 'react-nodejs.zip'
 };
 
@@ -32,7 +32,7 @@ function createProdBuildFolder() {
 
 function buildReactCodeTask(cb) {
   log('building React code into the directory')
-  return exec('cd ../my-app && npm run build', function (err, stdout, stderr) {
+  return exec('cd ../git-frontend && npm run build', function (err, stdout, stderr) {
     log(stdout);
     log(stderr);
     cb(err);
@@ -47,7 +47,7 @@ function copyReactCodeTask() {
 
 function copyNodeJSCodeTask() {
   log('building and copying server code into the directory')
-  return src(['package.json', 'server.js'])
+  return src(['package.json'])
         .pipe(dest(`${paths.prod_build}`))
 }
 
