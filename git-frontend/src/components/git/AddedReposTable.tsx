@@ -37,14 +37,15 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
     }
 
     getChartURL(id) : string {
-        return "http://localhost:3001/?project-id="+this.state.project_id+"&git-id="+id;
+        return "http://spmd-git-frontend.s3-website-ap-southeast-2.amazonaws.com/?project-id="+this.state.project_id+"&git-id="+id;
     }
 
     async componentDidMount() {
         const requestOptions = {
             method: 'GET'
         }
-        let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"?";
+        //let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"?";+
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"?";
         let token = window.sessionStorage.getItem('gl-access-token');
         if (token !== null) {
             url += "token="+token;

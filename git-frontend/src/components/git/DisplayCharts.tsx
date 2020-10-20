@@ -28,7 +28,8 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
         // Get gitlab token from localstorage
         let gitlab_token = localStorage.getItem("spmd-git-labtoken");
         // Get commits information from backend
-        let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository/commits?";
+        //let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository/commits?";
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository/commits?";
         let params = "repo-id="+this.state.git_id+"&token="+gitlab_token+"&email="+"hbak0001@student.monash.edu"; // email is hardcoded for testing purposes
         let uri = url + params;
         const requestOptions = {
@@ -45,7 +46,8 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
            // Get gitlab token from localstorage
         let gitlab_token = localStorage.getItem("spmd-git-labtoken");
         // Get commits information from backend
-        let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/?";
+        // let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/?";
+        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/?";
         let params = "token="+gitlab_token;
         let uri = url + params;
         const requestOptions = {
