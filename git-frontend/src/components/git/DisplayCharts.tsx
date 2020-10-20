@@ -25,8 +25,14 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
     }
 
     async componentDidMount() {
-        // Get gitlab token from localstorage
-        let gitlab_token = localStorage.getItem("spmd-git-labtoken");
+        // Get gitlab token from sessionStorage
+        let gitlab_token = sessionStorage.getItem("spmd-git-labtoken");
+        let token_promise = await fetch("http://localhost:5001/git/project/"+this.state.project_id+"/gitlab-info");
+        let token_from_http = await token_promise.json();
+        if (token_from_http["has-gitlab"] === "True" && token_from_http["gitlab-access-token"] !== "None") {
+            gitlab_token = token_from_http["gitlab-access-token"];
+            if (gitlab_token !== null) sessionStorage.setItem("spmd-git-labtoken", gitlab_token);
+        }
         // Get commits information from backend
         //let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository/commits?";
         let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository/commits?";
@@ -43,8 +49,8 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
     }
 
     async getRepositoryName() {
-           // Get gitlab token from localstorage
-        let gitlab_token = localStorage.getItem("spmd-git-labtoken");
+           // Get gitlab token from sessionStorage
+        let gitlab_token = sessionStorage.getItem("spmd-git-labtoken");
         // Get commits information from backend
         // let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/?";
         let url = "http://localhost:5001/git/project/"+this.state.project_id+"/?";
