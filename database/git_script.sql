@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `gitdb`.`Project` ;
 CREATE TABLE IF NOT EXISTS `gitdb`.`Project` (
   `projectId` INT,
   `projectName` CHAR(50),
+  `gitlabToken` VARCHAR(64),
   PRIMARY KEY (`projectId`),
   UNIQUE INDEX `idProject_UNIQUE` (`projectId` ASC) VISIBLE)
 ENGINE = InnoDB;

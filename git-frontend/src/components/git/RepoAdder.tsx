@@ -165,7 +165,7 @@ class RepoAdder extends Component<{project_id?: any}, {project_id?: any}> {
         }
         // var promise = await fetch("http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/gitlab-access-code?code=" + code +
         // "&redirect_uri="+encodeURIComponent(redirect_uri), requestOptions)
-        var promise = await fetch("http://localhost:5001/git/gitlab-access-code?code=" + code +
+        var promise = await fetch("http://localhost:5001/git/project/"+this.state.project_id+"/gitlab-access-code?code=" + code +
         "&redirect_uri="+encodeURIComponent(redirect_uri), requestOptions)
         var response = await promise.json();
         return response;

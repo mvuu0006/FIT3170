@@ -21,7 +21,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/git")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003"}, maxAge = 0)
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
+"http://spmd-git-frontend.s3-website-ap-southeast-2.amazonaws.com"}, maxAge = 0)
 public class GitController {
     private DatabaseHandler dbHandler = new DatabaseHandler("jdbc:mysql://spmd-git-db-syd.chriccj5hso1.ap-southeast-2.rds.amazonaws.com:3306",
     "admin", "0xFDMui5vQoChrpit32x"); // Database username and password
@@ -253,10 +254,11 @@ public class GitController {
     /*
      GET: GitLab Access Token
      */
-    @GetMapping(path = "/gitlab-access-code")
+    @GetMapping(path = "/project/{project-id}/gitlab-access-code")
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
-    public String getAccessToken(@RequestParam String code, @RequestParam String redirect_uri) throws NoEntryException, JSONException {
+    public String getAccessToken(@RequestParam String code, @RequestParam String redirect_uri,
+    @PathVariable("project-id") String project_id) throws NoEntryException, JSONException, ClassNotFoundException {
         /*
             STEP 3: Get access token from gitlab using authorisation code (see frontend for previous steps)
         */
@@ -284,6 +286,13 @@ public class GitController {
             }
             in.close();
             con.disconnect();
+            // Update DB with access token
+            JSONObject tokenObject = new JSONObject(content.toString());
+            String updateScript = "UPDATE gitdb.Project " +
+                        "SET `gitlabToken` = '"+tokenObject.getString("access_token")+"' " +
+                        "WHERE projectId = "+project_id+";";
+            int changed_rows = dbHandler.executeUpdate(updateScript);
+            assert (changed_rows == 1);
             /*
                 Step 4: Send access token back to front-end
              */
@@ -293,6 +302,47 @@ public class GitController {
 
         throw new NoEntryException();
 
+    }
+
+    @GetMapping(path = "/project/{project-id}/gitlab-info")
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.OK)
+    public String getGitlabStatus(@PathVariable("project-id") String project_id) throws JSONException {
+        JSONObject glStatus = new JSONObject();
+        glStatus.put("has-gitlab", "False");
+        glStatus.put("gitlab-access-token", "None");
+        if( project_id.equals("")) {
+            throw new NoEntryException();
+        }
+        String getScript = "SELECT * FROM gitdb.Repository " +
+            "WHERE id IN (SELECT idRepo FROM gitdb.ProjectRepo " +
+                "WHERE projectId="+project_id+");";
+        HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
+        fields.put("url", FieldType.STRING);
+        fields.put("service", FieldType.STRING);
+        fields.put("id", FieldType.STRING);
+        JSONArray repos = new JSONArray();
+        try {
+            repos = dbHandler.executeQuery(getScript, fields);
+            for(int i = 0; i < repos.length(); i++) {
+                if (repos.getJSONObject(i).getString("service").equals("gitlab")) {
+                    glStatus.put("has-gitlab", "True");
+                    getScript = "SELECT * FROM gitdb.Project " +
+                        "WHERE projectId="+project_id+";";
+                    fields.clear();
+                    fields.put("gitlabToken", FieldType.STRING);
+                    JSONArray projects = dbHandler.executeQuery(getScript, fields);
+                    assert projects.length() == 1;
+                    glStatus.put("gitlab-access-token",
+                        projects.getJSONObject(0).getString("gitlabToken"));
+                    return glStatus.toString();
+                }
+            }
+        }
+        catch (NoEntryException | ClassNotFoundException e) {
+            return glStatus.toString();
+        }
+        return glStatus.toString();
     }
 
 }
