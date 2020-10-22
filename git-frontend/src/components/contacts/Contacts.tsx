@@ -41,7 +41,7 @@ class Contacts extends React.Component <{}, {users: any, projectId: any, project
     this.setState({projectId: this.projectId});
     var emailaddress = params.get('email');
     if (this.projectId != null){
-        var projectmemberslink = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-projectusers?email="+emailaddress+"&projectId="+this.projectId;
+        var projectmemberslink = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-projectusers?requestorEmail="+emailaddress+"&projectId="+this.projectId;
          const projectGETOptions = {
               method: 'GET',
               headers: {'Content-Type': 'application/json'},
