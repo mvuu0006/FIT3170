@@ -1,15 +1,12 @@
 package monash.edu.git;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-
+import com.mysql.cj.jdbc.MysqlDataSource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.sql.*;
+import java.util.HashMap;
 
 public class DatabaseHandler {
     /**
@@ -27,15 +24,20 @@ public class DatabaseHandler {
     }
 
     public JSONArray executeQuery(String sqlScript, HashMap<String, FieldType> fields) throws ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+        // Class.forName("com.mysql.cj.jdbc.Driver");
         Connection conn = null;
         JSONArray rowArray = new JSONArray();
         try {
-            conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
-        } 
+            // conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+            MysqlDataSource dataSource = new MysqlDataSource();
+            dataSource.setUser(databaseUsername);
+            dataSource.setURL(databaseURL);
+            dataSource.setPassword(databasePassword);
+            conn = dataSource.getConnection();
+        }
         catch (SQLException e) {
             throw new Error("Problem", e);
-        } 
+        }
         finally {
             try {
                 if (conn != null) {
@@ -56,7 +58,7 @@ public class DatabaseHandler {
                                     row.put(field, strVal);
                                     break;
                                 default:
-                                break;
+                                    break;
                             }
                         }
                         rowArray.put(row);
@@ -66,7 +68,7 @@ public class DatabaseHandler {
                         throw new NoEntryException();
                     }
                 }
-            } 
+            }
             catch (SQLException | JSONException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -80,22 +82,22 @@ public class DatabaseHandler {
         int returnInt = 0;
         try {
             conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
-        } 
+        }
         catch (SQLException e) {
             throw new Error("Problem", e);
-        } 
+        }
         finally {
-          try {
-            if (conn != null) {
-                Statement stmt = conn.createStatement();
-                int rs = stmt.executeUpdate(sqlScript);
-                conn.close();
-                returnInt = rs;
+            try {
+                if (conn != null) {
+                    Statement stmt = conn.createStatement();
+                    int rs = stmt.executeUpdate(sqlScript);
+                    conn.close();
+                    returnInt = rs;
+                }
             }
-          } 
-          catch (SQLException ex) {
-              System.out.println(ex.getMessage());
-          }
+            catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         return returnInt;
     }

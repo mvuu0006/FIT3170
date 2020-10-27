@@ -5,8 +5,8 @@ plugins {
 }
 
 group = 'monash.edu'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '14'
+version = '0.0.3-SNAPSHOT'
+sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
@@ -19,6 +19,7 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	implementation files('libs/mysql-connector-java-8.0.21.jar')
 }
 
 test {

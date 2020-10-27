@@ -295,4 +295,31 @@ public class GitController {
 
     }
 
+    /*
+    Delete: Repository from project
+    */
+    @CrossOrigin
+    @ResponseBody
+    @DeleteMapping(path = "/project/{project-id}/repository")
+    public String deleteRepo(@PathVariable("project-id") String id, @RequestParam("repo-id") String repo_id,
+                          @RequestParam("token") Optional<String> token) throws NoEntryException, ForbiddenException, ClassNotFoundException, JSONException {
+        if( repo_id.equals("") || id.equals("") ) {
+            throw new NoEntryException();
+        }
+        String deleteScript =  "DELETE FROM gitdb.ProjectRepo " +
+                "WHERE projectId="+id+" AND " +
+                "idRepo='"+repo_id+"';";
+
+        int rowsChanged = dbHandler.executeUpdate(deleteScript);
+        // Throw error if row wasn't changed
+        if (rowsChanged == 0) {
+            throw new ForbiddenException();
+        }
+        else {
+            JSONObject returnObject = new JSONObject();
+            returnObject.put("repo-id", repo_id);
+            return returnObject.toString();
+        }
+    }
+
 }

@@ -1,3 +1,7 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "C:/Program Files (x86)/MySQL/Connector J 8.0/mysql-connector-java-8.0.21.jar"
+    ]
 }
