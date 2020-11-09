@@ -13,6 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.*;
+import java.util.HashMap;
+
 public class DatabaseHandler {
     /**
      * This class is designed to clean up the controller(s) by abstracting the code into a separate class
@@ -39,10 +42,10 @@ public class DatabaseHandler {
             dataSource.setURL(databaseURL);
             dataSource.setPassword(databasePassword);
             conn = dataSource.getConnection();
-        } 
+        }
         catch (SQLException e) {
             throw new Error("Problem", e);
-        } 
+        }
         finally {
             try {
                 if (conn != null) {
@@ -63,7 +66,7 @@ public class DatabaseHandler {
                                     row.put(field, strVal);
                                     break;
                                 default:
-                                break;
+                                    break;
                             }
                         }
                         rowArray.put(row);
@@ -73,7 +76,7 @@ public class DatabaseHandler {
                         throw new NoEntryException();
                     }
                 }
-            } 
+            }
             catch (SQLException | JSONException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -87,22 +90,22 @@ public class DatabaseHandler {
         int returnInt = 0;
         try {
             conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
-        } 
+        }
         catch (SQLException e) {
             throw new Error("Problem", e);
-        } 
+        }
         finally {
-          try {
-            if (conn != null) {
-                Statement stmt = conn.createStatement();
-                int rs = stmt.executeUpdate(sqlScript);
-                conn.close();
-                returnInt = rs;
+            try {
+                if (conn != null) {
+                    Statement stmt = conn.createStatement();
+                    int rs = stmt.executeUpdate(sqlScript);
+                    conn.close();
+                    returnInt = rs;
+                }
             }
-          } 
-          catch (SQLException ex) {
-              System.out.println(ex.getMessage());
-          }
+            catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         return returnInt;
     }
