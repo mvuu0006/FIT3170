@@ -37,7 +37,7 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
     }
 
     getChartURL(id) : string {
-        return "http://spmd-git-frontend.s3-website-ap-southeast-2.amazonaws.com/?project-id="+this.state.project_id+"&git-id="+id;
+        return "http://spmd-git-frontend.s3-website-ap-southeast-2.amazonaws.com/git?project-id="+this.state.project_id+"&git-id="+id;
     }
 
     async componentDidMount() {

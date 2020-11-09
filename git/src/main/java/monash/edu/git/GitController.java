@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +17,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
 @RestController
 @RequestMapping("/git")
@@ -29,39 +37,29 @@ public class GitController {
     private GitHubInterface ghInterface = new GitHubInterface();
     private GitLabInterface glInterface = new GitLabInterface();
 
-
     /*
      PUT: New project into database
      */
     @PutMapping(path = "/project")
     @ResponseStatus(code = HttpStatus.CREATED)
     @ResponseBody
-    public void putProject(@RequestParam("project-id") String id,
-        @RequestParam("email") String email, @RequestParam("user-type") String user_type) throws ForbiddenException, JSONException, ClassNotFoundException {
+    public void putProject(@RequestParam("project-id") String project_id,
+        @RequestParam("id_token") String id_token) throws ForbiddenException, JSONException, ClassNotFoundException, IOException {
         // Check that query params arent empty
-        if( id.equals("") || email.equals("") || user_type.equals("")) {
+        if( project_id.equals("")) {
             throw new ForbiddenException();
         }
+        String email = checkAccess(project_id, id_token, false);
         // Add project to database
-        String addScript = "INSERT INTO gitdb.Project(projectId) VALUES ("+id+")";
+        String addScript = "INSERT INTO gitdb.Project(projectId) VALUES ("+project_id+")";
         int rowsChanged = dbHandler.executeUpdate(addScript);
         // Throw error if row wasn't added
         if (rowsChanged == 0) {
             throw new ForbiddenException();
         }
         // Connect email to project
-        switch (user_type){
-            case "student":
-                addScript = "INSERT INTO gitdb.StudentProject(emailStudent, projectId) VALUES('"+
-                    email+"', "+id+")";
-                break;
-            case "teacher":
-                addScript = "INSERT INTO gitdb.TeacherProject(idTeacher, projectId) VALUES('"+
-                    email+"', "+id+")";
-                break;
-            default:
-            throw new ForbiddenException();
-        }
+        addScript = "INSERT INTO gitdb.StudentProject(emailStudent, projectId) VALUES('"+
+            email+"', "+project_id+")";
         rowsChanged = dbHandler.executeUpdate(addScript);
         // Throw error if row wasn't added
         if (rowsChanged == 0) {
@@ -75,15 +73,16 @@ public class GitController {
      */
     @GetMapping(path = "/project/{project-id}")
     @ResponseBody
-    public String getProjectRepos(@PathVariable("project-id") String id,
-    @RequestParam("email") Optional<String> email, @RequestParam("user-type") Optional<String> user_type,
+    public String getProjectRepos(@PathVariable("project-id") String project_id,
+    @RequestParam("id_token") String id_token,
     @RequestParam Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
-        if( id.equals("")) {
+        checkAccess(project_id, id_token, true);
+        if( project_id.equals("")) {
             throw new NoEntryException();
         }
         String getScript = "SELECT * FROM gitdb.Repository " +
             "WHERE id IN (SELECT idRepo FROM gitdb.ProjectRepo " +
-                "WHERE projectId="+id+");";
+                "WHERE projectId="+project_id+");";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("url", FieldType.STRING);
         fields.put("service", FieldType.STRING);
@@ -120,15 +119,18 @@ public class GitController {
     @ResponseBody
     @PostMapping(path = "/project/{project-id}/repository")
     public String putRepo(@PathVariable("project-id") String id,
-        @RequestParam("service") String service, @RequestParam("url") String url, @RequestParam("token") Optional<String> token) throws NoEntryException, ForbiddenException, JSONException, ClassNotFoundException, IOException {
+        @RequestParam("service") String service, @RequestParam("url") String url, @RequestParam("token") Optional<String> token, @RequestParam("id_token") String id_token) throws NoEntryException, ForbiddenException, JSONException, ClassNotFoundException, IOException {
         if( url.equals("")  || service.equals("") || id.equals("") ) {
             throw new NoEntryException();
         }
+        checkAccess(id, id_token, true);
         String repo_id = null;
+        String repo_name = null;
         switch (service) {
             case "gitlab":
                 if (token.isPresent()){
                     repo_id = glInterface.getIdFromURL(url, token.get());
+                    repo_name = glInterface.getRepoInfo(repo_id, token.get()).getString("name");
                 }
                 else {
                     throw new ForbiddenException();
@@ -136,6 +138,7 @@ public class GitController {
                 break;
             case "github":
                 repo_id = ghInterface.getIdFromURL(url);
+                //repo_info = ghInterface.getRepoInfo(url);
                 break;
             default:
         }
@@ -156,6 +159,7 @@ public class GitController {
         returnObject.put("repo-id", repo_id);
         returnObject.put("repo-url", url);
         returnObject.put("repo-service", service);
+        returnObject.put("repo-name", repo_name);
         return returnObject.toString();
     }
 
@@ -167,7 +171,9 @@ public class GitController {
     @ResponseBody
     public String getRepoContribution(@PathVariable("project-id") String id, @RequestParam("email") String email,
         @RequestParam("repo-id") String repo_id,
-        @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        @RequestParam("token") Optional<String> token,
+        @RequestParam("id_token") String id_token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        checkAccess(id, id_token, true);
         if( id.equals("")  || repo_id.equals("") || email.equals("")) {
             throw new NoEntryException();
         }
@@ -209,12 +215,14 @@ public class GitController {
      */
     @GetMapping(path = "/project/{project-id}/repository/commits")
     @ResponseBody
-    public String getRepoCommits(@PathVariable("project-id") String project_id, @RequestParam("email") String email,
+    public String getRepoCommits(@PathVariable("project-id") String project_id,
         @RequestParam("repo-id") String repo_id,
-        @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
-        if( project_id.equals("")  || repo_id.equals("") || email.equals("")) {
+        @RequestParam("token") Optional<String> token,
+        @RequestParam("id_token") String id_token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        if( project_id.equals("")  || repo_id.equals("")) {
             throw new NoEntryException();
         }
+        String email = checkAccess(project_id, id_token, true);
         // Database code: 404 is returned if email does not have link to project id
         String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
                                "WHERE projectId="+project_id+" AND EXISTS( " +
@@ -258,7 +266,7 @@ public class GitController {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.OK)
     public String getAccessToken(@RequestParam String code, @RequestParam String redirect_uri,
-    @PathVariable("project-id") String project_id) throws NoEntryException, JSONException, ClassNotFoundException {
+    @PathVariable("project-id") String project_id, @RequestParam("id_token") String id_token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
         /*
             STEP 3: Get access token from gitlab using authorisation code (see frontend for previous steps)
         */
@@ -270,6 +278,8 @@ public class GitController {
                 "&redirect_uri="+redirect_uri;
 
         JSONArray jsonArray = new JSONArray();
+
+        checkAccess(project_id, id_token, true);
 
         try {
             URL url = new URL(getAccessCodeURL);
@@ -345,4 +355,60 @@ public class GitController {
         return glStatus.toString();
     }
 
+
+    private String authenticateGoogleProfile(String id_token, boolean is_put) {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+        .setAudience(Collections.singletonList("12178522373-eiukpdtqbjg8cmj0no3tjbmisl3qres2.apps.googleusercontent.com")).build();
+
+        try{
+            GoogleIdToken idToken = verifier.verify(id_token);
+            if (idToken != null) {
+                Payload payload = idToken.getPayload();
+
+                String userId = payload.getSubject();
+                // Get profile information from payload
+                String email = payload.getEmail();
+                boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+                String name = (String) payload.get("name");
+                String pictureUrl = (String) payload.get("picture");
+                String locale = (String) payload.get("locale");
+                String familyName = (String) payload.get("family_name");
+                String givenName = (String) payload.get("given_name");
+                return email;
+            }
+            else {
+                System.out.println("Invalid ID token.");
+            }
+        }
+        catch (IOException | GeneralSecurityException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String checkAccess(String project_id, String id_token, boolean is_get) throws ForbiddenException, ClassNotFoundException, JSONException, IOException {
+        String auth_email;
+        // Get email from google api
+        auth_email = authenticateGoogleProfile(id_token, is_get);
+        if(auth_email == null) {
+            throw new UnauthorisedException();
+        }
+        // Check if email is attached to the project
+        GetJSONReader jsonReader= new GetJSONReader();
+        String url = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-user?email="+auth_email;
+        System.out.println(url);
+        JSONObject json = jsonReader.readJsonFromUrl(url);
+        System.out.println(json.toString());
+        JSONArray projects = json.getJSONObject("entry").getJSONArray("projects");
+        for (int i = 0; i < projects.length(); i++) {
+            JSONObject project = projects.getJSONObject(i);
+            if (project.getString("projectId").equals(project_id)) {
+                return auth_email;
+            }
+        }
+        if (!is_get) {
+            return auth_email;
+        }
+        throw new ForbiddenException();
+    }
 }

@@ -12,6 +12,9 @@ const GoogleLoginWrapper: FunctionComponent<{page: any}> = ({page}) => {
     if (id_token !== undefined){
         window.sessionStorage.setItem('google_id_token', id_token);
     }
+    if (emailAddress !== undefined){
+        window.sessionStorage.setItem('google_email', emailAddress);
+    }
     if (page !== undefined){
         switch (page) {
             case "git":

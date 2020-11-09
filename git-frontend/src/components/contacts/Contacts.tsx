@@ -2,7 +2,7 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import ContactComponents from './ContactComponents';
 
-class Contacts extends React.Component <{email: any}, {users: any, projectId: any, projectName: any}>{
+class Contacts extends React.Component <{email: any}, {users: any, projectId: any, projectName: any, email: any}>{
   public projectId;
   public emailaddress;
   public projectName;
@@ -10,7 +10,7 @@ class Contacts extends React.Component <{email: any}, {users: any, projectId: an
 
   constructor(props) {
     super(props);
-    this.state = {users: null, projectId: null, projectName: null};
+    this.state = {users: null, projectId: null, projectName: null, email: window.sessionStorage.getItem('google_email')};
     this.projectName = "";
     console.log(props.email);
   }
@@ -39,7 +39,7 @@ class Contacts extends React.Component <{email: any}, {users: any, projectId: an
     // Current test params are project=2&email=testemail@gmail.com
     this.projectId = params.get('project-id');
     this.setState({projectId: this.projectId});
-    var emailaddress = this.props.email;
+    var emailaddress = this.state.email;
     if (this.projectId != null){
         var projectmemberslink = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-projectusers?requestorEmail="+emailaddress+"&projectId="+this.projectId;
          const projectGETOptions = {
