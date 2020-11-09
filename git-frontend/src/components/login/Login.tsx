@@ -11,13 +11,18 @@ const Login: Page = ({ integration, state, dispatch }) => {
   const { signIn, googleUser, isInitialized, isSignedIn } = useGoogleAuth()
   const emailAddress = googleUser?.getBasicProfile()?.getEmail()
 
+  var search = window.location.search;
+  var params = new URLSearchParams(search);
+
+  var redirect = "/git?" + params.toString();
+
   return (
     <div className={styles.Login}>
       {!isInitialized ? (
         <Loading iconColor={"white"} />
       ) : isSignedIn ? (
         emailAddress ? (
-          <Redirect to="/git" />
+          <Redirect to={redirect} />
         ) : (
           <h1>something went wrong</h1>
         )

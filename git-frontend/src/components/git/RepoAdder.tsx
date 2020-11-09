@@ -52,11 +52,23 @@ const addRepoLogic = async (service, id, project_id) => {
     const response = await promise.json();
     if (promise.status == 200){
         console.log("Repo add successful");
-        postToUserService(response, project_id);
+        console.log(response);
+        await postToUserService(response, project_id);
     }
     else {
         console.log("Repo add unsuccessful");
     }
+
+    var search = window.location.search;
+    var the_params = new URLSearchParams(search);
+
+    let refresh_after_add = "http://spmd-git-frontend.s3-website-ap-southeast-2.amazonaws.com/git?"
+        the_params.forEach(function(value, key) {
+            if (key !== "git-to-add" && key !== "code") {
+                refresh_after_add += "&" + key + "=" + value;
+            }
+        })
+    document.location.href = refresh_after_add;
 }
 
 const redirectToGitLab = (gitlab_url, project_id) => {
@@ -92,8 +104,8 @@ const postToUserService = async (repo_info, project_id) => {
             projectId: project_id
         })
     }
+    console.log(requestOptions);
     let promise = await fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/save-git", requestOptions);
-    let response = await promise.json();
     if (promise.ok) {
         console.log("successfully sent id of new repo to user-service");
     }
@@ -118,7 +130,7 @@ const getAuthorisationCode = async (code, uri, project_id) => {
     // "&redirect_uri="+encodeURIComponent(redirect_uri), requestOptions)
     let url = "http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+project_id+"/gitlab-access-code?code=" + code +
     "&redirect_uri="+encodeURIComponent(redirect_uri);
-    let google_token = idToken;
+    let google_token = window.sessionStorage.getItem('google_id_token');
     console.log(idToken);
     if (google_token !== null) {
         url += "&id_token="+google_token;

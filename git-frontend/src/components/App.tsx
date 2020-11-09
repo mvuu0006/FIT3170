@@ -52,13 +52,5 @@ class App extends React.Component<{window?: any, project_id?: any, git_id?: any,
         
     }
 
-    storeProject(projectInfo) {
-        let gitID = projectInfo["GitId"];
-
-        if (!(gitID in this.projects)) {
-            this.projects[gitID] = projectInfo
-        }
-    }
-
 }
 export default App;

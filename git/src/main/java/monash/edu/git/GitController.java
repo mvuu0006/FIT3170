@@ -95,13 +95,21 @@ public class GitController {
             return repos.toString();
         }
         for (int i = 0; i < repos.length(); i++) {
-            if (repos.getJSONObject(i).getString("service").equals("gitlab") && token.isPresent()) {
-                JSONObject repoInfo = glInterface.getRepoInfo(repos.getJSONObject(i).getString("id"), token.get());
-                repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+            try {
+                if (repos.getJSONObject(i).getString("service").equals("gitlab") && token.isPresent()) {
+                    JSONObject repoInfo = glInterface.getRepoInfo(repos.getJSONObject(i).getString("id"), token.get());
+                    repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+                }
+                else if (repos.getJSONObject(i).getString("service").equals("github")) {
+                    JSONObject repoInfo = ghInterface.getRepoInfo(repos.getJSONObject(i).getString("id"));
+                    repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+                }
             }
-            else if (repos.getJSONObject(i).getString("service").equals("github")) {
-                JSONObject repoInfo = ghInterface.getRepoInfo(repos.getJSONObject(i).getString("id"));
-                repos.getJSONObject(i).put("name", repoInfo.getString("name"));
+            catch (IOException e) {
+                String msg = "An error occured when getting the repo info for " + repos.getJSONObject(i).getString("service") +
+                    ": " + repos.getJSONObject(i).getString("url");
+                System.out.println(msg);
+                System.out.println(e.getMessage());
             }
         }
         if (repos.length() == 0) {
@@ -138,7 +146,7 @@ public class GitController {
                 break;
             case "github":
                 repo_id = ghInterface.getIdFromURL(url);
-                //repo_info = ghInterface.getRepoInfo(url);
+                repo_name = ghInterface.getRepoInfo(repo_id).getString("name");
                 break;
             default:
         }
@@ -179,10 +187,7 @@ public class GitController {
         }
         // Database code: 404 is returned if email does not have link to project id
         String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
-                               "WHERE projectId="+id+" AND EXISTS( " +
-                                    "SELECT * FROM gitdb.StudentProject " +
-                                        "WHERE emailStudent='"+email+"' AND projectId="+id+" " +
-                                ") AND idRepo='"+repo_id+"';";
+                               "WHERE projectId="+id+" AND idRepo='"+repo_id+"';";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("idRepo", FieldType.STRING);
         fields.put("serviceRepo", FieldType.STRING);
@@ -225,10 +230,7 @@ public class GitController {
         String email = checkAccess(project_id, id_token, true);
         // Database code: 404 is returned if email does not have link to project id
         String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
-                               "WHERE projectId="+project_id+" AND EXISTS( " +
-                                    "SELECT * FROM gitdb.StudentProject " +
-                                        "WHERE emailStudent='"+email+"' AND projectId="+project_id+" " +
-                                ") AND idRepo='"+repo_id+"';";
+                               "WHERE projectId="+project_id+" AND idRepo='"+repo_id+"';";
         HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
         fields.put("idRepo", FieldType.STRING);
         fields.put("serviceRepo", FieldType.STRING);
@@ -240,22 +242,28 @@ public class GitController {
         String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
         // Get Contributors
         JSONArray contributors = new JSONArray();
-        switch (service) {
-            case "github":
-                contributors = ghInterface.getRepoCommits(repo_id);
-                break;
-            case "gitlab":
-                if (token.isPresent()){
-                    contributors = glInterface.getRepoCommits(repo_id, token.get());
-                }
-                else {
-                    throw new ForbiddenException();
-                }
-                break;
-            default:
-                break;
+        try{
+            switch (service) {
+                case "github":
+                    contributors = ghInterface.getRepoCommits(repo_id);
+                    break;
+                case "gitlab":
+                    if (token.isPresent()){
+                        contributors = glInterface.getRepoCommits(repo_id, token.get());
+                    }
+                    else {
+                        throw new ForbiddenException();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return(contributors.toString());
         }
-        return(contributors.toString());
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw new NoEntryException();
+        }
     }
 
 
@@ -396,9 +404,7 @@ public class GitController {
         // Check if email is attached to the project
         GetJSONReader jsonReader= new GetJSONReader();
         String url = "http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/get-user?email="+auth_email;
-        System.out.println(url);
         JSONObject json = jsonReader.readJsonFromUrl(url);
-        System.out.println(json.toString());
         JSONArray projects = json.getJSONObject("entry").getJSONArray("projects");
         for (int i = 0; i < projects.length(); i++) {
             JSONObject project = projects.getJSONObject(i);
