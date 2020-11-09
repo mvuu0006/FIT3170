@@ -104,7 +104,7 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                emailAddress:"test123@gmail.com",
+                emailAddress: window.sessionStorage.getItem('google_email'),
                 gitId: repo_id.toString(),
                 projectId: this.state.project_id.toString()
             })
