@@ -3,6 +3,7 @@ import React from "react";
 import { useGoogleAuth } from "./google/GoogleAuthProvider"
 import App from "./App"
 import Contacts from "./contacts/Contacts";
+import UsefulResources from "./UsefulSafeResources";
 
 
 const GoogleLoginWrapper: FunctionComponent<{page: any}> = ({page}) => {
@@ -25,6 +26,10 @@ const GoogleLoginWrapper: FunctionComponent<{page: any}> = ({page}) => {
                 return(
                     <Contacts email={emailAddress}/>
                 )
+            case "useful":
+                return(
+                    <UsefulResources />
+                )   
         }
     }
     return(<div></div>)

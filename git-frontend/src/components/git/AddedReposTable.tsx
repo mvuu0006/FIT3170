@@ -74,7 +74,7 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
 
      async removeRepository(repoID) {
         let token = window.sessionStorage.getItem('gl-access-token');
-        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository?";
+        let url = "http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository?";
         let params = "repo-id="+repoID;
         if (token !== null) {
             params += "&token="+token;
@@ -89,6 +89,8 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
             let res = await promise.json();
             await this.postToUserService(res);
             await this.fetchData();
+
+            document.location.reload();
         }
         else {
             console.log("Repo delete unsuccessful");
@@ -111,7 +113,6 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
         }
         console.log(requestOptions.body);
         let promise = await fetch("http://spmdhomepage-env.eba-upzkmcvz.ap-southeast-2.elasticbeanstalk.com/user-project-service/remove-git", requestOptions);
-        let response = await promise.json();
         if (promise.ok) {
             console.log("successfully removed id of new repo to user-service");
         }

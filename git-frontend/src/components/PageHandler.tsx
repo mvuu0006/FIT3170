@@ -29,6 +29,9 @@ const PageHandler: FunctionComponent<AppProps> = ({integration}) => {
                 <Route path="/git">
                     <GoogleLoginWrapper page="git" />
                 </Route>
+                <Route path="/useful-websites-frontend">
+                    <GoogleLoginWrapper page="useful" />
+                 </Route>
                 <Route path="/">
                     <Login integration={integration} state={state} dispatch={dispatch} />
                 </Route>

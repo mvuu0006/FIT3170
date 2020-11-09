@@ -18,7 +18,7 @@ class ContactComponents extends React.Component<{users: any, projectId: any, pro
                 let arrayOfPeople = this.props.users.users.map((repo) =>
                 (<tr key={repo.emailAddress}>
                     <td>{repo.firstName} {repo.lastName}</td>
-                    <td><a href={"mailto:"+ repo.emailAddress+"?Subject="+ this.props.projectName + ", " + this.props.projectId} target="_top">
+                    <td><a href={"mailto:"+ repo.emailAddress+"?Subject="+ this.props.users.projects.projectUnitCode+ ": " + this.props.projectName + ", " + this.props.projectId} target="_top">
                                 {repo.emailAddress}</a></td>
                     <td>{repo.userGroup}</td>
                 </tr>));

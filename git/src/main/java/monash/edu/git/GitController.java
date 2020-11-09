@@ -19,7 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -264,6 +266,105 @@ public class GitController {
             System.out.println(e.getMessage());
             throw new NoEntryException();
         }
+    }
+
+
+    /*
+     GET: Repository Commits (commit info)
+     */
+    @GetMapping(path = "/project/{project-id}/repository/last-changed-email")
+    @ResponseBody
+    public String getLastChangedEmail(@PathVariable("project-id") String project_id, @RequestParam("emails") String email,
+                                 @RequestParam("git-ids") String repo_id,
+                                 @RequestParam("token") Optional<String> token) throws NoEntryException, JSONException, ClassNotFoundException, IOException {
+        if( project_id.equals("")  || repo_id.equals("") || email.equals("")) {
+            throw new NoEntryException();
+        }
+        // Seperating project id's and emails into arrays
+        var singleid = "";
+        List<String> git_array = new ArrayList<String>();
+        for (int i=0; i<repo_id.length();i++){
+            if (repo_id.charAt(i) == ','){
+                git_array.add(singleid);
+                singleid = "";
+            }
+            else if (i == repo_id.length()-1){
+                git_array.add(singleid+repo_id.charAt(i));
+                singleid = "";
+            }
+            else{
+                singleid += repo_id.charAt(i);
+            }
+        }
+        List<String> email_array = new ArrayList<String>();
+        for (int i=0; i<email.length();i++){
+            if (email.charAt(i) == ','){
+                email_array.add(singleid);
+                singleid = "";
+            }
+            else if (i == email.length()-1){
+                email_array.add(singleid+email.charAt(i));
+                singleid = "";
+            }
+            else{
+                singleid += email.charAt(i);
+            }
+        }
+        // Database code: 404 is returned if email does not have link to project id
+        String findScript =  "SELECT * FROM gitdb.ProjectRepo " +
+                "WHERE projectId="+project_id+" AND EXISTS( " +
+                "SELECT * FROM gitdb.StudentProject " +
+                "WHERE emailStudent='"+email_array.get(0)+"' AND projectId="+project_id+" " +
+                ") AND idRepo='"+git_array.get(0)+"';";
+        HashMap<String, FieldType> fields = new HashMap<String, FieldType>();
+        fields.put("idRepo", FieldType.STRING);
+        fields.put("serviceRepo", FieldType.STRING);
+        fields.put("projectId", FieldType.INT);
+        JSONArray rowMap = dbHandler.executeQuery(findScript, fields);
+        if (rowMap.length() > 1){
+            throw new ForbiddenException();
+        }
+        String service = rowMap.getJSONObject(0).getString("serviceRepo").toLowerCase();
+
+        // Initialising final array
+        JSONArray finalchanged = new JSONArray();
+        for (int i=0; i<email_array.size(); i++){
+            finalchanged.put(new JSONObject().put("email",email_array.get(i)));
+        }
+
+        // Looping through the git id's to get the last changed contributors
+        for (int i=0; i<git_array.size(); i++) {
+            JSONObject lastchanged = new JSONObject();
+            switch (service) {
+                case "github":
+                    lastchanged = ghInterface.getLastContributions(git_array.get(i));
+                    break;
+                case "gitlab":
+                    if (token.isPresent()) {
+                        lastchanged = glInterface.getLastContributions(git_array.get(i), token.get());
+                    } else {
+                        throw new ForbiddenException();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            // comparing the contributors to the final array and updating it if needed.
+            for (int j=0; j< finalchanged.length(); j++){
+                var currentemail = finalchanged.getJSONObject(j).getString("email");
+                if (lastchanged.has(currentemail)){
+                    if (finalchanged.getJSONObject(j).has("lastModified")){
+                        if (finalchanged.getJSONObject(j).getString("lastModified").compareTo(lastchanged.getString(currentemail))< 0){
+                            finalchanged.getJSONObject(j).put("lastModified", lastchanged.getString(currentemail));
+                        }
+                    }
+                    else {
+                        finalchanged.getJSONObject(j).put("lastModified", lastchanged.getString(currentemail));
+                    }
+                }
+            }
+        }
+        return(finalchanged.toString());
     }
 
 
