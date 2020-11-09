@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import PageHandler from './components/PageHandler';
+import GoogleAuthProvider from './components/google/GoogleAuthProvider';
+import Integration from './components/Integration';
 //import * as serviceWorker from './serviceWorker';
 
 
@@ -16,7 +18,9 @@ ReactDOM.render(
     // </Router>,
     // document.getElementById('root')
    <React.StrictMode>
-    <PageHandler />
+      <GoogleAuthProvider>
+      <PageHandler integration={Integration} />
+      </GoogleAuthProvider>
    </React.StrictMode>,
   document.getElementById('root')
 );

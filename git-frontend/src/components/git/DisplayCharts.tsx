@@ -27,7 +27,7 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
     async componentDidMount() {
         // Get gitlab token from sessionStorage
         let gitlab_token = sessionStorage.getItem("spmd-git-labtoken");
-        let token_promise = await fetch("http://localhost:5001/git/project/"+this.state.project_id+"/gitlab-info");
+        let token_promise = await fetch("http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/gitlab-info");
         let token_from_http = await token_promise.json();
         if (token_from_http["has-gitlab"] === "True" && token_from_http["gitlab-access-token"] !== "None") {
             gitlab_token = token_from_http["gitlab-access-token"];
@@ -35,9 +35,13 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
         }
         // Get commits information from backend
         //let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository/commits?";
-        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/repository/commits?";
-        let params = "repo-id="+this.state.git_id+"&token="+gitlab_token+"&email="+"hbak0001@student.monash.edu"; // email is hardcoded for testing purposes
+        let url = "http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/repository/commits?";
+        let params = "repo-id="+this.state.git_id+"&token="+gitlab_token;
         let uri = url + params;
+        let google_token = window.sessionStorage.getItem('google_id_token');
+        if (google_token !== null) {
+            uri += "&id_token="+google_token;
+        }
         const requestOptions = {
             method: 'GET'
         }
@@ -53,9 +57,13 @@ class DisplayCharts extends Component<{project_id: any, git_id: any}, {project_i
         let gitlab_token = sessionStorage.getItem("spmd-git-labtoken");
         // Get commits information from backend
         // let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/?";
-        let url = "http://localhost:5001/git/project/"+this.state.project_id+"/?";
+        let url = "http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/?";
         let params = "token="+gitlab_token;
         let uri = url + params;
+        let google_token = window.sessionStorage.getItem('google_id_token');
+        if (google_token !== null) {
+            uri += "&id_token="+google_token;
+        }
         const requestOptions = {
             method: 'GET'
         }

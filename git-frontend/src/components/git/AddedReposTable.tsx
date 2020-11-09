@@ -45,9 +45,9 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
             method: 'GET'
         }
         //let url = "http://spmdgitbackend-env-1.eba-knaa5ymu.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"?";+
-        let url = "http://localhost:5001/git/project/"+this.state.project_id+"?";
+        let url = "http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"?";
         let token = window.sessionStorage.getItem('gl-access-token');
-        let token_promise = await fetch("http://localhost:5001/git/project/"+this.state.project_id+"/gitlab-info");
+        let token_promise = await fetch("http://spmdgitbackend-env.eba-dyda2zrz.ap-southeast-2.elasticbeanstalk.com/git/project/"+this.state.project_id+"/gitlab-info");
         let token_from_http = await token_promise.json();
         if (token_from_http["has-gitlab"] === "True" && token_from_http["gitlab-access-token"] !== "None") {
             token = token_from_http["gitlab-access-token"];
@@ -55,6 +55,10 @@ class AddedReposTable extends React.Component<{project_id?: any}, {project_id?: 
         }
         if (token !== null) {
             url += "token="+token;
+        }
+        let google_token = window.sessionStorage.getItem('google_id_token');
+        if (google_token !== null) {
+            url += "&id_token="+google_token;
         }
         let response = await fetch(url, requestOptions);
         let content = await response.json();
